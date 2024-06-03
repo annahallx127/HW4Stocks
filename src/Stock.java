@@ -38,12 +38,12 @@ public interface Stock {
   public double getMovingAverage(int days, String date);
 
   /**
-   * Finds the X-day crossovers for the stock over the given days. and a given date range.
+   * Finds the X-day crossovers for the stock over the given date range.
    * If the number of days is greater than the number of days the stock has been tracked,
    * the method will return the crossovers since the stock has been tracked.
    *
    * @param days the number of days to look back to find the crossovers.
-   *             Must be greater than 0..
+   *             Must be greater than 0.
    */
   public String[] getCrossovers(String dateStart, String dateEnd, int days);
 }
