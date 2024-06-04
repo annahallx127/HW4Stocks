@@ -1,3 +1,5 @@
+package model;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -9,8 +11,12 @@ public class AlphaVantageDemo {
     //Please get your own free API key here: https://www.alphavantage.co/
     //Please look at documentation here: https://www.alphavantage.co/documentation/
     String apiKey = "W0M1JOKC82EZEQA8";
+    // extra API Key: OTYUTQ7V96CNWN4C
     String stockSymbol = "GOOG"; //ticker symbol for Google
     URL url = null;
+    // TODO: API calls should only be made after the user requests a date that is not cached,
+    //  or if the user requests a date range that is not cached. Then, the data should be cached
+    //  again if the  date is present, or throw an exception if the date is not present.
 
     try {
       /*
@@ -52,7 +58,7 @@ public class AlphaVantageDemo {
       }
     }
     catch (IOException e) {
-      throw new IllegalArgumentException("No price data found for "+stockSymbol);
+      throw new IllegalArgumentException("No price data found for " + stockSymbol);
     }
     System.out.println("Return value: ");
     System.out.println(output.toString());
