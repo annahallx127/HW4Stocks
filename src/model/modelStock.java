@@ -1,8 +1,7 @@
 package model;
 
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -26,13 +25,13 @@ public class modelStock implements Stock {
     }
 
     try {
-      Date start = DateFormat.getDateInstance().parse(dateStart);
-      Date end = DateFormat.getDateInstance().parse(dateEnd);
+      LocalDate start = LocalDate.parse(dateStart);
+      LocalDate end = LocalDate.parse(dateEnd);
 
-      if (start.after(end)) {
+      if (start.isAfter(end)) {
         throw new IllegalArgumentException("start date must be before end date.");
       }
-    } catch (ParseException e) {
+    } catch (DateTimeParseException e) {
       throw new IllegalArgumentException("dates must be in a valid format.");
     }
 
