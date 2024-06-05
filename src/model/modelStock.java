@@ -1,11 +1,16 @@
 package model;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class modelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
+
 
   protected modelStock(String symbol, String apiInfo) {
     this.symbol = symbol;
@@ -18,6 +23,37 @@ public class modelStock implements Stock {
   }
 
   public double gainedValue(String dateStart, String dateEnd) {
+    if (dateStart == null || dateEnd == null) {
+      throw new IllegalArgumentException("dates cannot be null.");
+    }
+
+    try {
+      Date start = DateFormat.getDateInstance().parse(dateStart);
+      Date end = DateFormat.getDateInstance().parse(dateEnd);
+
+      if (start.after(end)) {
+        throw new IllegalArgumentException("start date must be before end date.");
+      }
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("dates must be in a valid format.");
+    }
+
+    String foundStart = null;
+    String foundEnd = null;
+    for (String s : apiInfo) {
+      if (s.contains(dateStart)) {
+        foundStart = s;
+      }
+      if (s.contains(dateEnd)) {
+        foundEnd = s;
+      }
+    }
+
+    // check if the given string is a weekend. if it is, go back
+    if (foundStart == null || foundEnd == null) {
+      throw new IllegalArgumentException("did not find the start date or end date of the stock");
+    }
+
     return 0.0;
   }
 

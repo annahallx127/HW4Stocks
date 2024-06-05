@@ -9,10 +9,10 @@ public interface Stock {
    * Determines if the stock gained or lost value over the given day,
    * and returns the change in value.
    * @param dateStart the date to start looking back from.
-   *                  Must be a valid date in the format "MM/DD/YYYY".
+   *                  Must be a valid date in the format "YYYY/MM/DD".
    *                  Must be before dateEnd.
    * @param dateEnd the date to end looking back from.
-   *                Must be a valid date in the format "MM/DD/YYYY".
+   *                Must be a valid date in the format "YYYY/MM/DD".
    *                Must be after dateStart.
    * @return the change in the stock's value in USD.
    */
@@ -24,10 +24,10 @@ public interface Stock {
    * the method will return the total change in value since the stock has been tracked.
    *
    * @param dateStart the date to start looking back from.
-   *                  Must be a valid date in the format "MM/DD/YYYY".
+   *                  Must be a valid date in the format "YYYY/MM/DD".
    *                  Must be before dateEnd.
    * @param dateEnd the date to end looking back from.
-   *                Must be a valid date in the format "MM/DD/YYYY".
+   *                Must be a valid date in the format "YYYY/MM/DD".
    *                Must be after dateStart.
    * @return the total change in the stock's value in USD.
    * @throws IllegalArgumentException if the number of days is less than or equal to 0.
@@ -42,9 +42,9 @@ public interface Stock {
    * @param days the number of days to look back to find the average value.
    *             Must be greater than 0.
    * @param date the date to start looking back from.
-   *             Must be a valid date in the format "MM/DD/YYYY".
+   *             Must be a valid date in the format "YYYY/MM/DD".
    * @return the average value of the stock in USD.
-   * @throws IllegalArgumentException if the date is not a valid date in the format "MM/DD/YYYY",
+   * @throws IllegalArgumentException if the date is not a valid date in the format "YYYY/MM/DD",
    *                                  or if the number of days is less than or equal to 0.
    */
   public double getMovingAverage(int days, String date);
