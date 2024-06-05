@@ -141,6 +141,4 @@ public class modelStock implements Stock {
 
     return "";
   }
-
-
 }

@@ -1,5 +1,6 @@
 package model;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -35,7 +36,8 @@ public class ModelImpl implements Model {
 
   @Override
   public StringBuilder apiCall(String symbol) {
-    String apiKey = "W0M1JOKC82EZEQA8";
+
+    final String apiKey = "W0M1JOKC82EZEQA8";
     // extra API Key: OTYUTQ7V96CNWN4C
     URL url = null;
 
@@ -81,6 +83,16 @@ public class ModelImpl implements Model {
       }
     } catch (IOException e) {
       throw new IllegalArgumentException("No price data found for " + symbol);
+    }
+
+    // API call successful, cache the data in the data package
+    try {
+      // TODO: check if the file exists before overwrite
+      // Files.copy()
+      FileWriter writer = new FileWriter(symbol + ".csv");
+      writer.append(output);
+    } catch (IOException e) {
+      e.printStackTrace(System.err);
     }
 
     return output;
