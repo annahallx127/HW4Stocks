@@ -11,7 +11,6 @@ public class modelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
 
-
   protected modelStock(String symbol, String apiInfo) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
@@ -41,6 +40,7 @@ public class modelStock implements Stock {
     String foundStart = null;
     String foundEnd = null;
     for (String s : apiInfo) {
+
       if (s.contains(dateStart)) {
         foundStart = s;
       }
