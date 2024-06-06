@@ -9,19 +9,19 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class modelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
 
-  // TODO: useful methods LocalDate.minus and LocalDate.plus for date checking
-  protected modelStock(String symbol) {
+  public modelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
     readFile();
 
     // Remove the header line - "timestamp,open,high,low,close,volume"
+    // for testing - timestamp,open,high,low,close,volume,
+    // Gain over 5 days,5-day moving average,30-day moving average,30-day crossover
     this.apiInfo.remove(0);
   }
 
@@ -68,7 +68,7 @@ public class modelStock implements Stock {
         }
       }
     }
-    
+
     return change;
   }
 
@@ -92,13 +92,11 @@ public class modelStock implements Stock {
         break;
       }
     }
-
     return sum / days;
   }
-  
+
   @Override
   public String getCrossovers(String dateStart, String dateEnd, int days) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     StringBuilder ret = new StringBuilder();
 
     if (days <= 0) {
@@ -141,11 +139,6 @@ public class modelStock implements Stock {
     return ret.toString();
   }
 
-  @Override
-  public String getSymbol() {
-    return symbol;
-  }
-
   // toString prints out stock values on a given date
   @Override
   public String toString(String date) {
@@ -177,19 +170,24 @@ public class modelStock implements Stock {
   }
 
   @Override
+  public String toString() {
+    return this.symbol;
+  }
+
+  @Override
   public boolean isValidDate(String dateStr) {
     if (dateStr == null) {
       return false;
     }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-
-    if (!apiInfo.toString().contains(dateStr)) {
-      throw new IllegalArgumentException("Date must be a valid market day.");
-    }
+    LocalDate date;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     try {
-      LocalDate date = LocalDate.parse(dateStr, formatter);
+      date = LocalDate.parse(dateStr, formatter);
+      if (!apiInfo.toString().contains(date.toString())) {
+        throw new IllegalArgumentException("Date must be a valid market day.");
+      }
       return !date.isAfter(LocalDate.now());
     } catch (DateTimeParseException e) {
       return false;
@@ -201,15 +199,15 @@ public class modelStock implements Stock {
       return false;
     }
 
-    if (!apiInfo.toString().contains(dateStart) || !apiInfo.toString().contains(dateEnd)) {
-      throw new IllegalArgumentException("Dates must be valid market days.");
-    }
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     try {
       LocalDate sDate = LocalDate.parse(dateStart, formatter);
       LocalDate eDate = LocalDate.parse(dateEnd, formatter);
+      if (!apiInfo.toString().contains(sDate.toString())
+              || !apiInfo.toString().contains(eDate.toString())) {
+        throw new IllegalArgumentException("Dates must be valid market days.");
+      }
       return !eDate.isAfter(sDate) && !eDate.isAfter(LocalDate.now());
     } catch (DateTimeParseException e) {
       return false;

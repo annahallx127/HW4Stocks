@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class modelPortfolio implements Portfolio {
-  private String name;
-  private HashMap<Stock, Integer> stocks;
+  private final String name;
+  private final HashMap<Stock, Integer> stocks;
 
   public modelPortfolio(String name) {
     this.name = name;
@@ -14,7 +14,7 @@ public class modelPortfolio implements Portfolio {
 
   @Override
   public Map<Stock, Integer> getStocks() {
-    return stocks;
+    return Map.copyOf(stocks);
   }
 
   @Override
@@ -44,10 +44,12 @@ public class modelPortfolio implements Portfolio {
 
   @Override
   public double valueOfPortfolio(String date) {
+
     double value = 0.0;
     for (Map.Entry<Stock, Integer> s : stocks.entrySet()) {
       // stock price on this date * # of shares
-      // value += s.getKey() * s.getValue();
+      // split to find close price
+      value += Double.parseDouble(s.getKey().toString(date).split("\\R")[5].substring(7)) * s.getValue();
     }
     return value;
   }
@@ -56,8 +58,10 @@ public class modelPortfolio implements Portfolio {
   public String toString() {
     // prints the whole portfolio
     StringBuilder ret = new StringBuilder();
-    for (Stock s : stocks.keySet()) {
-      ret.append(s.toString());
+    for (Map.Entry<Stock,Integer> s : stocks.entrySet()) {
+      // symbol: # shares
+      ret.append(s.getKey().toString() + ": "
+              + getStocks().get(s.getKey()) + " shares" + System.lineSeparator());
     }
     return ret.toString();
   }

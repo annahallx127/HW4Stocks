@@ -20,8 +20,11 @@ public class ModelImpl implements Model {
 
   @Override
   public Stock get(String symbol) throws IllegalArgumentException {
+    // Stored in data, make new stock
+    // if ()
+
+    // in map, get the stock
     if (stocks.get(symbol) != null) {
-      // in map, get the stock
       return stocks.get(symbol);
     }
 
@@ -105,7 +108,7 @@ public class ModelImpl implements Model {
       BufferedWriter bw = getBufferedWriter(symbol);
       byte[] buffer = new byte[1024];
       int read;
-      while ((read = in.read(buffer)) != 1) {
+      while ((read = in.read(buffer)) != -1) {
         String chunk = new String(buffer, 0, read);
         bw.write(chunk);
       }
