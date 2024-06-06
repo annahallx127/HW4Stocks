@@ -1,5 +1,7 @@
 package model;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,18 +26,18 @@ public class ModelImpl implements Model {
     }
     // call api
     // TODO: this won't work, but it's essentially what the implementation will be.
-    return new modelStock(symbol, apiCall(symbol).toString());
+    return new modelStock(symbol);
   }
 
   @Override
   public Portfolio makePortfolio(String name) {
-    Portfolio p = new modelPortfolio(name);
+    Portfolio newPortfolio = new modelPortfolio(name);
 
-    return p;
+    return newPortfolio;
   }
 
   @Override
-  public StringBuilder apiCall(String symbol) {
+  public void apiCall(String symbol) {
 
     final String apiKey = "W0M1JOKC82EZEQA8";
     // extra API Key: OTYUTQ7V96CNWN4C
@@ -62,39 +64,42 @@ public class ModelImpl implements Model {
               + "no longer works");
     }
 
-    InputStream in = null;
-    StringBuilder output = new StringBuilder();
+    InputStream in;
 
     try {
-      /*
-      Execute this query. This returns an InputStream object.
-      In the csv format, it returns several lines, each line being separated
-      by commas. Each line contains the date, price at opening time, highest
-      price for that date, lowest price for that date, price at closing time
-      and the volume of trade (no. of shares bought/sold) on that date.
-
-      This is printed below.
-       */
       in = url.openStream();
-      int b;
-
-      while ((b = in.read()) != -1) {
-        output.append((char) b);
-      }
     } catch (IOException e) {
-      throw new IllegalArgumentException("No price data found for " + symbol);
+      throw new IllegalArgumentException("No results found for stock " + symbol + ".");
     }
 
-    // API call successful, cache the data in the data package
+    //  ----------------API call successful, cache the data in the data packagey
+
+    // Writes 1024 bytes of the API data to the file at a time.
+    // If the buffer is not completely full, the remainder of the file is written.
+    // Technically this could be more efficient by checking if each buffer is equal to the new
+    // buffer and only overwriting buffers that have changed, but the difference is probably
+    // negligible.
     try {
-      // TODO: check if the file exists before overwrite
-      // Files.copy()
-      FileWriter writer = new FileWriter(symbol + ".csv");
-      writer.append(output);
+      BufferedWriter bw = getBufferedWriter(symbol);
+      byte[] buffer = new byte[1024];
+      int read;
+      while ((read = in.read(buffer)) != 1) {
+        String chunk = new String(buffer, 0, read);
+        bw.write(chunk);
+      }
     } catch (IOException e) {
       e.printStackTrace(System.err);
     }
+  }
 
-    return output;
+  private static BufferedWriter getBufferedWriter(String symbol) throws IOException {
+    File file = new File("src/data/" + symbol + ".csv");
+
+    // Delete the current file to overwrite
+    if (file.exists()) {
+      file.delete();
+    }
+
+    return new BufferedWriter(new FileWriter(file));
   }
 }

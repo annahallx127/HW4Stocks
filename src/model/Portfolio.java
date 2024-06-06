@@ -28,7 +28,7 @@ public interface Portfolio {
    *             Must be a valid date in the format "MM/DD/YYYY".
    * @throws IllegalArgumentException if the date is not a valid date in the format "MM/DD/YYYY".
    */
-  double value(String date) throws IllegalArgumentException;
+  double valueOfPortfolio(String date) throws IllegalArgumentException;
 
   /**
    * Prints out the whole portfolio's stocks.

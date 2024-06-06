@@ -88,5 +88,13 @@ public interface Stock {
    *                                 or if the date is not a date the stock has been tracked on.
    */
   public String toString(String date) throws IllegalArgumentException;
-//  public Date date();
+
+  /**
+   * Checks if the date entered by the user is within the scope of the date in the
+   * API.
+   *
+   * @param date the date specified by the user.
+   * @return the validity of the entered date in boolean form.
+   */
+  boolean isValidDate(String date);
 }

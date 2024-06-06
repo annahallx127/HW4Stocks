@@ -25,7 +25,6 @@ public interface Model {
    * Queries the AlphaVantage API to find the information on a given stock. The file returned is
    * cached as a .csv file in the data package.
    * @param symbol the ticker symbol of the stock.
-   * @return the stock information in a StringBuilder.
-   */
-  StringBuilder apiCall(String symbol);
+  */
+  void apiCall(String symbol);
 }

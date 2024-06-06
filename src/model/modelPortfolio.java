@@ -33,7 +33,7 @@ public class modelPortfolio implements Portfolio {
   }
 
   @Override
-  public double value(String date) {
+  public double valueOfPortfolio(String date) {
     double value = 0.0;
     for (Map.Entry<Stock, Integer> s : stocks.entrySet()) {
       // stock price on this date * # of shares

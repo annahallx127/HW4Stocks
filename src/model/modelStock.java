@@ -1,22 +1,50 @@
 package model;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class modelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
 
-  protected modelStock(String symbol, String apiInfo) {
+  protected modelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
+    readFile();
 
-    // Split the .csv file along newlines
-    this.apiInfo.addAll(Arrays.asList(apiInfo.split(System.lineSeparator())));
-    // Remove the header line
+    // Remove the header line - "timestamp,open,high,low,close,volume"
     this.apiInfo.remove(0);
+  }
+
+  private void readFile() {
+    try {
+      BufferedReader br = getBufferedReader();
+      while (br.ready()) {
+        apiInfo.add(br.readLine());
+      }
+    } catch (IOException e) {
+      e.printStackTrace(System.err);
+    }
+  }
+
+  /**
+   * Creates a bufferedReader of 1024 bytes to read the API information file.
+   * The API information file is always in the location "src/data/symbol.csv", where symbol is this
+   * stock's symbol.
+   *
+   * @return A BufferedReader to read the API information file for the stock.
+   * @throws FileNotFoundException if the API information file for the stock is not found.
+   */
+  private BufferedReader getBufferedReader() throws FileNotFoundException {
+    File file = new File("src/data/" + this.symbol + ".csv");
+    return new BufferedReader(new FileReader(file), 1024);
   }
 
   public double gainedValue(String dateStart, String dateEnd) throws IllegalArgumentException {
@@ -140,5 +168,15 @@ public class modelStock implements Stock {
     }
 
     return "";
+  }
+
+  public boolean isValidDate(String dateStr) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    try {
+      LocalDate date = LocalDate.parse(dateStr, formatter);
+      return true;
+    } catch (DateTimeParseException e) {
+      return false;
+    }
   }
 }
