@@ -68,9 +68,11 @@ public class ViewStock implements View {
       return;
     }
 
-    System.out.print("Start Date (YYYY/MM/DD): ");
+    System.out.println("DISCLAIMER: if you have entered a date range where it falls on a weekend, "
+            + "\n the nearest business day forward will be considered");
+    System.out.print("Start Date (YYYY-MM-DD): ");
     String startDate = scanner.nextLine();
-    System.out.print("End Date (YYYY/MM/DD): ");
+    System.out.print("End Date (YYYY-MM-DD): ");
     String endDate = scanner.nextLine();
 
     double gainOrLoss = chosenStock.gainedValue(startDate, endDate);
@@ -87,10 +89,12 @@ public class ViewStock implements View {
       return;
     }
 
+    System.out.println("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
+            + "\nthe nearest business day forward will be considered");
     System.out.print("Enter number of days: ");
     int days = scanner.nextInt();
     scanner.nextLine();
-    System.out.print("Enter date (YYYY/MM/DD): ");
+    System.out.print("Enter date (YYYY-MM-DD): ");
     String date = scanner.nextLine();
 
     if (days <= 0) {
@@ -113,12 +117,15 @@ public class ViewStock implements View {
       return;
     }
 
+    System.out.println("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
+            + "\nthe nearest business day forward will be considered");
     System.out.print("Enter number of days: ");
     int days = scanner.nextInt();
     scanner.nextLine();
-    System.out.print("Enter start date (YYYY/MM/DD): ");
+
+    System.out.print("Enter start date (YYYY-MM-DD): ");
     String startDate = scanner.nextLine();
-    System.out.print("Enter end date (YYYY/MM/DD): ");
+    System.out.print("Enter end date (YYYY-MM-DD): ");
     String endDate = scanner.nextLine();
 
     if (days <= 0) {
@@ -145,7 +152,8 @@ public class ViewStock implements View {
     scanner.nextLine();
     if (quantity > 0) {
       portfolio.add(stock, quantity);
-      System.out.println("You have added " + quantity + " shares of " + ticker + " to your portfolio!");
+      System.out.println("You have added " + quantity + " shares of " + ticker
+              + " to your portfolio!");
     } else {
       System.out.println("Quantity must be greater than 0 and a whole number");
     }
@@ -212,7 +220,9 @@ public class ViewStock implements View {
           portfolio.remove(stockToRemove, numOfShares);
           break;
         case 3:
-          System.out.print("Enter date (YYYY/MM/DD): ");
+          System.out.println("DISCLAIMER: if you have entered a date where it falls on a weekend,"
+                  + "\nthe nearest business day forward will be considered");
+          System.out.print("Enter date (YYYY-MM-DD): ");
           String date = scanner.nextLine();
           double value = portfolio.valueOfPortfolio(date);
           System.out.println("The value of the portfolio on " + date + " is: " + value);
