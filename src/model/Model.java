@@ -24,5 +24,21 @@ public interface Model {
    */
   Portfolio makePortfolio(String name);
 
+  /**
+   * Gets the portfolios in the hashmap with the names of the portfolios and
+   * the collection of stocks within it.
+   *
+   * @return a map of all existing portfolios and its components
+   */
   HashMap<String, Portfolio> getPortfolios();
+
+  /**
+   * Adds a portfolio to the HashMap with its respective components; name and the stocks
+   * under the portfolio name.
+   *
+   * @param name name of the portfolio
+   * @param portfolio a portfolio/collections of the stocks
+   */
+  void addPortfolio(String name, Portfolio portfolio);
+
 }

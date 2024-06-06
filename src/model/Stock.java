@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 /**
  * An interface for a stock.
  * Each stock has a name, a ticker symbol, opening price, closing price, low price, and high price.
@@ -67,11 +69,11 @@ public interface Stock {
    * @param dateEnd   the date to end looking back from.
    *                  Must be a valid date in the format "YYYY/MM/DD".
    *                  Must be after dateStart.
-   * @return the dates of the crossovers in an array in the format "YYYY/MM/DD".
+   * @return the dates of the crossovers in a String.
    * @throws IllegalArgumentException if the date is not a valid date,
    *                                  or if the number of days is less than or equal to 0.
    */
-  public String[] getCrossovers(String dateStart, String dateEnd, int days) throws IllegalArgumentException;
+  public String getCrossovers(String dateStart, String dateEnd, int days) throws IllegalArgumentException;
 
   /**
    * Gets the respective ticker of the stock.

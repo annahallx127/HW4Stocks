@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class modelStock implements Stock {
   private final String symbol;
@@ -48,7 +49,6 @@ public class modelStock implements Stock {
     return new BufferedReader(new FileReader(file), 1024);
   }
 
-  
   @Override
   public double gainedValue(String dateStart, String dateEnd) throws IllegalArgumentException {
     double change = 0.0;
@@ -74,7 +74,7 @@ public class modelStock implements Stock {
 
   @Override
   public double getMovingAverage(int days, String date) throws IllegalArgumentException {
-    double toAdd = 0;
+    double sum = 0;
 
     if (!isValidDate(date)) {
       throw new IllegalArgumentException("Invalid date.");
@@ -87,19 +87,19 @@ public class modelStock implements Stock {
     for (int i = 0; i < apiInfo.size(); i++) {
       if (apiInfo.get(i).contains(date)) {
         for (int j = 1; j <= days; j++) {
-          toAdd += Double.parseDouble(apiInfo.get(i + j).split(",")[4]);
+          sum += Double.parseDouble(apiInfo.get(i + j).split(",")[4]);
         }
         break;
       }
     }
 
-    return toAdd / days;
+    return sum / days;
   }
   
   @Override
-  public String[] getCrossovers(String dateStart, String dateEnd, int days) {
+  public String getCrossovers(String dateStart, String dateEnd, int days) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-    StringBuilder sb = new StringBuilder();
+    StringBuilder ret = new StringBuilder();
 
     if (days <= 0) {
       throw new IllegalArgumentException("The number of days must be greater than 0.");
@@ -109,11 +109,14 @@ public class modelStock implements Stock {
       throw new IllegalArgumentException("Invalid date.");
     }
 
-    // TODO: finish and abstract this
     for (int i = 0; i < apiInfo.size(); i++) {
       if (apiInfo.get(i).contains(dateStart)) {
         for (int j = i; j < apiInfo.size(); j++) {
-          
+          String[] split = apiInfo.get(j).split(",");
+          // if current close price > x day average
+          if (Double.parseDouble(split[4]) > this.getMovingAverage(days, split[0])) {
+            ret.append(split[4]).append(System.lineSeparator());
+          }
           if (apiInfo.get(j).contains(dateEnd)) {
             break;
           }
@@ -135,8 +138,7 @@ public class modelStock implements Stock {
 //        }
 //      }
 //    }
-
-    return new String[0];
+    return ret.toString();
   }
 
   @Override

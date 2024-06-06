@@ -125,4 +125,9 @@ public class ModelImpl implements Model {
     return portfolios;
   }
 
+  @Override
+  public void addPortfolio(String name, Portfolio portfolio) {
+    portfolios.put(name, portfolio);
+  }
+
 }

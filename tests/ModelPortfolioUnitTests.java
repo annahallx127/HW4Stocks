@@ -42,7 +42,7 @@
 //  }
 //
 //  @Test(expected = IllegalArgumentException.class)
-//  public void testRemoveMoreThanOwned() {
+//  public void testRemoveMoreThanOwnedThrows() {
 //    portfolio.add(stock2, 10);
 //    portfolio.remove(stock2, 15);
 //  }
@@ -57,7 +57,7 @@
 //  }
 //
 //  @Test
-//  public void testToString() {
+//  public void testPortfolioToString() {
 //    portfolio.add(stock1, 10);
 //    portfolio.add(stock2, 20);
 //
