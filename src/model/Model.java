@@ -1,5 +1,8 @@
 package model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public interface Model {
 
   /**
@@ -11,7 +14,7 @@ public interface Model {
    * @return the stock the symbol represents
    * @throws IllegalArgumentException if the symbol given is not a stock
    */
-  Stock get(String symbol);
+  Stock get(String symbol) throws IllegalArgumentException;
 
   /**
    * Create a portfolio with the given name.
@@ -21,10 +24,5 @@ public interface Model {
    */
   Portfolio makePortfolio(String name);
 
-  /**
-   * Queries the AlphaVantage API to find the information on a given stock. The file returned is
-   * cached as a .csv file in the data package.
-   * @param symbol the ticker symbol of the stock.
-  */
-  void apiCall(String symbol);
+  HashMap<String, Portfolio> getPortfolios();
 }

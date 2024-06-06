@@ -48,7 +48,7 @@ public class ViewStock {
           createPortfolio();
           break;
         case 5:
-//          viewPortfolio();
+          viewPortfolio();
           break;
         case 6:
           System.out.println("Exiting...");
@@ -86,10 +86,16 @@ public class ViewStock {
     System.out.print("Enter start date with YYYY/MM/DD format: ");
     String startDate = scanner.nextLine();
 
-    if (quantity > 0 && stock.isValidDate(startDate)) {
-      stock.getMovingAverage(quantity, startDate);
-    } else {
+    //  if the date range falls along a weekend, add a message where it says that
+    // "Since the date range falls under a weekend, the open day amounts are considered only"
+    // can upgrade later to say the exact days
+    if (quantity <= 0) {
       System.out.println("Quantity must be greater than 0 and a whole number");
+    } else if (!stock.isValidDate(startDate)) {
+      System.out.println("Invalid Start Date");
+    } else {
+      System.out.println("The" + quantity + "-Day Moving Average, Starting on:"
+              + startDate + "is" + stock.getMovingAverage(quantity, startDate));
     }
   }
 
@@ -105,14 +111,15 @@ public class ViewStock {
     System.out.print("Enter end date with YYYY/MM/DD format: ");
     String endDate = scanner.nextLine();
 
-    if (quantity < 0) {
+    //  if the date range falls along a weekend, add a message where it says that
+
+    if (quantity <= 0) {
       System.out.println("Quantity must be greater than 0 and a whole number");
-    } else if (!stock.isValidDate(startDate)) {
-      System.out.println("Invalid Start Date");
-    } else if (!stock.isValidDate(endDate)) {
-      System.out.println("Invalid End Date");
+    } else if (!stock.isValidDate(startDate) || !stock.isValidDate(endDate)) {
+      System.out.println("Invalid Start or End Date");
     } else {
-      stock.getCrossovers(startDate, endDate, quantity);
+      System.out.println("The" + quantity + "-Day Crossover for Date Range:" + startDate
+              + "-" + endDate + "is: \n" + stock.getCrossovers(startDate, endDate, quantity));
     }
   }
 
@@ -125,37 +132,38 @@ public class ViewStock {
     scanner.nextLine();
     if (quantity > 0) {
       portfolio.add(stock, quantity);
+      // add the quantity added for?
     } else {
       System.out.println("Quantity must be greater than 0 and a whole number");
     }
     System.out.println("You have added " + ticker + " to your portfolio!");
   }
 
-//  private void viewPortfolio() {
-//    if (model.getPortfolios().isEmpty()) {
-//      System.out.println("No portfolios available. Please create one first.");
-//      return;
-//    }
-//
-//    System.out.println("Available Portfolios:");
-//    for (int i = 0; i < model.getPortfolios().size(); i++) {
-//      System.out.println((i + 1) + ". " + model.getPortfolios().get(i).getName());
-//    }
-//    System.out.println((model.getPortfolios().size() + 1) + ". Go Back");
-//
-//    System.out.print("Choose a portfolio to view: ");
-//    int option = scanner.nextInt();
-//    scanner.nextLine();
-//
-//    if (option > 0 && option <= model.getPortfolios().size()) {
-//      System.out.println(model.getPortfolios().get(option - 1).getName());
-//      viewPortfolioChooseMenuScreen(model.getPortfolios().get(option - 1));
-//    } else if (option == model.getPortfolios().size() + 1) {
-//      return;
-//    } else {
-//      System.out.println("Invalid choice. Please try again.");
-//    }
-//  }
+  private void viewPortfolio() {
+    if (model.getPortfolios().isEmpty()) {
+      System.out.println("No portfolios available. Please create one first.");
+      return;
+    }
+
+    System.out.println("Available Portfolios:");
+    for (int i = 0; i < model.getPortfolios().size(); i++) {
+      System.out.println((i + 1) + ". " + model.getPortfolios().get(i));
+    }
+    System.out.println((model.getPortfolios().size() + 1) + ". Go Back");
+
+    System.out.print("Choose a portfolio to view: ");
+    int option = scanner.nextInt();
+    scanner.nextLine();
+
+    if (option > 0 && option <= model.getPortfolios().size()) {
+      System.out.println(model.getPortfolios().get(option - 1));
+      viewPortfolioChooseMenuScreen(model.getPortfolios().get(option - 1));
+    } else if (option == model.getPortfolios().size() + 1) {
+      return;
+    } else {
+      System.out.println("Invalid choice. Please try again.");
+    }
+  }
 
   private void viewPortfolioChooseMenuScreen(Portfolio portfolio) {
     System.out.println("1. Add a Stock");
@@ -202,6 +210,10 @@ public class ViewStock {
     Portfolio portfolio = model.makePortfolio(name);
     System.out.println("Portfolio '" + name + "' created.");
     addAndBuyStock(portfolio);
+  }
+
+  private void addPortfolioToMenu() {
+
   }
 
   public static void main(String[] args) {

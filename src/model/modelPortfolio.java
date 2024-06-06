@@ -13,6 +13,16 @@ public class modelPortfolio implements Portfolio {
   }
 
   @Override
+  public Map<Stock, Integer> getStocks() {
+    return stocks;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
   public void add(Stock s, int shares) {
     stocks.put(s, shares);
   }
@@ -51,4 +61,5 @@ public class modelPortfolio implements Portfolio {
     }
     return ret.toString();
   }
+
 }

@@ -19,29 +19,51 @@ public class ModelImpl implements Model {
   }
 
   @Override
-  public Stock get(String symbol) {
+  public Stock get(String symbol) throws IllegalArgumentException {
     if (stocks.get(symbol) != null) {
-      // in map
+      // in map, get the stock
       return stocks.get(symbol);
     }
-    // call api
-    // TODO: this won't work, but it's essentially what the implementation will be.
-    return new modelStock(symbol);
+
+    // Call API to find stock
+    apiCall(symbol);
+
+    // If apiCall doesn't throw an exception, then the stock information was found and stored in the
+    // data package. We can create a new stock with the given symbol, and it will automatically
+    // assign its own values.
+    Stock newStock = new modelStock(symbol);
+    stocks.put(symbol, newStock);
+    return newStock;
   }
 
   @Override
   public Portfolio makePortfolio(String name) {
     Portfolio newPortfolio = new modelPortfolio(name);
-
+    portfolios.put(name, newPortfolio);
     return newPortfolio;
   }
 
-  @Override
-  public void apiCall(String symbol) {
+
+  /**
+   * Queries the AlphaVantage API to find the information on a given stock. The file returned is
+   * cached as a .csv file in the data package. If the file is already present, it is overwritten in
+   * favor of the new API data.
+   *
+   * <p>
+   * This method should only be called when stock data is missing from the cached database {@code
+   * ~/src/data}.
+   * Over reliance on the API can and will result in rate-limiting from the query server.
+   * Each API key is limited to 25 calls per day.
+   * </p>
+   *
+   * @param symbol the ticker symbol of the stock.
+   * @throws IllegalArgumentException if the stock is not present in the API database.
+   */
+  private void apiCall(String symbol) throws IllegalArgumentException {
 
     final String apiKey = "W0M1JOKC82EZEQA8";
     // extra API Key: OTYUTQ7V96CNWN4C
-    URL url = null;
+    URL url;
 
     // TODO: API calls should only be made after the user requests a date that is not cached,
     //  or if the user requests a date range that is not cached. Then, the data should be cached
@@ -60,8 +82,8 @@ public class ModelImpl implements Model {
               + "&symbol"
               + "=" + symbol + "&apikey=" + apiKey + "&datatype=csv");
     } catch (MalformedURLException e) {
-      throw new RuntimeException("the alphavantage API has either changed or "
-              + "no longer works");
+      throw new RuntimeException("The AlphaVantage API has either changed or "
+              + "no longer works.");
     }
 
     InputStream in;
@@ -72,7 +94,7 @@ public class ModelImpl implements Model {
       throw new IllegalArgumentException("No results found for stock " + symbol + ".");
     }
 
-    //  ----------------API call successful, cache the data in the data packagey
+    //  ----------------API call successful, cache the data in the data package----------------
 
     // Writes 1024 bytes of the API data to the file at a time.
     // If the buffer is not completely full, the remainder of the file is written.
@@ -87,6 +109,7 @@ public class ModelImpl implements Model {
         String chunk = new String(buffer, 0, read);
         bw.write(chunk);
       }
+      in.close();
     } catch (IOException e) {
       e.printStackTrace(System.err);
     }
@@ -94,12 +117,12 @@ public class ModelImpl implements Model {
 
   private static BufferedWriter getBufferedWriter(String symbol) throws IOException {
     File file = new File("src/data/" + symbol + ".csv");
-
-    // Delete the current file to overwrite
-    if (file.exists()) {
-      file.delete();
-    }
-
     return new BufferedWriter(new FileWriter(file));
   }
+
+  @Override
+  public HashMap<String, Portfolio> getPortfolios() {
+    return portfolios;
+  }
+
 }

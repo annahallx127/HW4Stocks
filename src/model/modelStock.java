@@ -48,105 +48,93 @@ public class modelStock implements Stock {
     return new BufferedReader(new FileReader(file), 1024);
   }
 
-  public double gainedValue(String dateStart, String dateEnd) throws IllegalArgumentException {
-    if (dateStart == null || dateEnd == null) {
-      throw new IllegalArgumentException("Dates cannot be null.");
-    }
-
-    try {
-      LocalDate start = LocalDate.parse(dateStart);
-      LocalDate end = LocalDate.parse(dateEnd);
-
-      if (start.isAfter(end)) {
-        throw new IllegalArgumentException("Start date must be before end date.");
-      }
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException("Dates must be in a valid format.");
-    }
-
-    boolean foundStart = false;
-    boolean foundEnd = false;
-    for (String line : apiInfo) {
-      if (line.contains(dateStart)) {
-        foundStart = true;
-      } else if (line.contains(dateEnd)) {
-        foundEnd = true;
-      }
-    }
-
-    // TODO: figure out how to go back multiple days to find the last valid date
-    // if we didn't find the start date or end date, we need to go back a day
-    if (!foundStart || !foundEnd) {
-      throw new IllegalArgumentException("Did not find the start date or end date of the stock");
-    }
-
-    return 0.0;
-  }
-
-  // TODO: Implement this
+  
   @Override
-  public double getChange(String dateStart, String dateEnd) {
-    if (dateStart == null || dateEnd == null) {
-      throw new IllegalArgumentException("Dates cannot be null.");
+  public double gainedValue(String dateStart, String dateEnd) throws IllegalArgumentException {
+    double change = 0.0;
+
+    if (!isValidDate(dateStart, dateEnd)) {
+      throw new IllegalArgumentException("Invalid dates.");
     }
 
-    try {
-      LocalDate start = LocalDate.parse(dateStart);
-      LocalDate end = LocalDate.parse(dateEnd);
-
-      if (start.isAfter(end)) {
-        throw new IllegalArgumentException("Start date must be before end date.");
+    for (int i = 0; i < apiInfo.size(); i++) {
+      if (apiInfo.get(i).contains(dateStart)) {
+        for (int j = i; j < apiInfo.size(); j++) {
+          if (apiInfo.get(j).contains(dateEnd)) {
+            change = Double.parseDouble(apiInfo.get(j).split(",")[4])
+                    - Double.parseDouble(apiInfo.get(i).split(",")[4]);
+            break;
+          }
+        }
       }
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException("Dates must be in a valid format.");
     }
-
-    // if not valid date, or if dateEnd is not after dateStart, use date class
-    return 0.0;
+    
+    return change;
   }
 
-  // TODO: Implement this
   @Override
   public double getMovingAverage(int days, String date) throws IllegalArgumentException {
-    if (date == null) {
-      throw new IllegalArgumentException("Date cannot be null.");
+    double toAdd = 0;
+
+    if (!isValidDate(date)) {
+      throw new IllegalArgumentException("Invalid date.");
     }
 
     if (days <= 0) {
       throw new IllegalArgumentException("The number of days must be greater than 0.");
     }
 
-
-    try {
-      LocalDate.parse(date);
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException("Date must be in a valid format.");
+    for (int i = 0; i < apiInfo.size(); i++) {
+      if (apiInfo.get(i).contains(date)) {
+        for (int j = 1; j <= days; j++) {
+          toAdd += Double.parseDouble(apiInfo.get(i + j).split(",")[4]);
+        }
+        break;
+      }
     }
 
-    return 0.0;
+    return toAdd / days;
   }
-
-  // TODO: Implement this
+  
   @Override
   public String[] getCrossovers(String dateStart, String dateEnd, int days) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    StringBuilder sb = new StringBuilder();
+
     if (days <= 0) {
       throw new IllegalArgumentException("The number of days must be greater than 0.");
     }
 
-    if (dateStart == null || dateEnd == null) {
-      throw new IllegalArgumentException("dates cannot be null.");
+    if (!isValidDate(dateStart, dateEnd)) {
+      throw new IllegalArgumentException("Invalid date.");
     }
 
-    try {
-      LocalDate start = LocalDate.parse(dateStart);
-      LocalDate end = LocalDate.parse(dateEnd);
-
-      if (start.isAfter(end)) {
-        throw new IllegalArgumentException("start date must be before end date.");
+    // TODO: finish and abstract this
+    for (int i = 0; i < apiInfo.size(); i++) {
+      if (apiInfo.get(i).contains(dateStart)) {
+        for (int j = i; j < apiInfo.size(); j++) {
+          
+          if (apiInfo.get(j).contains(dateEnd)) {
+            break;
+          }
+        }
       }
-    } catch (DateTimeParseException e) {
-      throw new IllegalArgumentException("dates must be in a valid format.");
     }
+
+//    finish and abstract this
+//    for (int i = 0; i < apiInfo.size(); i++) {
+//      if (apiInfo.get(i).contains(dateStart)) {
+//        int counter = i + 1;
+//        String toParse = apiInfo.get(i).split(",")[0];
+//        String nextParse = apiInfo.get(counter).split(",")[0];
+//        LocalDate parseStart = LocalDate.parse(toParse, formatter);
+//        LocalDate parseNext = LocalDate.parse(nextParse, formatter);
+//        // next date - this date != 1
+//        if (!parseNext.minusDays(1).isEqual(parseStart)) {
+//
+//        }
+//      }
+//    }
 
     return new String[0];
   }
@@ -163,9 +151,7 @@ public class modelStock implements Stock {
       throw new IllegalArgumentException("Date cannot be null.");
     }
 
-    try {
-      LocalDate.parse(date);
-    } catch (DateTimeParseException e) {
+    if (!isValidDate(date)) {
       throw new IllegalArgumentException("Date must be in a valid format.");
     }
 
@@ -188,17 +174,42 @@ public class modelStock implements Stock {
     return sb.toString();
   }
 
+  @Override
   public boolean isValidDate(String dateStr) {
     if (dateStr == null) {
       return false;
     }
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
+    if (!apiInfo.toString().contains(dateStr)) {
+      throw new IllegalArgumentException("Date must be a valid market day.");
+    }
+
     try {
       LocalDate date = LocalDate.parse(dateStr, formatter);
-      return true;
+      return !date.isAfter(LocalDate.now());
     } catch (DateTimeParseException e) {
-      // TODO: throw exception or return false?
+      return false;
+    }
+  }
+
+  private boolean isValidDate(String dateStart, String dateEnd) {
+    if (dateStart == null || dateEnd == null) {
+      return false;
+    }
+
+    if (!apiInfo.toString().contains(dateStart) || !apiInfo.toString().contains(dateEnd)) {
+      throw new IllegalArgumentException("Dates must be valid market days.");
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
+    try {
+      LocalDate sDate = LocalDate.parse(dateStart, formatter);
+      LocalDate eDate = LocalDate.parse(dateEnd, formatter);
+      return !eDate.isAfter(sDate) && !eDate.isAfter(LocalDate.now());
+    } catch (DateTimeParseException e) {
       return false;
     }
   }
