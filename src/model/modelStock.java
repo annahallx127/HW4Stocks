@@ -14,6 +14,7 @@ public class modelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
 
+  // TODO: useful methods LocalDate.minus and LocalDate.plus for date checking
   protected modelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
@@ -35,11 +36,11 @@ public class modelStock implements Stock {
   }
 
   /**
-   * Creates a bufferedReader of 1024 bytes to read the API information file.
-   * The API information file is always in the location "src/data/symbol.csv", where symbol is this
-   * stock's symbol.
+   * Creates a {@code BufferedReader} of 1024 bytes to read the API information file.
+   * The API information file is always in the location {@code ~/src/data/sym.csv}, where sym is
+   * this {@code Stock}'s symbol.
    *
-   * @return A BufferedReader to read the API information file for the stock.
+   * @return A {@code BufferedReader} to read the API information file for the stock.
    * @throws FileNotFoundException if the API information file for the stock is not found.
    */
   private BufferedReader getBufferedReader() throws FileNotFoundException {
@@ -66,9 +67,9 @@ public class modelStock implements Stock {
     boolean foundStart = false;
     boolean foundEnd = false;
     for (String line : apiInfo) {
-      if (line.equals(dateStart)) {
+      if (line.contains(dateStart)) {
         foundStart = true;
-      } else if (line.equals(dateEnd)) {
+      } else if (line.contains(dateEnd)) {
         foundEnd = true;
       }
     }
@@ -107,13 +108,14 @@ public class modelStock implements Stock {
   // TODO: Implement this
   @Override
   public double getMovingAverage(int days, String date) throws IllegalArgumentException {
+    if (date == null) {
+      throw new IllegalArgumentException("Date cannot be null.");
+    }
+
     if (days <= 0) {
       throw new IllegalArgumentException("The number of days must be greater than 0.");
     }
 
-    if (date == null) {
-      throw new IllegalArgumentException("Date cannot be null.");
-    }
 
     try {
       LocalDate.parse(date);
@@ -167,15 +169,36 @@ public class modelStock implements Stock {
       throw new IllegalArgumentException("Date must be in a valid format.");
     }
 
-    return "";
+    StringBuilder sb = new StringBuilder();
+
+    for (String s : apiInfo) {
+      if (s.contains(date)) {
+        String[] split = s.split(",");
+        sb.append("Stock: " + this.symbol + System.lineSeparator());
+        sb.append("Date: " + split[0] + System.lineSeparator());
+        sb.append("Open: " + split[1] + System.lineSeparator());
+        sb.append("High: " + split[2] + System.lineSeparator());
+        sb.append("Low: " + split[3] + System.lineSeparator());
+        sb.append("Close: " + split[4] + System.lineSeparator());
+        sb.append("Volume: " + split[5] + System.lineSeparator());
+        break;
+      }
+    }
+
+    return sb.toString();
   }
 
   public boolean isValidDate(String dateStr) {
+    if (dateStr == null) {
+      return false;
+    }
+
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     try {
       LocalDate date = LocalDate.parse(dateStr, formatter);
       return true;
     } catch (DateTimeParseException e) {
+      // TODO: throw exception or return false?
       return false;
     }
   }
