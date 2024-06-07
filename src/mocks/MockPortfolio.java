@@ -21,6 +21,11 @@ public class MockPortfolio implements Portfolio {
 
   private final Map<Stock, Integer> stocks = new HashMap<>();
 
+  /**
+   * Initializes
+   *
+   * @param name
+   */
   public MockPortfolio(String name) {
     this.name = name;
   }

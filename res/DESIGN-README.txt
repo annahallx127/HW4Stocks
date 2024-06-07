@@ -39,6 +39,9 @@ model and view, and is responsible for handling any user input. It calls the mod
 data, and then calls the view to display the data to the user. Any exceptions that are thrown are
 passed to the view to display an error message to the user.
 
+Any and all data found from the API is stored in the 'data' package. The file name for a given stock
+ticker is the stock ticker followed by ".csv".
+
 The 'Main' class and method are found in the controller package, and are responsible for starting
 the program. It creates a new instance of the controller, and then calls the go() method to start
 the program. It will read and append from Readable and Appendable objects, defaulting to the

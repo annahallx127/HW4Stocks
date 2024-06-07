@@ -23,6 +23,16 @@ public class MockView implements View {
   private final Appendable out;
   private final Scanner scanner;
 
+
+  /**
+   * Constructs a new MockView with the specified model, input, and output.
+   * Initializes the model, output appendable, and scanner for reading input.
+   * Starts the main interaction loop.
+   *
+   * @param model the model to interact with
+   * @param in the input source for user interactions
+   * @param out the output target for displaying messages
+   */
   public MockView(Model model, Readable in, Appendable out) {
     this.model = model;
     this.out = out;

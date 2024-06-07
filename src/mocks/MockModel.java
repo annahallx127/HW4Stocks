@@ -30,6 +30,12 @@ public class MockModel implements Model {
     portfolios.put(name, portfolio);
   }
 
+  /**
+   * Puts the portfolio into the collection of portfolios/Map
+   *
+   * @param name of the portfolio
+   * @param portfolio the portfolio and its components
+   */
   public void addPortfolio(String name, Portfolio portfolio) {
     portfolios.put(name, portfolio);
   }
