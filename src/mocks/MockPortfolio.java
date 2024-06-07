@@ -22,9 +22,10 @@ public class MockPortfolio implements Portfolio {
   private final Map<Stock, Integer> stocks = new HashMap<>();
 
   /**
-   * Initializes
+   * Constructs a new MockPortfolio with the specified name.
+   * Initializes the portfolio with the given name.
    *
-   * @param name
+   * @param name the name of the portfolio
    */
   public MockPortfolio(String name) {
     this.name = name;
