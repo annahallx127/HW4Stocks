@@ -1,5 +1,12 @@
 package view;
 
+/**
+ * The View interface defines the methods required for interacting with the user in the stock
+ * investment application. It handles user inputs, displays options and results, and manages
+ * the main interaction loop. The view is responsible for providing various functionalities of
+ * a stock for a user through the text based user interface. The user will be presented
+ * with options that utilize the methods in this interface to complete the user interactions.
+ */
 public interface View {
 
   /**
@@ -11,17 +18,20 @@ public interface View {
 
   /**
    * Presents the user with the options to calculate the gain or loss of a stock over a
-   * specified period. If the date(s) entered is invalid, it will prompt the user back to the menu
-   * to restart. This method uses the model to retrieve stock data and compute
-   * the financial result, calculating it using the getChange() method and user inputs.
+   * specified period. If the date(s) entered is not a market date, it will take the nearest market
+   * date backwards. Ex: If date entered is Saturday or Sunday,
+   * it will consider the friday before the weekend price.
+   * This method uses the method getChange() to retrieve stock data and compute
+   * the financial result, calculating it with user inputs.
    * Once the gain or loss is calculated, it will take the user back to the original menu screen.
    */
   void calculateGainOrLoss();
 
   /**
    * Presents the user with the options to calculate the moving average of a stock
-   * over a specified number of days. If the date(s) entered is invalid, it will prompt the user
-   * back to the menu to restart.
+   * over a specified number of days. If the date(s) entered is not a market date,
+   * it will take the nearest market date backwards. Ex: If date entered is Saturday or Sunday,
+   * it will consider the friday before the weekend price.
    * This uses the method getMovingAverage() to calculate the result based on user inputs.
    * Once the average is calculated, it will display the result and take the user back to the
    * original menu screen.
@@ -32,8 +42,9 @@ public interface View {
    * Presents the user with the options to calculate the crossovers of a specified stock for a
    * specified period over a given number of days. Uses the getCrossovers() method and
    * user inputs to calculate result. This method can help the user identify potential buy or
-   * sell signals based on crossover events. If the date(s) entered is invalid, it will prompt the
-   * user back to the menu to restart.
+   * sell signals based on crossover events. If the date(s) entered is not a market date,
+   * it will take the nearest market date backwards. Ex: If date entered is Saturday or Sunday,
+   * it will consider the friday before the weekend price.
    */
   void calculateXDayCrossovers();
 
@@ -49,8 +60,9 @@ public interface View {
   /**
    * Displays the existing portfolios and their details. It will then allow the user to interact
    * with each of their portfolios, whether to add, remove, or find the value of their portfolio
-   * on a specific day based off user inputs. If the date(s) entered is invalid, it will prompt
-   * the user back to the menu to restart.
+   * on a specific day based off user inputs. If the date(s) entered is not a market date,
+   * it will take the nearest market date backwards. Ex: If date entered is Saturday or Sunday,
+   * it will consider the friday before the weekend price.
    * If there are no existing portfolios, it will then prompt the user to create one and take
    * them back to the menu screen.
    */

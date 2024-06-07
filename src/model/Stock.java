@@ -79,7 +79,9 @@ public interface Stock {
   /**
    * Checks if the date entered by the user is within the scope of the dates in the
    * API. Will throw an IllegalArgumentException if the date is in the future or if
-   * the format is not YYYY-MM-DD format.
+   * the format is not YYYY-MM-DD format. Also checks if date is the weekend, if it is
+   * it will get the friday before the weekend and return true, so that the user
+   * can keep going.
    *
    * @param date the date specified by the user.
    * @return the validity of the entered date in boolean form.
@@ -88,7 +90,7 @@ public interface Stock {
 
   /**
    * Finds the price of the specific stock on a valid specified date.
-   * It will present  the closing price of that stock on that date.
+   * It will present the closing price of that stock on that date.
    *
    * @param date the date the user wants to get the price from
    * @return the price of the stock at that date as a double

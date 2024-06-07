@@ -10,10 +10,38 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the model for the stock investment program. The model is responsible for storing
+ * information about stocks and portfolios, and for making API calls to retrieve stock data.
+ * It does not interact with the user directly, but instead provides the data to the controller.
+ *
+ * <p>
+ * Each stock is stored in a map with its symbol as the key. If a stock is not present in the map,
+ * the model will make an API call to retrieve the stock data. The stock data is then stored in the
+ * data package as a .csv file. If the stock is present in the data package, the model will read the
+ * data from the file and create a new stock object with the given symbol.
+ * </p>
+ *
+ * <p>
+ * Each stock has information about its symbol and the data from the API/CSV file. The stock
+ * object is responsible for calculating the gain or loss of the stock, the moving average of the
+ * stock, and the crossovers of the stock. It can also validate dates and check if a date is a
+ * market day, throwing exceptions if the date is invalid. These exceptions are caught by the
+ * controller and displayed to the user through the view.
+ * </p>
+ *
+ * <p>
+ * Each portfolio is stored in a map with its name as the key. The model is responsible for
+ * creating new portfolios, adding stocks to portfolios and calculating the gain or loss of a
+ * portfolio.
+ * </p>
+ */
 public class ModelImpl implements Model {
   HashMap<String, Stock> stocks;
   HashMap<String, Portfolio> portfolios;
@@ -26,15 +54,14 @@ public class ModelImpl implements Model {
   @Override
   public Stock get(String symbol) throws IllegalArgumentException {
     // if present in data package, get the stock
-    File file = new File("src/data/" + symbol + ".csv");
-    if (file.exists()) {
+    if (Files.exists(Paths.get("src/data/" + symbol + ".csv"))) {
       Stock newStock = new modelStock(symbol);
       stocks.put(symbol, newStock);
       return newStock;
     }
 
     // if present in map, get the stock
-    if (stocks.get(symbol) != null) {
+    if (stocks.containsKey(symbol)) {
       return stocks.get(symbol);
     }
 
@@ -50,10 +77,9 @@ public class ModelImpl implements Model {
   }
 
   @Override
-  public Portfolio makePortfolio(String name) {
+  public void makePortfolio(String name) {
     Portfolio newPortfolio = new modelPortfolio(name);
     portfolios.put(name, newPortfolio);
-    return newPortfolio;
   }
 
 
@@ -76,6 +102,7 @@ public class ModelImpl implements Model {
 
     final String apiKey = "8E787NZ9TE3Y4ZI4";
     // extra API Key: OTYUTQ7V96CNWN4C
+    // High volume API key: 09I1ESM2FDLI0Y6D
     URL url;
 
     // TODO: API calls should only be made after the user requests a date that is not cached,
@@ -100,6 +127,7 @@ public class ModelImpl implements Model {
     }
 
     InputStream in;
+
     try {
       in = url.openStream();
     } catch (IOException e) {
@@ -110,7 +138,7 @@ public class ModelImpl implements Model {
 
     // Writes 1024 bytes of the API data to the file at a time.
     // If the buffer is not completely full, the remainder of the file is written.
-    // This could be more efficient by checking if each buffer is equal to the new
+    // This could be made more efficient by checking if each buffer is equal to the new
     // buffer and only overwriting buffers that have changed.
     try {
       BufferedWriter bw = getBufferedWriter(symbol);
@@ -121,18 +149,13 @@ public class ModelImpl implements Model {
         bw.write(chunk);
       }
       bw.flush();
-//      BufferedWriter bw = new BufferedWriter(new FileWriter("src/data/" + symbol + ".csv"));
-//      while (in.available() > 0) {
-//        bw.write(in.read());
-//      }
-//      in.close();
     } catch (IOException e) {
       e.printStackTrace(System.err);
     }
   }
 
   private static BufferedWriter getBufferedWriter(String symbol) throws IOException {
-    File file = new File("src/data/" + symbol + ".csv");
+    File file = Paths.get("src/data/" + symbol + ".csv").toFile();
     return new BufferedWriter(new FileWriter(file));
   }
 

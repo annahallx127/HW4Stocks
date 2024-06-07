@@ -1,16 +1,24 @@
 import org.junit.Before;
 import org.junit.Test;
-
 import model.Model;
 import model.Stock;
 import model.ModelImpl;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class for the Stock implementation within the Model.
+ * This class contains unit tests to verify the functionality of the Stock class,
+ * ensuring that stock data retrieval and calculations are handled correctly.
+ */
 public class ModelStockUnitTests {
   private Model model;
   private Stock stock;
 
+  /**
+   * Sets up the application with values before each of the following tests.
+   * Initializes the model and retrieves a stock instance.
+   */
   @Before
   public void setUp() {
     model = new ModelImpl();
@@ -18,27 +26,7 @@ public class ModelStockUnitTests {
   }
 
   @Test
-  public void testModelGet() {
-    assertEquals(stock, model.get("AAPL"));
-    assertEquals("AAPL", stock.toString());
-  }
-
-  @Test
-  public void testModelAPIStockNotFound() {
-    try {
-      model.get("INVALID");
-    } catch (IllegalArgumentException e) {
-      assertEquals("No results found for stock INVALID.", e.getMessage());
-    }
-  }
-
-  @Test
-  public void testModelAPIStockFound() {
-    assertEquals(stock, model.get("AAPL"));
-  }
-
-  @Test
-  public void testStockToString() {
+  public void testStockGetSymbol() {
     assertEquals("AAPL", stock.toString());
   }
 
@@ -76,12 +64,9 @@ public class ModelStockUnitTests {
   }
 
   @Test
-  public void testStockGainedValueClosedIntoOpened() {
-    try {
-      assertEquals(0.0, stock.gainedValue("2024-06-02", "2024-06-03"), 0.01);
-    } catch (IllegalArgumentException e) {
-      assertEquals("Dates must be valid market days.", e.getMessage());
-    }
+  public void testStockGainedValueClosedIntoOpenedWeekendDate() {
+    assertEquals(1.7800000000000011, stock.gainedValue("2024-06-02",
+            "2024-06-03"), 0.01);
   }
 
   @Test
@@ -177,7 +162,7 @@ public class ModelStockUnitTests {
     try {
       stock.getMovingAverage(Integer.parseInt(String.valueOf((long) (Integer.MAX_VALUE + 1))), "2024-06-05");
     } catch (IllegalArgumentException e) {
-      assertEquals("Days must be a valid positive integer.", e.getMessage());
+      assertEquals("The number of days must be greater than 0.", e.getMessage());
     }
   }
 
@@ -205,14 +190,9 @@ public class ModelStockUnitTests {
   }
 
   @Test
-  public void testGetPriceOnDateInvalidDate() {
-    try {
+  public void testGetPriceOnDateInvalidDateGetsFridayBeforePrice() {
       stock.getPriceOnDate("2024-06-02");
-      assertEquals(190.4400, stock.getPriceOnDate("2024-06-02"), 0.01);
-
-    } catch (IllegalArgumentException e) {
-      assertEquals("Invalid date.", e.getMessage());
-    }
+      assertEquals(192.25, stock.getPriceOnDate("2024-06-02"), 0.01);
   }
 
   @Test

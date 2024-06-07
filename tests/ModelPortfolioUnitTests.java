@@ -8,6 +8,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for the Portfolio implementation within the Model.
+ * This class contains unit tests to verify the functionality of adding, removing,
+ * and managing stocks within a portfolio, as well as calculating the value of the portfolio.
+ */
 public class ModelPortfolioUnitTests {
 
   private Portfolio portfolio;
@@ -15,10 +20,15 @@ public class ModelPortfolioUnitTests {
   private Stock stock1;
   private Stock stock2;
 
+  /**
+   * Sets up the application with values before each of the following tests.
+   * Initializes the model, creates a test portfolio, and retrieves stock instances.
+   */
   @Before
   public void setUp() {
     model = new ModelImpl();
-    portfolio = model.makePortfolio("Test Portfolio");
+    model.makePortfolio("Test Portfolio");
+    portfolio = model.getPortfolios().get("Test Portfolio");
     stock1 = model.get("AAPL");
     stock2 = model.get("GOOG");
   }
@@ -84,13 +94,14 @@ public class ModelPortfolioUnitTests {
   public void testRemoveFromEmptyPortfolio() {
     try {
       portfolio.add(stock1, 10);
-      portfolio.remove(stock1, 14);;
-    }
-    catch (IllegalArgumentException e) {
+      portfolio.remove(stock1, 14);
+      ;
+    } catch (IllegalArgumentException e) {
       assertEquals("Cannot remove more shares than the number of shares present.",
               e.getMessage());
     }
   }
+
   @Test
   public void testAddMaxToPortfolio2() {
     portfolio.add(stock2, 1000000000);
@@ -106,14 +117,16 @@ public class ModelPortfolioUnitTests {
   @Test
   public void testNewMakeNewPortfolioGetName() {
     Portfolio testPortfolio;
-    testPortfolio = model.makePortfolio("New Portfolio");
+    model.makePortfolio("New Portfolio");
+    testPortfolio = model.getPortfolios().get("New Portfolio");
     assertEquals("New Portfolio", testPortfolio.getName());
   }
 
   @Test
   public void testMakeNewPortfolio() {
     Portfolio testPortfolio;
-    testPortfolio = model.makePortfolio("New Portfolio");
+    model.makePortfolio("New Portfolio");
+    testPortfolio = model.getPortfolios().get("New Portfolio");
     testPortfolio.add(stock2, 100);
 
     String expectedString = "GOOG: 100 shares" + System.lineSeparator();
@@ -149,6 +162,27 @@ public class ModelPortfolioUnitTests {
   }
 
   @Test
+  public void testValueOfPortfolioOnHoliday() {
+    portfolio.add(stock1, 3);
+    double expectedValue = (3 * 193.6000);
+    assertEquals(expectedValue, portfolio.valueOfPortfolio("2023-12-25"), 0.01);
+
+    p
+  }
+
+  @Test
+  public void testValueOfPortfolioOnNonMarketDay() {
+    // tests for weekend dates, takes the friday before value instead
+    portfolio.add(stock1, 3);
+    double expectedValue = (3 * 192.2500);
+    assertEquals(expectedValue, portfolio.valueOfPortfolio("2024-06-02"), 0.01);
+
+    portfolio.add(stock1, 3);
+    double expectedValue2 = (6 * 192.2500);
+    assertEquals(expectedValue2, portfolio.valueOfPortfolio("2024-06-01"), 0.01);
+  }
+
+  @Test
   public void testAddZeroShares() {
     try {
       portfolio.add(stock2, 0);
@@ -172,7 +206,8 @@ public class ModelPortfolioUnitTests {
     portfolio.add(stock1, 3);
 
     Portfolio testPortfolio;
-    testPortfolio = model.makePortfolio("New Portfolio");
+    model.makePortfolio("New Portfolio");
+    testPortfolio = model.getPortfolios().get("New Portfolio");
     testPortfolio.add(stock1, 3);
 
     assertEquals(testPortfolio.getStocks(), portfolio.getStocks());
@@ -184,7 +219,9 @@ public class ModelPortfolioUnitTests {
     portfolio.add(stock2, 3);
 
     Portfolio testPortfolio;
-    testPortfolio = model.makePortfolio("New Portfolio");
+    model.makePortfolio("New Portfolio");
+    testPortfolio = model.getPortfolios().get("New Portfolio");
+
     testPortfolio.add(stock1, 3);
     testPortfolio.add(stock2, 3);
 

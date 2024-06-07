@@ -9,9 +9,16 @@ import java.util.Map;
 import model.Portfolio;
 import model.Stock;
 
-
+/**
+ * A mock implementation of the Portfolio interface for testing purposes.
+ * This class simulates the behavior of a real portfolio, managing a collection
+ * of stocks and their associated share counts. It provides methods to add and
+ * remove stocks, calculate the portfolio's value on a specific date, and validate dates.
+ */
 public class MockPortfolio implements Portfolio {
+
   private final String name;
+
   private final Map<Stock, Integer> stocks = new HashMap<>();
 
   public MockPortfolio(String name) {
@@ -60,7 +67,8 @@ public class MockPortfolio implements Portfolio {
 
     StringBuilder sb = new StringBuilder();
     for (Map.Entry<Stock, Integer> entry : stocks.entrySet()) {
-      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares").append(System.lineSeparator());
+      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares")
+              .append(System.lineSeparator());
     }
     return sb.toString();
   }

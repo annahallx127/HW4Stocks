@@ -1,4 +1,4 @@
-The design of our program is roughly based on the model view controller (MVC) architecture.
+The design of our program is based on the model view controller (MVC) architecture.
 
 Stocks are represented by the 'Stock' interface and implemented in the 'modelStock' class of
 the model package. They represent a single stock for a company, and store the stock's symbol, name,
@@ -26,20 +26,20 @@ the API when it needs to update the stock data (such as when it is not present i
 or the dates are not found within the stored file) or when the user requests a new stock. Thus,
 users can use previously stored data without the need for an internet connection. However, due to
 the fact that the data is stored in a file, the data is not updated in real time, and may be
-inaccurate if used without updating the data.
+inaccurate if used without being updated (such as without an internet connection.)
 
 The view is represented by the 'View' interface, and its implementation is the 'ViewImpl' class in
 the view package. It is the user interface that the user interacts with, displaying any relevant
-data to the user. However, the current design of the program also has the view handling user input,
-which is not the intended design of the MVC architecture. The view currently directly manipulates
-the model, which is also a consequence of the lack for SOLID design principles.
+data to the user. The view also handles any exceptions that are thrown by the controller, and will
+display any subsequent error message to the user.
 
 The controller is represented by the 'Controller' interface, and its implementation is the
-'ControllerImpl' class in the controller package.
-Due to the current design of the program, the controller does not function as a true controller as
-stated in the MVC architecture. The controller is not responsible for handling user input.
-Currently, the controller is only responsible for calling the main method to run the program.
+'ControllerImpl' class in the controller package. It is the part of the program that connects the
+model and view, and is responsible for handling any user input. It calls the model to update the
+data, and then calls the view to display the data to the user. Any exceptions that are thrown are
+passed to the view to display an error message to the user.
 
-The 'Main' class is the main method of the program, and is found within the
-It creates a new instance of the model, view, and controller, and runs the program by calling the
-controller's run method.
+The 'Main' class and method are found in the controller package, and are responsible for starting
+the program. It creates a new instance of the controller, and then calls the go() method to start
+the program. It will read and append from Readable and Appendable objects, defaulting to the
+console.

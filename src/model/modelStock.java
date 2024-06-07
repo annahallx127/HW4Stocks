@@ -2,18 +2,32 @@ package model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+/**
+ * Represents a stock in the stock investment program. A stock has a symbol and information about
+ * its prices and volumes on different dates. The stock object is responsible for calculating the
+ * gain or loss of the stock, the moving average of the stock, and the crossovers of the stock. It
+ * can also validate dates and check if a date is a market day, throwing exceptions if the date is
+ * invalid.
+ */
 public class modelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
 
+  /**
+   * Constructs a modelStock object with the specified ticker symbol.
+   * Initializes the apiInfo list and reads stock data from a file,
+   * removing the header line.
+   *
+   * @param symbol the ticker of the specified stock
+   */
   public modelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
@@ -26,8 +40,8 @@ public class modelStock implements Stock {
   }
 
   private void readFile() {
-    try {
-      BufferedReader br = getBufferedReader();
+    try(FileReader fileReader = new FileReader("src/data/" + this.symbol + ".csv");
+        BufferedReader br = new BufferedReader(fileReader)) {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }
@@ -41,19 +55,6 @@ public class modelStock implements Stock {
     }
   }
 
-  /**
-   * Creates a {@code BufferedReader} of 1024 bytes to read the API information file.
-   * The API information file is always in the location {@code ~/src/data/sym.csv}, where sym is
-   * this {@code Stock}'s symbol.
-   *
-   * @return A {@code BufferedReader} to read the API information file for the stock.
-   * @throws FileNotFoundException if the API information file for the stock is not found.
-   */
-  private BufferedReader getBufferedReader() throws FileNotFoundException {
-    File file = new File("src/data/" + this.symbol + ".csv");
-    return new BufferedReader(new FileReader(file));
-  }
-
   @Override
   public double gainedValue(String dateStart, String dateEnd) throws IllegalArgumentException {
     double change = 0.0;
@@ -61,6 +62,9 @@ public class modelStock implements Stock {
     if (!isValidDate(dateStart, dateEnd)) {
       throw new IllegalArgumentException("Invalid dates.");
     }
+
+    dateStart = getNearestMarketDate(dateStart);
+    dateEnd = getNearestMarketDate(dateEnd);
 
     for (int i = 0; i < apiInfo.size(); i++) {
       if (apiInfo.get(i).contains(dateEnd)) {
@@ -89,6 +93,8 @@ public class modelStock implements Stock {
       throw new IllegalArgumentException("Invalid date.");
     }
 
+    date = getNearestMarketDate(date);
+
     for (int i = 0; i < apiInfo.size(); i++) {
       if (apiInfo.get(i).contains(date)) {
         // normalize number of days to the maximum
@@ -115,6 +121,9 @@ public class modelStock implements Stock {
     if (!isValidDate(dateStart, dateEnd)) {
       throw new IllegalArgumentException("Invalid dates.");
     }
+
+    dateStart = getNearestMarketDate(dateStart);
+    dateEnd = getNearestMarketDate(dateEnd);
 
     for (int i = 0; i < apiInfo.size(); i++) {
       if (apiInfo.get(i).contains(dateEnd)) {
@@ -147,6 +156,8 @@ public class modelStock implements Stock {
     if (!isValidDate(date)) {
       throw new IllegalArgumentException("Invalid date.");
     }
+
+    date = getNearestMarketDate(date);
 
     StringBuilder sb = new StringBuilder();
 
@@ -187,7 +198,7 @@ public class modelStock implements Stock {
         throw new IllegalArgumentException("Date cannot be in the future.");
       }
       if (!apiInfo.toString().contains(date.toString())) {
-        throw new IllegalArgumentException("Date must be a valid market day.");
+        dateStr = getNearestMarketDate(dateStr);
       }
       return !date.isAfter(LocalDate.now());
     } catch (DateTimeParseException e) {
@@ -208,9 +219,11 @@ public class modelStock implements Stock {
       if (sDate.isAfter(LocalDate.now()) || eDate.isAfter(LocalDate.now())) {
         throw new IllegalArgumentException("Dates cannot be in the future.");
       }
-      if (!apiInfo.toString().contains(sDate.toString())
-              || !apiInfo.toString().contains(eDate.toString())) {
-        throw new IllegalArgumentException("Dates must be valid market days.");
+      if (!apiInfo.toString().contains(sDate.toString())) {
+        dateStart = getNearestMarketDate(dateStart);
+      }
+      if (!apiInfo.toString().contains(eDate.toString())) {
+        dateEnd = getNearestMarketDate(dateEnd);
       }
       return eDate.isAfter(sDate) && !eDate.isAfter(LocalDate.now());
     } catch (DateTimeParseException e) {
@@ -225,6 +238,8 @@ public class modelStock implements Stock {
       throw new IllegalArgumentException("Invalid date.");
     }
 
+    date = getNearestMarketDate(date);
+
     for (String entry : apiInfo) {
       if (entry.contains(date)) {
         String[] split = entry.split(",");
@@ -232,5 +247,30 @@ public class modelStock implements Stock {
       }
     }
     return price;
+  }
+
+  /**
+   * Gets the nearest market date to the given date.
+   * If the given date is a weekend, it returns the previous market day.
+   *
+   * @param dateStr the date to check.
+   * @return the nearest previous market date as a string.
+   */
+  private String getNearestMarketDate(String dateStr) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    LocalDate date = LocalDate.parse(dateStr, formatter);
+
+    while (!apiInfo.toString().contains(date.toString())) {
+      if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
+        date = date.minusDays(1);
+      } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+        date = date.minusDays(2);
+      }
+      if (date.isBefore(LocalDate.parse(apiInfo.get(apiInfo.size() - 1).split(",")[0]))) {
+        throw new IllegalArgumentException("No valid market dates available.");
+      }
+    }
+
+    return date.toString();
   }
 }

@@ -1,8 +1,13 @@
 package model;
 
-
 import java.util.Map;
 
+/**
+ * Represents a portfolio in the stock investment program. Every portfolio can have multiple stocks
+ * with the respective number of whole shares. The portfolio object is responsible for adding and
+ * removing stocks from the portfolio, finding the total value of the portfolio on a given date, and
+ * checking if the date is a valid date for each stock in the portfolio.
+ */
 public interface Portfolio {
 
   /**
@@ -15,9 +20,10 @@ public interface Portfolio {
   /**
    * Gets the name of the portfolio that the user created.
    *
-   * @return the name of the portfolio
+   * @return the name of the portfolio.
    */
   String getName();
+
   /**
    * Adds a stock to the portfolio.
    *
@@ -28,12 +34,13 @@ public interface Portfolio {
 
   /**
    * Removes a stock from the portfolio.
-   * If the stock is not in the portfolio, the method will do nothing.
+   * If the stock is not in the portfolio, the method will throw an IllegalArgumentException.
    *
    * @param s      the stock to remove from the portfolio.
    * @param shares the number of shares wanting to remove.
    * @throws IllegalArgumentException if then number of shares removed is greater than the
-   *                                  number of shares owned.
+   *                                  number of shares owned, or if the stock is not
+   *                                  in the portfolio.
    */
   void remove(Stock s, int shares) throws IllegalArgumentException;
 
@@ -41,16 +48,22 @@ public interface Portfolio {
    * Finds the total value of the portfolio on the given date.
    *
    * @param date the date to find the total value of the portfolio on.
-   *             Must be a valid date in the format "YYYY/MM/DD".
    * @throws IllegalArgumentException if the date is not a valid date in the format "YYYY/MM/DD".
    */
   double valueOfPortfolio(String date) throws IllegalArgumentException;
 
   /**
    * Prints out the whole portfolio's stocks.
+   *
    * @return the portfolio's stocks in a string.
    */
   String toString();
 
+  /**
+   * Checks if the date is a valid date for each stock in the portfolio.
+   *
+   * @param date the date to check if it is a valid date.
+   * @return true if the date is a valid date, false otherwise.
+   */
   boolean isValidDateForPortfolio(String date);
 }

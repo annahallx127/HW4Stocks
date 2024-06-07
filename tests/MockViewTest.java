@@ -1,23 +1,34 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 
+import controller.ControllerImpl;
 import mocks.MockModel;
 import mocks.MockStock;
 import model.Portfolio;
-import view.ViewStock;
+import view.ViewImpl;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class for the MockView implementation.
+ * This class contains unit tests to verify the functionality of the ViewImpl class,
+ * ensuring that user interactions are handled correctly and that the appropriate
+ * outputs are generated.
+ */
 public class MockViewTest {
   private MockModel model;
   private MockStock stock;
-  private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+  private StringWriter outContent;
+  private StringReader inContent;
+  private ControllerImpl controller;
 
+  /**
+   * Sets up the application with values before each of the following tests.
+   * Initializes the mock model, stock, output content, and controller.
+   */
   @Before
   public void setUp() {
     model = new MockModel();
@@ -26,26 +37,25 @@ public class MockViewTest {
     stock.setPriceOnDate("2021-01-31", 160.0);
     model.addMockStock("AAPL", stock);
 
-    InputStream originalIn = System.in;
-    System.setOut(new PrintStream(outContent));
-
+    outContent = new StringWriter();
+    controller = new ControllerImpl(new StringReader(""), outContent);
   }
 
   private void simulateUserInput(String input) {
-    InputStream in = new ByteArrayInputStream(input.getBytes());
-    System.setIn(in);
+    inContent = new StringReader(input);
+    controller = new ControllerImpl(inContent, outContent);
   }
 
-  // needed this method so that the line separators would be compatible with testing.
-  private String normalizeLineSeparators(String input) {
+  // private method to standardize the line separators for testing
+  private String standardizeLineSeparators(String input) {
     return input.replace("\r\n", "\n").replace("\r", "\n");
   }
 
   @Test
   public void testCreatePortfolioAndAddStock() {
-    simulateUserInput("4\nMyPortfolio\nAAPL\n10\n6\n");
+    simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(10, portfolio.getStocks().get(stock).intValue());
@@ -55,19 +65,20 @@ public class MockViewTest {
   public void testCalculateGainOrLoss() {
     simulateUserInput("1\nAAPL\n2021-01-01\n2021-01-31\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     assertEquals(10.0, stock.gainedValue("2021-01-01", "2021-01-31"), 0.01);
   }
 
   @Test
   public void testViewPortfolio() {
-    simulateUserInput("5\n1\n5\n6\n");
+    simulateUserInput("5\n1\n6\n");
 
-    Portfolio portfolio = model.makePortfolio("MyPortfolio");
+    model.makePortfolio("MyPortfolio");
+    Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     model.addPortfolio("MyPortfolio", portfolio);
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     assertEquals("The portfolio is empty!", portfolio.toString());
   }
@@ -76,28 +87,25 @@ public class MockViewTest {
   public void testCalculateXDayMovingAverage() {
     simulateUserInput("2\nAAPL\n10\n2021-01-01\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
-    assertEquals(155.0, stock.getMovingAverage(10, "2021-01-01"),
-            0.01);
+    assertEquals(155.0, stock.getMovingAverage(10, "2021-01-01"), 0.01);
   }
 
   @Test
   public void testCalculateXDayCrossovers() {
     simulateUserInput("3\nAAPL\n10\n2021-01-01\n2021-01-31\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
-    assertEquals("Mock crossover data", stock.getCrossovers("2021-01-01",
-            "2021-01-31", 10));
+    assertEquals("Mock crossover data", stock.getCrossovers("2021-01-01", "2021-01-31", 10));
   }
 
   @Test
   public void testInvalidTickerSymbolForGainOrLoss() {
     simulateUserInput("1\nINVALID\n6\n");
-    new ViewStock(model);
+    new ViewImpl(controller);
 
-    System.out.flush();
     String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
             "Choose an Option From the Menu:\n" +
             "1. Calculate Gain or Loss of a Stock\n" +
@@ -120,37 +128,14 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(normalizeLineSeparators(expectedOutput), normalizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
   public void testInvalidDatesForGainOrLoss() {
-    try {
-      simulateUserInput("1\nAAPL\neoirjoiejerif\nrthrth\n6\n");
-      new ViewStock(model);
+    simulateUserInput("1\nAAPL\neoirjoiejerif\nrthrth\n6\n");
+    new ViewImpl(controller);
 
-    } catch (IllegalArgumentException e) {
-      assertEquals("Invalid date.", e.getMessage());
-    }
-  }
-
-  @Test
-  public void testInvalidTickerSymbolForMovingAverage() {
-    try {
-      simulateUserInput("2\nINVALID\n");
-      new ViewStock(model);
-    } catch (IllegalArgumentException e) {
-      assertEquals("Invalid ticker symbol", e.getMessage());
-    }
-  }
-
-  @Test
-  public void testInvalidDatesForMovingAverage() {
-    simulateUserInput("2\nAAPL\n10\nINVALID_DATE\n6\n");
-
-    new ViewStock(model);
-
-    System.out.flush();
     String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
             "Choose an Option From the Menu:\n" +
             "1. Calculate Gain or Loss of a Stock\n" +
@@ -160,12 +145,7 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: " +
-            "DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
-            "the nearest business day forward will be considered\n" +
-            "Enter number of days: " +
-            "Enter date (YYYY-MM-DD): " +
-            "Invalid Start Date\n" +
+            "Enter ticker symbol: Invalid date.\n" +
             "Isaac and Anna's Stock Investment Company\n" +
             "Choose an Option From the Menu:\n" +
             "1. Calculate Gain or Loss of a Stock\n" +
@@ -178,14 +158,79 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(normalizeLineSeparators(expectedOutput), normalizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+  }
+
+  @Test
+  public void testInvalidTickerSymbolForMovingAverage() {
+    simulateUserInput("2\nINVALID\n10\n2021-01-01\n6\n");
+    new ViewImpl(controller);
+
+    String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Enter ticker symbol: Invalid ticker symbol.\n" +
+            "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Exiting...\n";
+
+    String actualOutput = outContent.toString();
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+  }
+
+  @Test
+  public void testInvalidDatesForMovingAverage() {
+    simulateUserInput("2\nAAPL\n10\nINVALID_DATE\n6\n");
+
+    new ViewImpl(controller);
+
+    String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Enter ticker symbol: DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
+            "the nearest business day forward will be considered\n" +
+            "Enter number of days: \n" +
+            "Enter date (YYYY-MM-DD): \n" +
+            "Invalid Date, \n" +
+            "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Exiting...\n";
+
+    String actualOutput = outContent.toString();
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
   public void testAddStockToPortfolio() {
-    simulateUserInput("4\nMyPortfolio\nAAPL\n10\n5\n1\n1\nAAPL\n20\n5\n6\n");
+    simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n1\nAAPL\n20\nno\n5\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(30, portfolio.getStocks().get(stock).intValue());
@@ -193,9 +238,9 @@ public class MockViewTest {
 
   @Test
   public void testRemoveStockFromPortfolio() {
-    simulateUserInput("4\nMyPortfolio\nAAPL\n10\n5\n1\n2\nAAPL\n5\n2\n5\n6\n");
+    simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n2\nAAPL\n5\n5\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(5, portfolio.getStocks().get(stock).intValue());
@@ -203,9 +248,9 @@ public class MockViewTest {
 
   @Test
   public void testFindPortfolioValue() {
-    simulateUserInput("4\nMyPortfolio\nAAPL\n10\n5\n1\n3\n2021-01-31\n5\n6\n");
+    simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n3\n2021-01-31\n5\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(1600.0, portfolio.valueOfPortfolio("2021-01-31"), 0.001);
@@ -213,42 +258,77 @@ public class MockViewTest {
 
   @Test
   public void testFindPortfolioValueInvalidDate() {
-    simulateUserInput("4\nMyPortfolio\nAAPL\n10\n5\n1\n3\nwefwef\n5\n6\n");
-    new ViewStock(model);
+    simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n3\nwefwef\n5\n6\n");
+    new ViewImpl(controller);
 
-    System.out.flush();
-    String expectedOutput = "";
-//    try {
-//      simulateUserInput("4\nMyPortfolio\nAAPL\n10\n5\n1\n3\nwefwef\n5\n6\n");
-//      new ViewStock(model);
-//    } catch (IllegalArgumentException e) {
-//      assertEquals("Invalid date.", e.getMessage());
-//    }
+    String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Enter ticker symbol: DISCLAIMER: If you have entered a weekend, the date considered will be the friday before.\n" +
+            "Enter date (YYYY-MM-DD): \n" +
+            "Invalid date.\n" +
+            "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Exiting...\n";
+
     String actualOutput = outContent.toString();
-    assertEquals(normalizeLineSeparators(expectedOutput), normalizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
   public void testPrintPortfolio() {
-    simulateUserInput("4\nMyPortfolio\nAAPL\n10\n5\n4\n6\n");
+    simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n5\n6\n");
 
-    new ViewStock(model);
+    new ViewImpl(controller);
 
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
-    assertEquals(normalizeLineSeparators("AAPL: 10 shares\n"), normalizeLineSeparators(portfolio.toString()));
-
+    assertEquals(standardizeLineSeparators("AAPL: 10 shares\n"), standardizeLineSeparators(portfolio.toString()));
   }
 
   @Test
   public void testInvalidDatesForCrossovers() {
-    try {
-      simulateUserInput("3\nAAPL\n10\nINVALID_DATE\n2025-66-66\n6\n");
-      new ViewStock(model);
-//      assertEquals(100, stock.getCrossovers(
-//              "INVALID_DATE", "2021-01-31", 10));
-    } catch (IllegalArgumentException e) {
-      assertEquals("Invalid date.", e.getMessage());
-    }
-  }
+    simulateUserInput("3\nAAPL\n10\nINVALID_DATE\n2025-66-66\n6\n");
+    new ViewImpl(controller);
 
+    String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Enter ticker symbol: DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
+            "the nearest business day forward will be considered\n" +
+            "Enter number of days: \n" +
+            "Enter start date (YYYY-MM-DD): \n" +
+            "Invalid start date. Please enter a valid market date.\n" +
+            "Isaac and Anna's Stock Investment Company\n" +
+            "Choose an Option From the Menu:\n" +
+            "1. Calculate Gain or Loss of a Stock\n" +
+            "2. Calculate X-Day Moving Average\n" +
+            "3. Calculate X-Day Crossovers\n" +
+            "4. Create a New Portfolio\n" +
+            "5. View Existing Portfolios\n" +
+            "6. Exit Menu\n" +
+            "Choose an option: \n" +
+            "Exiting...\n";
+
+    String actualOutput = outContent.toString();
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+  }
 }

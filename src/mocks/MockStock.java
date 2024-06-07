@@ -5,12 +5,20 @@ import java.util.Map;
 
 import model.Stock;
 
+/**
+ * A mock implementation of the Stock interface for testing purposes.
+ * This class simulates the behavior of a real stock, managing stock prices
+ * over time and providing methods to retrieve stock information and perform
+ * calculations based on mock data.
+ */
 public class MockStock implements Stock {
-  private final String ticker;
+
+  private final String symbol;
+
   private final Map<String, Double> prices = new HashMap<>();
 
   public MockStock(String ticker) {
-    this.ticker = ticker;
+    this.symbol = ticker;
   }
 
   @Override
@@ -20,7 +28,8 @@ public class MockStock implements Stock {
 
   @Override
   public double getMovingAverage(int days, String date) {
-    return prices.values().stream().mapToDouble(Double::doubleValue).limit(days).average().orElse(0.0);
+    return prices.values().stream().mapToDouble(Double::doubleValue).limit(days).average()
+            .orElse(0.0);
   }
 
   @Override
@@ -31,7 +40,7 @@ public class MockStock implements Stock {
   @Override
   public String toString(String date) {
     double price = getPriceOnDate(date);
-    return String.format("%s - %s: %s", ticker, date, price);
+    return String.format("%s - %s: %s", symbol, date, price);
   }
 
   @Override
@@ -45,9 +54,9 @@ public class MockStock implements Stock {
 
   @Override
   public String toString() {
-    return ticker;
+    return symbol;
   }
-
+// ye mb i j saw it on my
   /**
    * Manually set the price of the stock on the specified date.
    * For the purposes of mock testing only.

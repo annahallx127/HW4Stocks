@@ -6,8 +6,17 @@ import model.Model;
 import model.Portfolio;
 import model.Stock;
 
+/**
+ * A mock implementation of the Model interface for testing purposes.
+ * This class provides basic implementations of the methods defined in ModelImpl,
+ * facilitating unit tests by simulating the behavior of the actual model.
+ * It manages a collection of portfolios and stocks, allowing for testing
+ * portfolio and stock-related functionalities without relying on real data.
+ */
 public class MockModel implements Model {
+
   private final Map<String, Portfolio> portfolios = new HashMap<>();
+
   private final Map<String, Stock> stocks = new HashMap<>();
 
   @Override
@@ -16,10 +25,9 @@ public class MockModel implements Model {
   }
 
   @Override
-  public Portfolio makePortfolio(String name) {
+  public void makePortfolio(String name) {
     Portfolio portfolio = new MockPortfolio(name);
     portfolios.put(name, portfolio);
-    return portfolio;
   }
 
   public void addPortfolio(String name, Portfolio portfolio) {

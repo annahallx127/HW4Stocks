@@ -1,8 +1,13 @@
 package model;
 
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The Model interface defines the core functionalities of the model that is required
+ * for managing stocks and portfolios. Implementations of this interface are responsible
+ * for retrieving stock data, creating portfolios, and managing collections of portfolios
+ * and stocks.
+ */
 public interface Model {
 
   /**
@@ -20,9 +25,8 @@ public interface Model {
    * Creates a portfolio with the given name and adds it to the Hashmap of portfolios.
    *
    * @param name the name of the portfolio
-   * @return the portfolio created and added to the Hashmap
    */
-  Portfolio makePortfolio(String name);
+  void makePortfolio(String name);
 
   /**
    * Gets the portfolios in the Hashmap with the names of the portfolios and
