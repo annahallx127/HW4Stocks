@@ -1,13 +1,18 @@
 package model;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ModelImpl implements Model {
   HashMap<String, Stock> stocks;
@@ -20,10 +25,15 @@ public class ModelImpl implements Model {
 
   @Override
   public Stock get(String symbol) throws IllegalArgumentException {
-    // Stored in data, make new stock
-    // if ()
+    // if present in data package, get the stock
+    File file = new File("src/data/" + symbol + ".csv");
+    if (file.exists()) {
+      Stock newStock = new modelStock(symbol);
+      stocks.put(symbol, newStock);
+      return newStock;
+    }
 
-    // in map, get the stock
+    // if present in map, get the stock
     if (stocks.get(symbol) != null) {
       return stocks.get(symbol);
     }
@@ -64,7 +74,7 @@ public class ModelImpl implements Model {
    */
   private void apiCall(String symbol) throws IllegalArgumentException {
 
-    final String apiKey = "W0M1JOKC82EZEQA8";
+    final String apiKey = "8E787NZ9TE3Y4ZI4";
     // extra API Key: OTYUTQ7V96CNWN4C
     URL url;
 
@@ -90,7 +100,6 @@ public class ModelImpl implements Model {
     }
 
     InputStream in;
-
     try {
       in = url.openStream();
     } catch (IOException e) {
@@ -101,9 +110,8 @@ public class ModelImpl implements Model {
 
     // Writes 1024 bytes of the API data to the file at a time.
     // If the buffer is not completely full, the remainder of the file is written.
-    // Technically this could be more efficient by checking if each buffer is equal to the new
-    // buffer and only overwriting buffers that have changed, but the difference is probably
-    // negligible.
+    // This could be more efficient by checking if each buffer is equal to the new
+    // buffer and only overwriting buffers that have changed.
     try {
       BufferedWriter bw = getBufferedWriter(symbol);
       byte[] buffer = new byte[1024];
@@ -112,7 +120,12 @@ public class ModelImpl implements Model {
         String chunk = new String(buffer, 0, read);
         bw.write(chunk);
       }
-      in.close();
+      bw.flush();
+//      BufferedWriter bw = new BufferedWriter(new FileWriter("src/data/" + symbol + ".csv"));
+//      while (in.available() > 0) {
+//        bw.write(in.read());
+//      }
+//      in.close();
     } catch (IOException e) {
       e.printStackTrace(System.err);
     }
@@ -124,13 +137,7 @@ public class ModelImpl implements Model {
   }
 
   @Override
-  public HashMap<String, Portfolio> getPortfolios() {
-    return portfolios;
+  public Map<String, Portfolio> getPortfolios() {
+    return Map.copyOf(portfolios);
   }
-
-  @Override
-  public void addPortfolio(String name, Portfolio portfolio) {
-    portfolios.put(name, portfolio);
-  }
-
 }

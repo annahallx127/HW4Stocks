@@ -51,4 +51,6 @@ public interface Portfolio {
    * @return the portfolio's stocks in a string.
    */
   String toString();
+
+  boolean isValidDateForPortfolio(String date);
 }

@@ -70,7 +70,7 @@ public interface Stock {
   String toString(String date) throws IllegalArgumentException;
 
   /**
-   * Gets the symbol  of the stock.
+   * Gets the symbol of the stock.
    *
    * @return the stock as a string
    */
@@ -85,4 +85,13 @@ public interface Stock {
    * @return the validity of the entered date in boolean form.
    */
   boolean isValidDate(String date);
+
+  /**
+   * Finds the price of the specific stock on a valid specified date.
+   * It will present  the closing price of that stock on that date.
+   *
+   * @param date the date the user wants to get the price from
+   * @return the price of the stock at that date as a double
+   */
+  double getPriceOnDate(String date);
 }

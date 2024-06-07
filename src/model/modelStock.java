@@ -31,6 +31,11 @@ public class modelStock implements Stock {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }
+      if (this.apiInfo.isEmpty()) {
+        File file = new File("src/data/" + this.symbol + ".csv");
+        file.delete();
+        throw new IllegalArgumentException("No results found for stock " + symbol + ".");
+      }
     } catch (IOException e) {
       e.printStackTrace(System.err);
     }
@@ -46,7 +51,7 @@ public class modelStock implements Stock {
    */
   private BufferedReader getBufferedReader() throws FileNotFoundException {
     File file = new File("src/data/" + this.symbol + ".csv");
-    return new BufferedReader(new FileReader(file), 1024);
+    return new BufferedReader(new FileReader(file));
   }
 
   @Override
@@ -58,11 +63,11 @@ public class modelStock implements Stock {
     }
 
     for (int i = 0; i < apiInfo.size(); i++) {
-      if (apiInfo.get(i).contains(dateStart)) {
+      if (apiInfo.get(i).contains(dateEnd)) {
         for (int j = i; j < apiInfo.size(); j++) {
-          if (apiInfo.get(j).contains(dateEnd)) {
-            change = Double.parseDouble(apiInfo.get(j).split(",")[4])
-                    - Double.parseDouble(apiInfo.get(i).split(",")[4]);
+          if (apiInfo.get(j).contains(dateStart)) {
+            change = Double.parseDouble(apiInfo.get(i).split(",")[4])
+                    - Double.parseDouble(apiInfo.get(j).split(",")[4]);
             break;
           }
         }
@@ -76,17 +81,21 @@ public class modelStock implements Stock {
   public double getMovingAverage(int days, String date) throws IllegalArgumentException {
     double sum = 0;
 
-    if (!isValidDate(date)) {
-      throw new IllegalArgumentException("Invalid date.");
-    }
-
     if (days <= 0) {
       throw new IllegalArgumentException("The number of days must be greater than 0.");
     }
 
+    if (!isValidDate(date)) {
+      throw new IllegalArgumentException("Invalid date.");
+    }
+
     for (int i = 0; i < apiInfo.size(); i++) {
       if (apiInfo.get(i).contains(date)) {
-        for (int j = 1; j <= days; j++) {
+        // normalize number of days to the maximum
+        if (days > apiInfo.size() - i) {
+          days = apiInfo.size() - i;
+        }
+        for (int j = 0; j < days && j + i < apiInfo.size(); j++) {
           sum += Double.parseDouble(apiInfo.get(i + j).split(",")[4]);
         }
         break;
@@ -104,38 +113,27 @@ public class modelStock implements Stock {
     }
 
     if (!isValidDate(dateStart, dateEnd)) {
-      throw new IllegalArgumentException("Invalid date.");
+      throw new IllegalArgumentException("Invalid dates.");
     }
 
     for (int i = 0; i < apiInfo.size(); i++) {
-      if (apiInfo.get(i).contains(dateStart)) {
+      if (apiInfo.get(i).contains(dateEnd)) {
         for (int j = i; j < apiInfo.size(); j++) {
           String[] split = apiInfo.get(j).split(",");
           // if current close price > x day average
           if (Double.parseDouble(split[4]) > this.getMovingAverage(days, split[0])) {
-            ret.append(split[4]).append(System.lineSeparator());
+            // append date
+            ret.append(split[0]).append(System.lineSeparator());
           }
-          if (apiInfo.get(j).contains(dateEnd)) {
+          if (apiInfo.get(j).contains(dateStart)) {
             break;
           }
         }
       }
     }
-
-//    finish and abstract this
-//    for (int i = 0; i < apiInfo.size(); i++) {
-//      if (apiInfo.get(i).contains(dateStart)) {
-//        int counter = i + 1;
-//        String toParse = apiInfo.get(i).split(",")[0];
-//        String nextParse = apiInfo.get(counter).split(",")[0];
-//        LocalDate parseStart = LocalDate.parse(toParse, formatter);
-//        LocalDate parseNext = LocalDate.parse(nextParse, formatter);
-//        // next date - this date != 1
-//        if (!parseNext.minusDays(1).isEqual(parseStart)) {
-//
-//        }
-//      }
-//    }
+    if (ret.isEmpty()) {
+      return ret.append("None!").append(System.lineSeparator()).toString();
+    }
     return ret.toString();
   }
 
@@ -147,7 +145,7 @@ public class modelStock implements Stock {
     }
 
     if (!isValidDate(date)) {
-      throw new IllegalArgumentException("Date must be in a valid format.");
+      throw new IllegalArgumentException("Invalid date.");
     }
 
     StringBuilder sb = new StringBuilder();
@@ -185,6 +183,9 @@ public class modelStock implements Stock {
 
     try {
       date = LocalDate.parse(dateStr, formatter);
+      if (date.isAfter(LocalDate.now())) {
+        throw new IllegalArgumentException("Date cannot be in the future.");
+      }
       if (!apiInfo.toString().contains(date.toString())) {
         throw new IllegalArgumentException("Date must be a valid market day.");
       }
@@ -204,13 +205,32 @@ public class modelStock implements Stock {
     try {
       LocalDate sDate = LocalDate.parse(dateStart, formatter);
       LocalDate eDate = LocalDate.parse(dateEnd, formatter);
+      if (sDate.isAfter(LocalDate.now()) || eDate.isAfter(LocalDate.now())) {
+        throw new IllegalArgumentException("Dates cannot be in the future.");
+      }
       if (!apiInfo.toString().contains(sDate.toString())
               || !apiInfo.toString().contains(eDate.toString())) {
         throw new IllegalArgumentException("Dates must be valid market days.");
       }
-      return !eDate.isAfter(sDate) && !eDate.isAfter(LocalDate.now());
+      return eDate.isAfter(sDate) && !eDate.isAfter(LocalDate.now());
     } catch (DateTimeParseException e) {
       return false;
     }
+  }
+
+  @Override
+  public double getPriceOnDate(String date) {
+    double price = 0.0;
+    if (!isValidDate(date)) {
+      throw new IllegalArgumentException("Invalid date.");
+    }
+
+    for (String entry : apiInfo) {
+      if (entry.contains(date)) {
+        String[] split = entry.split(",");
+        price = Double.parseDouble(split[4]);
+      }
+    }
+    return price;
   }
 }

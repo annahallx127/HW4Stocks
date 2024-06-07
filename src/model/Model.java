@@ -12,33 +12,23 @@ public interface Model {
    *
    * @param symbol tne ticker symbol of the stock
    * @return the stock the symbol represents
-   * @throws IllegalArgumentException if the symbol given is not a stock
+   * @throws IllegalArgumentException if the symbol given is not a valid stock
    */
   Stock get(String symbol) throws IllegalArgumentException;
 
   /**
-   * Create a portfolio with the given name.
+   * Creates a portfolio with the given name and adds it to the Hashmap of portfolios.
    *
    * @param name the name of the portfolio
-   * @return the portfolio created
+   * @return the portfolio created and added to the Hashmap
    */
   Portfolio makePortfolio(String name);
 
   /**
-   * Gets the portfolios in the hashmap with the names of the portfolios and
+   * Gets the portfolios in the Hashmap with the names of the portfolios and
    * the collection of stocks within it.
    *
-   * @return a map of all existing portfolios and its components
+   * @return a Map of all existing portfolios and its components
    */
-  HashMap<String, Portfolio> getPortfolios();
-
-  /**
-   * Adds a portfolio to the HashMap with its respective components; name and the stocks
-   * under the portfolio name.
-   *
-   * @param name name of the portfolio
-   * @param portfolio a portfolio/collections of the stocks
-   */
-  void addPortfolio(String name, Portfolio portfolio);
-
+  Map<String, Portfolio> getPortfolios();
 }

@@ -1,4 +1,4 @@
-package model;
+package mocks;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -6,13 +6,16 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class modelPortfolio implements Portfolio {
-  private final String name;
-  private final HashMap<Stock, Integer> stocks;
+import model.Portfolio;
+import model.Stock;
 
-  public modelPortfolio(String name) {
+
+public class MockPortfolio implements Portfolio {
+  private final String name;
+  private final Map<Stock, Integer> stocks = new HashMap<>();
+
+  public MockPortfolio(String name) {
     this.name = name;
-    this.stocks = new HashMap<>();
   }
 
   @Override
@@ -27,25 +30,15 @@ public class modelPortfolio implements Portfolio {
 
   @Override
   public void add(Stock s, int shares) {
-    if (shares <= 0) {
-      throw new IllegalArgumentException("Shares added must be one or more.");
-    }
     stocks.put(s, stocks.getOrDefault(s, 0) + shares);
   }
 
   @Override
-  public void remove(Stock s, int shares) throws IllegalArgumentException {
-    if (!stocks.containsKey(s)) {
-      throw new IllegalArgumentException("Cannot remove a stock that doesn't exist.");
-    }
-
-    int currentShares = stocks.get(s);
-    if (shares > currentShares) {
-      throw new IllegalArgumentException("Cannot remove more shares than "
-              + "the number of shares present.");
-    }
-
-    if (currentShares - shares == 0) {
+  public void remove(Stock s, int shares) {
+    int currentShares = stocks.getOrDefault(s, 0);
+    if (currentShares < shares) {
+      throw new IllegalArgumentException("Cannot remove more shares than present.");
+    } else if (currentShares == shares) {
       stocks.remove(s);
     } else {
       stocks.put(s, currentShares - shares);
@@ -54,14 +47,9 @@ public class modelPortfolio implements Portfolio {
 
   @Override
   public double valueOfPortfolio(String date) {
-    double value = 0.0;
-    for (Map.Entry<Stock, Integer> entry : stocks.entrySet()) {
-      Stock stock = entry.getKey();
-      int shares = entry.getValue();
-      double stockPrice = stock.getPriceOnDate(date);
-      value += stockPrice * shares;
-    }
-    return value;
+    return stocks.entrySet().stream()
+            .mapToDouble(entry -> entry.getKey().getPriceOnDate(date) * entry.getValue())
+            .sum();
   }
 
   @Override
@@ -70,15 +58,11 @@ public class modelPortfolio implements Portfolio {
       return "The portfolio is empty!";
     }
 
-    StringBuilder ret = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     for (Map.Entry<Stock, Integer> entry : stocks.entrySet()) {
-      Stock stock = entry.getKey();
-      int shares = entry.getValue();
-      ret.append(stock.toString()).append(": ")
-              .append(shares).append(" shares").append(System.lineSeparator());
+      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares").append(System.lineSeparator());
     }
-
-    return ret.toString();
+    return sb.toString();
   }
 
   @Override
@@ -102,5 +86,4 @@ public class modelPortfolio implements Portfolio {
       return false;
     }
   }
-
 }
