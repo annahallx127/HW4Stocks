@@ -56,7 +56,7 @@ public class MockStock implements Stock {
   public String toString() {
     return symbol;
   }
-// ye mb i j saw it on my
+
   /**
    * Manually set the price of the stock on the specified date.
    * For the purposes of mock testing only.
