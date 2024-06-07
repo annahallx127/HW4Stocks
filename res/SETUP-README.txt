@@ -32,7 +32,9 @@ be considered)
 Congrats!!
 
 Stocks our program supports: All the stocks that are supported by the API (add csv)
-All dates should be supported except for holidays that is not New Years or Christmas.
+All dates for portfolios should be supported except for holidays that is not New Years or
+Christmas.
+All dates for stock methods should be supported, except for holidays.
 If the date entered is a weekend,
 the date on the friday before should be considered instead.
 

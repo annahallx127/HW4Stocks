@@ -17,6 +17,11 @@ public class MockStock implements Stock {
 
   private final Map<String, Double> prices = new HashMap<>();
 
+  /**
+   * Constructs a new MockStock with the specified ticker symbol.
+   *
+   * @param ticker the ticker symbol of the stock
+   */
   public MockStock(String ticker) {
     this.symbol = ticker;
   }
