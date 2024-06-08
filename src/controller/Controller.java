@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.util.Map;
+
 import model.Portfolio;
 import model.Stock;
 
@@ -15,7 +16,7 @@ public interface Controller {
   /**
    * Start the controller and begin the program.
    */
-  void go();
+  void controllerGo();
 
   /**
    * Get a stock with the given symbol from the model.
@@ -31,7 +32,7 @@ public interface Controller {
    *
    * @return the map of portfolios with the given name.
    */
-   Map<String, Portfolio> getPortfolios();
+  Map<String, Portfolio> getPortfolios();
 
   /**
    * Get the next input from the user.

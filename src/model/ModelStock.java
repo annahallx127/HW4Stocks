@@ -17,7 +17,7 @@ import java.util.ArrayList;
  * can also validate dates and check if a date is a market day, throwing exceptions if the date is
  * invalid.
  */
-public class modelStock implements Stock {
+public class ModelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
 
@@ -28,7 +28,7 @@ public class modelStock implements Stock {
    *
    * @param symbol the ticker of the specified stock
    */
-  public modelStock(String symbol) {
+  public ModelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
     readFile();
@@ -40,8 +40,8 @@ public class modelStock implements Stock {
   }
 
   private void readFile() {
-    try(FileReader fileReader = new FileReader("src/data/" + this.symbol + ".csv");
-        BufferedReader br = new BufferedReader(fileReader)) {
+    try (FileReader fileReader = new FileReader("src/data/" + this.symbol + ".csv");
+         BufferedReader br = new BufferedReader(fileReader)) {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }

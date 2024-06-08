@@ -6,7 +6,7 @@ import model.Stock;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test class for the Portfolio implementation within the Model.
@@ -95,7 +95,6 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.add(stock1, 10);
       portfolio.remove(stock1, 14);
-      ;
     } catch (IllegalArgumentException e) {
       assertEquals("Cannot remove more shares than the number of shares present.",
               e.getMessage());

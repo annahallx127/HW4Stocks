@@ -1,4 +1,5 @@
 package mocks;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +32,9 @@ public class MockModel implements Model {
   }
 
   /**
-   * Puts the portfolio into the collection of portfolios/Map
+   * Puts the portfolio into the collection of portfolios/Map.
    *
-   * @param name of the portfolio
+   * @param name      of the portfolio
    * @param portfolio the portfolio and its components
    */
   public void addPortfolio(String name, Portfolio portfolio) {
@@ -50,7 +51,7 @@ public class MockModel implements Model {
    * For the purposes of mock testing only.
    *
    * @param ticker the symbol of the stock.
-   * @param stock the components of the specified stock.
+   * @param stock  the components of the specified stock.
    */
   public void addMockStock(String ticker, Stock stock) {
     stocks.put(ticker, stock);

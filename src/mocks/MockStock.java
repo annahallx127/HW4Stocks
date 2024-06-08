@@ -49,24 +49,25 @@ public class MockStock implements Stock {
   }
 
   @Override
-  public boolean isValidDate(String date) {
-    return prices.containsKey(date);
-  }
-  @Override
-  public double getPriceOnDate(String date) {
-    return prices.getOrDefault(date, 0.0);
+  public String toString() {
+    return symbol;
   }
 
   @Override
-  public String toString() {
-    return symbol;
+  public boolean isValidDate(String date) {
+    return prices.containsKey(date);
+  }
+
+  @Override
+  public double getPriceOnDate(String date) {
+    return prices.getOrDefault(date, 0.0);
   }
 
   /**
    * Manually set the price of the stock on the specified date.
    * For the purposes of mock testing only.
    *
-   * @param date the date of the stock price.
+   * @param date  the date of the stock price.
    * @param price the price of the stock on that date.
    */
   public void setPriceOnDate(String date, double price) {

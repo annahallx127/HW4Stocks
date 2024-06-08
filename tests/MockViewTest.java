@@ -22,7 +22,6 @@ public class MockViewTest {
   private MockModel model;
   private MockStock stock;
   private StringWriter outContent;
-  private StringReader inContent;
   private ControllerImpl controller;
 
   /**
@@ -42,7 +41,7 @@ public class MockViewTest {
   }
 
   private void simulateUserInput(String input) {
-    inContent = new StringReader(input);
+    StringReader inContent = new StringReader(input);
     controller = new ControllerImpl(inContent, outContent);
   }
 
@@ -67,7 +66,8 @@ public class MockViewTest {
 
     new ViewImpl(controller);
 
-    assertEquals(10.0, stock.gainedValue("2021-01-01", "2021-01-31"), 0.01);
+    assertEquals(10.0, stock.gainedValue("2021-01-01",
+            "2021-01-31"), 0.01);
   }
 
   @Test
@@ -89,7 +89,8 @@ public class MockViewTest {
 
     new ViewImpl(controller);
 
-    assertEquals(155.0, stock.getMovingAverage(10, "2021-01-01"), 0.01);
+    assertEquals(155.0, stock.getMovingAverage(10,
+            "2021-01-01"), 0.01);
   }
 
   @Test
@@ -98,7 +99,8 @@ public class MockViewTest {
 
     new ViewImpl(controller);
 
-    assertEquals("Mock crossover data", stock.getCrossovers("2021-01-01", "2021-01-31", 10));
+    assertEquals("Mock crossover data", stock.getCrossovers("2021-01-01",
+            "2021-01-31", 10));
   }
 
   @Test
@@ -128,7 +130,8 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput),
+            standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -158,7 +161,8 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput),
+            standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -188,7 +192,8 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput),
+            standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -206,7 +211,8 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
+            "Enter ticker symbol: DISCLAIMER: if you have entered a date" +
+            " range where it falls on a weekend,\n" +
             "the nearest business day forward will be considered\n" +
             "Enter number of days: \n" +
             "Enter date (YYYY-MM-DD): \n" +
@@ -223,7 +229,8 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput),
+            standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -270,7 +277,8 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: DISCLAIMER: If you have entered a weekend, the date considered will be the friday before.\n" +
+            "Enter ticker symbol: DISCLAIMER: If you have entered a weekend," +
+            " the date considered will be the friday before.\n" +
             "Enter date (YYYY-MM-DD): \n" +
             "Invalid date.\n" +
             "Isaac and Anna's Stock Investment Company\n" +
@@ -285,7 +293,8 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput),
+            standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -295,7 +304,8 @@ public class MockViewTest {
     new ViewImpl(controller);
 
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
-    assertEquals(standardizeLineSeparators("AAPL: 10 shares\n"), standardizeLineSeparators(portfolio.toString()));
+    assertEquals(standardizeLineSeparators("AAPL: 10 shares\n"),
+            standardizeLineSeparators(portfolio.toString()));
   }
 
   @Test
@@ -312,7 +322,8 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
+            "Enter ticker symbol: DISCLAIMER: if you have entered a date range " +
+            "where it falls on a weekend,\n" +
             "the nearest business day forward will be considered\n" +
             "Enter number of days: \n" +
             "Enter start date (YYYY-MM-DD): \n" +
@@ -329,6 +340,7 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput),
+            standardizeLineSeparators(actualOutput));
   }
 }

@@ -1,7 +1,6 @@
 package view;
 
 import controller.Controller;
-import model.Model;
 import model.Portfolio;
 import model.Stock;
 
@@ -91,8 +90,9 @@ public class ViewImpl implements View {
         case 6:
           print("Exiting...");
           System.exit(0);
+          break;
         default:
-          print("Invalid choice. Please try again.");
+          print("Invalid Operation!");
       }
     }
   }
@@ -209,7 +209,8 @@ public class ViewImpl implements View {
         }
         print("Invalid start date. Please enter a valid market date.");
       }
-    } while (!stock.isValidDate(startDate));
+    }
+    while (!stock.isValidDate(startDate));
 
     String endDate;
     do {
@@ -223,7 +224,8 @@ public class ViewImpl implements View {
         }
         print("Invalid end date. Please enter a valid market date.");
       }
-    } while (!stock.isValidDate(endDate));
+    }
+    while (!stock.isValidDate(endDate));
 
     if (days <= 0) {
       print("Quantity must be greater than 0 and a whole number");

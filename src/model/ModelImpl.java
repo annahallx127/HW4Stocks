@@ -1,18 +1,14 @@
 package model;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +51,7 @@ public class ModelImpl implements Model {
   public Stock get(String symbol) throws IllegalArgumentException {
     // if present in data package, get the stock
     if (Files.exists(Paths.get("src/data/" + symbol + ".csv"))) {
-      Stock newStock = new modelStock(symbol);
+      Stock newStock = new ModelStock(symbol);
       stocks.put(symbol, newStock);
       return newStock;
     }
@@ -71,14 +67,14 @@ public class ModelImpl implements Model {
     // If apiCall doesn't throw an exception, then the stock information was found and stored in the
     // data package. We can create a new stock with the given symbol, and it will automatically
     // assign its own values.
-    Stock newStock = new modelStock(symbol);
+    Stock newStock = new ModelStock(symbol);
     stocks.put(symbol, newStock);
     return newStock;
   }
 
   @Override
   public void makePortfolio(String name) {
-    Portfolio newPortfolio = new modelPortfolio(name);
+    Portfolio newPortfolio = new ModelPortfolio(name);
     portfolios.put(name, newPortfolio);
   }
 

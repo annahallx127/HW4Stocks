@@ -16,7 +16,7 @@ import java.util.Map;
  * The portfolio also contains methods to calculate its total value on a given date,
  * adjusting for weekends, and validates whether a date is valid for checking stock prices.
  */
-public class modelPortfolio implements Portfolio {
+public class ModelPortfolio implements Portfolio {
   private final String name;
   private final HashMap<Stock, Integer> stocks;
 
@@ -26,7 +26,7 @@ public class modelPortfolio implements Portfolio {
    *
    * @param name the name of the portfolio specified by the user
    */
-  public modelPortfolio(String name) {
+  public ModelPortfolio(String name) {
     this.name = name;
     this.stocks = new HashMap<>();
   }

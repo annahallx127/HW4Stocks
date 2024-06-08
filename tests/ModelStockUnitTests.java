@@ -1,5 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
+
 import model.Model;
 import model.Stock;
 import model.ModelImpl;
@@ -12,7 +13,6 @@ import static org.junit.Assert.assertEquals;
  * ensuring that stock data retrieval and calculations are handled correctly.
  */
 public class ModelStockUnitTests {
-  private Model model;
   private Stock stock;
 
   /**
@@ -21,7 +21,7 @@ public class ModelStockUnitTests {
    */
   @Before
   public void setUp() {
-    model = new ModelImpl();
+    Model model = new ModelImpl();
     stock = model.get("AAPL");
   }
 
@@ -72,7 +72,8 @@ public class ModelStockUnitTests {
   @Test
   public void testStockGainedValueOpenIntoClosed() {
     try {
-      assertEquals(0.0, stock.gainedValue("2024-03-31", "2024-06-01"), 0.01);
+      assertEquals(0.0, stock.gainedValue("2024-03-31",
+              "2024-06-01"), 0.01);
     } catch (IllegalArgumentException e) {
       assertEquals("Dates must be valid market days.", e.getMessage());
     }
@@ -81,7 +82,8 @@ public class ModelStockUnitTests {
   @Test
   public void testStockGainedValueBothClosed() {
     try {
-      assertEquals(0.0, stock.gainedValue("2024-06-01", "2024-06-02"), 0.01);
+      assertEquals(0.0, stock.gainedValue("2024-06-01",
+              "2024-06-02"), 0.01);
     } catch (IllegalArgumentException e) {
       assertEquals("Dates must be valid market days.", e.getMessage());
     }
@@ -102,13 +104,15 @@ public class ModelStockUnitTests {
   @Test
   public void testStockGainedValueFuture() {
     try {
-      assertEquals(0.0, stock.gainedValue("2024-06-01", "2025-06-02"), 0.01);
+      assertEquals(0.0, stock.gainedValue("2024-06-01",
+              "2025-06-02"), 0.01);
     } catch (IllegalArgumentException e) {
       assertEquals("Dates cannot be in the future.", e.getMessage());
     }
 
     try {
-      assertEquals(0.0, stock.gainedValue("2025-06-01", "2025-06-02"), 0.01);
+      assertEquals(0.0, stock.gainedValue("2025-06-01",
+              "2025-06-02"), 0.01);
     } catch (IllegalArgumentException e) {
       assertEquals("Dates cannot be in the future.", e.getMessage());
     }
@@ -156,11 +160,11 @@ public class ModelStockUnitTests {
     }
   }
 
-  // TODO: Make sure to test this in controller - value greater than max Int
   @Test
   public void testStockMovingAverageIllegalDays() {
     try {
-      stock.getMovingAverage(Integer.parseInt(String.valueOf((long) (Integer.MAX_VALUE + 1))), "2024-06-05");
+      stock.getMovingAverage(Integer.parseInt(String.valueOf((long) (Integer.MAX_VALUE + 1))),
+              "2024-06-05");
     } catch (IllegalArgumentException e) {
       assertEquals("The number of days must be greater than 0.", e.getMessage());
     }
@@ -168,7 +172,8 @@ public class ModelStockUnitTests {
 
   @Test
   public void testStockMovingAverageSameDay() {
-    assertEquals(195.8700, stock.getMovingAverage(1, "2024-06-05"), 0.01);
+    assertEquals(195.8700, stock.getMovingAverage(1, "2024-06-05"),
+            0.01);
   }
 
   @Test
@@ -181,7 +186,8 @@ public class ModelStockUnitTests {
 
   @Test
   public void testStockMovingAverageBeforeStockListing() {
-    assertEquals(77.62, stock.getMovingAverage(99, "1999-11-01"), 0.01);
+    assertEquals(77.62, stock.getMovingAverage(99, "1999-11-01"),
+            0.01);
   }
 
   @Test
@@ -191,20 +197,22 @@ public class ModelStockUnitTests {
 
   @Test
   public void testGetPriceOnDateInvalidDateGetsFridayBeforePrice() {
-      stock.getPriceOnDate("2024-06-02");
-      assertEquals(192.25, stock.getPriceOnDate("2024-06-02"), 0.01);
+    stock.getPriceOnDate("2024-06-02");
+    assertEquals(192.25, stock.getPriceOnDate("2024-06-02"), 0.01);
   }
 
   @Test
   public void testStockCrossoversFuture() {
     try {
-      assertEquals(0.0, stock.getCrossovers("2024-06-01", "2025-06-02", 30));
+      assertEquals(0.0, stock.getCrossovers("2024-06-01",
+              "2025-06-02", 30));
     } catch (IllegalArgumentException e) {
       assertEquals("Dates cannot be in the future.", e.getMessage());
     }
 
     try {
-      assertEquals(0.0, stock.getCrossovers("2025-06-01", "2025-06-02", 30));
+      assertEquals(0.0, stock.getCrossovers("2025-06-01",
+              "2025-06-02", 30));
     } catch (IllegalArgumentException e) {
       assertEquals("Dates cannot be in the future.", e.getMessage());
     }
@@ -282,6 +290,7 @@ public class ModelStockUnitTests {
             "2024-04-15" + System.lineSeparator() +
             "2024-04-12" + System.lineSeparator() +
             "2024-04-11" + System.lineSeparator();
-    assertEquals(sb, stock.getCrossovers("2024-04-10", "2024-04-29", 30));
+    assertEquals(sb, stock.getCrossovers("2024-04-10",
+            "2024-04-29", 30));
   }
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Scanner;
+
 import view.View;
 
 /**
@@ -30,8 +31,8 @@ public class MockView implements View {
    * Starts the main interaction loop.
    *
    * @param model the model to interact with
-   * @param in the input source for user interactions
-   * @param out the output target for displaying messages
+   * @param in    the input source for user interactions
+   * @param out   the output target for displaying messages
    */
   public MockView(Model model, Readable in, Appendable out) {
     this.model = model;
@@ -83,8 +84,9 @@ public class MockView implements View {
         case 6:
           print("Exiting...");
           System.exit(0);
+          break;
         default:
-          print("Invalid choice. Please try again.");
+          print("Invalid Operation!");
       }
     }
   }
@@ -171,7 +173,8 @@ public class MockView implements View {
         }
         print("Invalid start date. Please enter a valid market date.");
       }
-    } while (!stock.isValidDate(startDate));
+    }
+    while (!stock.isValidDate(startDate));
 
     String endDate;
     do {
@@ -185,7 +188,8 @@ public class MockView implements View {
         }
         print("Invalid end date. Please enter a valid market date.");
       }
-    } while (!stock.isValidDate(endDate));
+    }
+    while (!stock.isValidDate(endDate));
 
     if (days <= 0) {
       print("Quantity must be greater than 0 and a whole number");
