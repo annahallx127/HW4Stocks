@@ -1,4 +1,8 @@
 Setup using our program!
+You can run the program by placing the jar file into a new folder, then in the search bar of that
+folder you can delete the file directory and type "cmd" and enter
+this will lead you to the command prompt window and you can type
+java -jar HW4Stocks.jar
 
 Reminder:
 *After every input you enter press enter/return!*
