@@ -5,6 +5,7 @@ import model.Portfolio;
 import model.Stock;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Map;
 
@@ -296,8 +297,9 @@ public class ViewImpl implements View {
         print("Invalid quantity. Please try again.");
         return;
       }
+
       if (quantity > 0) {
-        portfolio.add(stock, quantity);
+        portfolio.add(stock, quantity, date);
         print("You have added " + quantity + " shares of " + ticker.toUpperCase()
                 + " to your portfolio!");
       } else {
@@ -312,7 +314,6 @@ public class ViewImpl implements View {
       }
     }
   }
-
 
   @Override
   public void viewPortfolio() {
@@ -352,6 +353,25 @@ public class ViewImpl implements View {
   }
 
   private void sellStocks(Portfolio portfolio) {
+
+    String intendedSellDate;
+
+    do {
+      print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+              "\ndate backwards will be considered");
+      print("Enter date you would like to sell on: ");
+      intendedSellDate = controller.nextLine();
+      try {
+        intendedSellDate = controller.nextLine();
+        portfolio.isValidDateForPortfolio(intendedSellDate);
+      } catch (IllegalArgumentException e) {
+        print(e.getMessage());
+      }
+      if (!portfolio.isValidDateForPortfolio(intendedSellDate)) {
+        print("Invalid date. Please enter a valid market date.");
+      }
+    } while (!portfolio.isValidDateForPortfolio(intendedSellDate));
+
     print("Enter ticker symbol to remove: ");
     String ticker = controller.nextLine().toUpperCase();
     Stock stockToRemove;
@@ -365,37 +385,18 @@ public class ViewImpl implements View {
     print("Enter quantity: ");
     double numOfShares = controller.nextInt();
     try {
-      portfolio.remove(stockToRemove, numOfShares);
+      portfolio.remove(stockToRemove, numOfShares, intendedSellDate);
     } catch (IllegalArgumentException e) {
       print(e.getMessage());
       return;
     }
-
-    String intendedSellDate;
-
-    do {
-      print("DISCLAIMER: If you have entered a non market date, the nearest market " +
-              "\ndate backwards will be considered");
-      print("Enter date you would like to purchase on: ");
-      intendedSellDate = controller.nextLine();
-      try {
-        intendedSellDate = controller.nextLine();
-        portfolio.isValidDateForPortfolio(intendedSellDate);
-      } catch (IllegalArgumentException e) {
-        print(e.getMessage());
-      }
-      if (!portfolio.isValidDateForPortfolio(intendedSellDate)) {
-        print("Invalid date. Please enter a valid market date.");
-      }
-    } while (!portfolio.isValidDateForPortfolio(intendedSellDate));
-
 
     print("You are Selling this Stock at Date: " + intendedSellDate);
 
     print("You have removed: " + String.format("%.2f", numOfShares) + " shares of "
             + stockToRemove
             + " from the portfolio " + portfolio.getName() + "on" + intendedSellDate + "!\n");
-    portfolio.savePortfolio();
+    controller.savePortfolio(portfolio.getName(), intendedSellDate);
   }
 
 
@@ -479,16 +480,15 @@ public class ViewImpl implements View {
     controller.makePortfolio(name);
     Portfolio portfolio = controller.getPortfolios().get(name);
     print("Portfolio '" + name + "' created.");
+    // save happens in addAndBuyStock
     addAndBuyStock(portfolio);
-    portfolio.savePortfolio();
-    // save the portfolio
   }
 
   // need a way to save the dates so the methods can look back at them
-
   private void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio) {
 
   }
+
   private void findDistributionValueAtDate(Portfolio portfolio) {
     String intendedDate;
 
@@ -529,22 +529,22 @@ public class ViewImpl implements View {
 
   // should the user load the portfolio in the menu screen or in the portfolio menu screen?
   // probably the first menu
-//  @Override
-//  public void loadChosenPortfolio() {
-//    print("Enter the name of the portfolio to load: ");
-//    String portfolioName = controller.nextLine();
-//    try {
-//      controller.loadPortfolio(portfolioName); // put the load portfolio into controller
-//      Portfolio loadedPortfolio = controller.getPortfolios().get(portfolioName);
-//      if (loadedPortfolio != null) {
-//        print("Portfolio '" + portfolioName + "' loaded successfully.");
-//        viewPortfolioChooseMenuScreen(loadedPortfolio);
-//      } else {
-//        print("Portfolio '" + portfolioName + "' does not exist.");
-//      }
-//    } catch (Exception e) {
-//      print("Error loading portfolio: " + e.getMessage());
-//    }
-//  }
+  private void loadChosenPortfolio() {
+    print("Enter the name of the portfolio to load: ");
+    String portfolioName = controller.nextLine();
+    // TODO: add support for path to load portfolio - can be hardcoded for now
+    try {
+      controller.loadPortfolio(portfolioName, "src/portfolios"); // put the load portfolio into controller
+      Portfolio loadedPortfolio = controller.getPortfolios().get(portfolioName);
+      if (loadedPortfolio != null) {
+        print("Portfolio '" + portfolioName + "' loaded successfully.");
+        viewPortfolioChooseMenuScreen(loadedPortfolio);
+      } else {
+        print("Portfolio '" + portfolioName + "' does not exist.");
+      }
+    } catch (Exception e) {
+      print("Error loading portfolio: " + e.getMessage());
+    }
+  }
   // call the portfolio menu screen here and then save portfolio
 }

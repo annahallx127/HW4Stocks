@@ -1,7 +1,12 @@
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.io.File;
+import java.io.IOException;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -16,19 +21,27 @@ public class PortfolioReaderTest {
   Portfolio portfolio;
   PortfolioWriter writer;
   PortfolioReader reader;
+  File test;
+  String pathToWrite;
+
+  @Rule
+  public TemporaryFolder folder = new TemporaryFolder();
 
   @Before
-  public void setUp() throws XMLStreamException {
+  public void setUp() throws IOException {
     portfolio = new ModelPortfolio("portfolioTest");
-    writer = new PortfolioWriter("portfolioTest");
-    writer.writeStock("2024-06-07", "AAPL", 1, 196.8900);
+    pathToWrite = "src/data/portfolios/portfolioTest.xml";
+    test = folder.newFile("portfolioTest.xml");
+    writer = new PortfolioWriter("portfolioTest", "2024-06-06", test.getAbsolutePath());
+    writer.writeStock( "AAPL", 1);
+    writer.writeStock("GOOG", 2);
+    writer.close();
     reader = new PortfolioReader("portfolioTest");
+
   }
 
   @Test
-  public void testPortfolioReaderGetName() {
-    Attributes a = new AttributesImpl();
-    String expectedOutput = a.getValue("name");
-    reader.startDocument();
+  public void testPortfolioReader() {
+
   }
 }

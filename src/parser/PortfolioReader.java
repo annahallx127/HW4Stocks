@@ -2,26 +2,38 @@ package parser;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.File;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import model.ModelPortfolio;
 import model.ModelStock;
 import model.Portfolio;
+import model.Stock;
 
 public class PortfolioReader extends DefaultHandler {
   private Portfolio portfolio;
-  private final String pName;
+  private final String name;
   private StringBuilder data;
 
   private String date;
   private String symbol;
   private double shares;
-  private double value;
+  private boolean bPortfolio = false;
   private boolean bStock = false;
   private boolean bSymbol = false;
+  private boolean bDate = false;
   private boolean bShares = false;
-  private boolean bValue = false;
 
-  public PortfolioReader(String pName) {
-    this.pName = pName;
+  public PortfolioReader(String name) {
+    this.name = name;
     this.shares = 0.0;
   }
 
@@ -32,40 +44,60 @@ public class PortfolioReader extends DefaultHandler {
 
   @Override
   public void startDocument() {
-    portfolio = new ModelPortfolio(pName);
+    portfolio = new ModelPortfolio(name);
   }
 
   @Override
   public void startElement(String uri, String localName, String qName, Attributes attributes) {
     if (qName.equalsIgnoreCase("portfolio")) {
       startDocument();
+      bPortfolio = true;
     } else if (qName.equalsIgnoreCase("stock")) {
       bStock = true;
+    } else if (qName.equalsIgnoreCase("date")) {
+      bDate = true;
     } else if (qName.equalsIgnoreCase("symbol")) {
       bSymbol = true;
     } else if (qName.equalsIgnoreCase("shares")) {
       bShares = true;
-    } else if (qName.equalsIgnoreCase("value")) {
-      bValue = true;
     }
     data = new StringBuilder();
   }
 
   @Override
   public void endElement(String uri, String localName, String qName) {
-    if (bSymbol) {
+    if (bPortfolio) {
+      portfolio = new ModelPortfolio(data.toString());
+      bPortfolio = false;
+    } else if (bSymbol) {
       symbol = data.toString();
       bSymbol = false;
+    } else if (bDate) {
+      date = data.toString();
+      bDate = false;
     } else if (bShares) {
       shares = Double.parseDouble(data.toString());
       bShares = false;
-    } else if (bValue) {
-      value = Double.parseDouble(data.toString());
-      bValue = false;
+    } else if (bStock) {
+      try {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        Stock stock = new ModelStock(symbol);
+        portfolio.add(stock, shares, LocalDate.parse(date, formatter));
+        this.reset();
+        bStock = false;
+      } catch (DateTimeParseException | IllegalArgumentException e) {
+        throw new IllegalArgumentException(e.getMessage());
+      }
     }
+  }
 
-    if (qName.equalsIgnoreCase("stock")) {
-      portfolio.add(new ModelStock(symbol), shares);
-    }
+  private void reset() {
+    symbol = "";
+    date = "";
+    shares = 0.0;
+  }
+
+  public Portfolio getPortfolio() {
+    return portfolio;
   }
 }

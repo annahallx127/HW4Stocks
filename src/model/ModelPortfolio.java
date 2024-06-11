@@ -1,25 +1,16 @@
 package model;
 
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import parser.PortfolioReader;
 import parser.PortfolioWriter;
 
 /**
@@ -47,7 +38,6 @@ public class ModelPortfolio implements Portfolio {
     this.name = name;
     this.stocks = new HashMap<>();
     this.transactions = new ArrayList<>();
-
   }
 
   @Override
@@ -65,31 +55,49 @@ public class ModelPortfolio implements Portfolio {
     return name;
   }
 
+  // add can only add a whole number!!!  only when rebalancing can it be fractional
   @Override
-  public void add(Stock s, double shares) {
+  public void add(Stock s, double shares, String date) {
     if (shares <= 0) {
-      throw new IllegalArgumentException("Shares added must be one or more.");
+      throw new IllegalArgumentException("Shares must be greater than zero.");
     }
-    stocks.put(s, stocks.getOrDefault(s, 0.0) + shares);
+
+    LocalDate intendedDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+
+
+    // Check if the transaction date is legal
+    if (!transactions.isEmpty() && intendedDate.isBefore(transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    }
+
+    Transaction transaction = new ModelTransaction(intendedDate, s, shares, "buy");
+    addTransaction(transaction);
   }
 
+  // removing can also only be in whole numbers
+  // add a clause to round up if its .5 and above, round down if .4 and down?
+  // how to deal with this when rebalancing, bc it can do fractional shares
+  // piazza says can allow to sell fractional shares
   @Override
-  public void remove(Stock s, double shares) throws IllegalArgumentException {
-    if (!stocks.containsKey(s)) {
-      throw new IllegalArgumentException("Cannot remove a stock that doesn't exist.");
+  public void remove(Stock s, double shares, String date) throws IllegalArgumentException {
+    if (shares <= 0) {
+      throw new IllegalArgumentException("Shares removed must be greater than zero.");
+    }
+    LocalDate intendedDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+
+
+    // Ensure no transaction is before the latest transaction
+    if (!transactions.isEmpty() && intendedDate.isBefore(transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
     }
 
-    double currentShares = stocks.get(s);
+    double currentShares = stocks.getOrDefault(s, 0.0);
     if (shares > currentShares) {
-      throw new IllegalArgumentException("Cannot remove more shares than "
-              + "the number of shares present.");
+      throw new IllegalArgumentException("Cannot remove more shares than the number of shares present.");
     }
 
-    if (currentShares - shares <= 0.001) {
-      stocks.remove(s);
-    } else {
-      stocks.put(s, currentShares - shares);
-    }
+    Transaction transaction = new ModelTransaction(intendedDate, s, shares, "sell");
+    addTransaction(transaction);
   }
 
   @Override
@@ -134,12 +142,14 @@ public class ModelPortfolio implements Portfolio {
     return date;
   }
 
-  // add if date is before first transaction, the value is 0
   @Override
   public double valueOfPortfolio(String date) {
     LocalDate validDate = getValidMarketDateWeekend(date);
 
-//    if (validDate.isBefore())
+    // if date is before the first transaction date, return 0
+    if (!transactions.isEmpty() && validDate.isBefore(transactions.get(0).getDate())) {
+      return 0.0;
+    }
 
     double value = 0.0;
     for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
@@ -153,9 +163,8 @@ public class ModelPortfolio implements Portfolio {
 
   @Override
   public boolean isValidDateForPortfolio(String date) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     try {
-      LocalDate parsedDate = LocalDate.parse(date, formatter);
+      LocalDate parsedDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
       if (parsedDate.isAfter(LocalDate.now())) {
         throw new IllegalArgumentException("Date cannot be in the future.");
       }
@@ -198,7 +207,7 @@ public class ModelPortfolio implements Portfolio {
       double stockValue = stockPrice * shares;
       calculatedTotalValue += stockValue;
       String stockInfo = String.format("$%.4f (%.2f%%)", stockValue,
-              Math.ceil(stockValue / totalValue) * 100);
+              Math.floor(stockValue / totalValue) * 100);
       // math.ceil or math.floor?
 
       distribution.put(stock.toString(), ", " + stockInfo + "%");
@@ -206,10 +215,11 @@ public class ModelPortfolio implements Portfolio {
 
     if (Math.abs(calculatedTotalValue - totalValue) > 0.0001) {
       throw new IllegalArgumentException(
-              "Total Distribution Value != Match Total Value of Portfolio");
+              "Total Distribution Value != Total Value of Portfolio");
     }
 
     distribution.put("Total Portfolio Value", String.format("$%.4f", totalValue));
+    // could change to have no format, j do tostring
 
     StringBuilder result = new StringBuilder();
     for (Map.Entry<String, String> entry : distribution.entrySet()) {
@@ -224,13 +234,40 @@ public class ModelPortfolio implements Portfolio {
   public String getCompositionAtDate(String date) {
     LocalDate validDate = getValidMarketDateWeekend(date);
 
-    return "";
+    try {
+      isValidDateForPortfolio(validDate.toString());
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+
+    Map<Stock, Double> portfolioComposition = new HashMap<>();
+    for (Transaction transaction : transactions) {
+      if (!transaction.getDate().isAfter(validDate)) {
+        Stock stock = transaction.getStock();
+        double shares = transaction.getShares();
+        if (transaction.getType().equalsIgnoreCase("buy")) {
+          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock, 0.0));
+        } else if (transaction.getType().equalsIgnoreCase("sell")) {
+          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock, 0.0));
+        }
+        // if transaction type is sell, it should remove? so the composition type doesn't matter?
+
+      }
+    }
+
+    StringBuilder result = new StringBuilder();
+    for (Map.Entry<Stock, Double> entry : portfolioComposition.entrySet()) {
+      result.append(entry.getKey().toString()).append(": ").
+              append(entry.getValue()).append(" shares").append(System.lineSeparator());
+    }
+
+    return result.toString();
   }
 
-  //  check for valid date in view or here?
+  // check for valid date in view or here?
   // plots the asterisk
   @Override
-  public String getPerformanceOverTime(String startDate, String endDate) {
+  public String plotPerformanceOverTime(String startDate, String endDate, PlotScale scale) {
 
     LocalDate validStartDate = getValidMarketDateWeekend(startDate);
     LocalDate validEndDate = getValidMarketDateWeekend(endDate);
@@ -242,61 +279,149 @@ public class ModelPortfolio implements Portfolio {
       System.out.println(e.getMessage());
     }
 
-    LocalDate start = LocalDate.parse(startDate);
-    LocalDate end = LocalDate.parse(endDate);
-
-
     return "";
   }
 
+  // weights must be whole numbers
+  // can make it chronological
+  // takes a specified date
+  // weight cannot be negative
+  // if weight is 0? then it gets rid of stock?
+  // for the view, specify to the user the format
+  // ask go through the portfolio and ask the user the weight of each stock
+  // then store it into a hashmap
+  // if they haven't entered a weight in for a stock..?
   @Override
-  public void reBalancePortfolio() {
+  public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> targetWeights) {
 
+    LocalDate intendedDate = LocalDate.parse(reBalanceDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+    if (transactions.isEmpty() && intendedDate.isBefore(
+            transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("ReBalance date cannot be before the latest transaction.");
+    }
+
+    try {
+      isValidDateForPortfolio(reBalanceDate.toString());
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+    }
+
+    // if not in date format? is this needed
+//    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//    String dateCheck = reBalanceDate.toString();
+//    LocalDate parsedDate = LocalDate.parse(dateCheck, formatter);
+//
+//    if (intendedDate != parsedDate) {
+//      throw new IllegalArgumentException("Invalid date format.");
+//    }
+
+    for (Map.Entry<Stock, Integer> entry : targetWeights.entrySet()) {
+      int weight = entry.getValue();
+      if (weight < 0 || weight > 100) {
+        throw new IllegalArgumentException("Each weight must target weight must be between 0 and 100");
+      }
+    }
+
+    int totalWeight = targetWeights.values().stream().mapToInt(Integer::intValue).sum();
+    if (totalWeight != 100) {
+      throw new IllegalArgumentException("Error: The total weight of all stocks must add up to 100%.");
+    }
+
+    double totalValue = valueOfPortfolio(reBalanceDate.toString());
+
+    Map<Stock, Double> currentValues = new HashMap<>();
+    for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
+      Stock stock = entry.getKey();
+      double shares = entry.getValue();
+      double stockPrice = stock.getPriceOnDate(reBalanceDate.toString());
+      currentValues.put(stock, shares * stockPrice);
+    }
+
+    Map<Stock, Double> targetValues = new HashMap<>();
+    for (Map.Entry<Stock, Integer> entry : targetWeights.entrySet()) {
+      Stock stock = entry.getKey();
+      int intendedWeight = entry.getValue();
+      targetValues.put(stock, totalValue * intendedWeight / 100);
+    }
+
+    for (Stock stock : targetValues.keySet()) {
+      double currentValue = currentValues.getOrDefault(stock, 0.0);
+      double targetValue = targetValues.get(stock);
+      double stockPrice = stock.getPriceOnDate(reBalanceDate.toString());
+
+      //sell
+      if (currentValue > targetValue) {
+        double valueDifferenceToSell = currentValue - targetValue;
+        double sharesToSell = valueDifferenceToSell/stockPrice;
+        remove(stock, sharesToSell, reBalanceDate);
+      }
+
+      //buy
+      if (currentValue < targetValue) {
+        double valueDifferenceToBuy = targetValue - currentValue;
+        double sharesToBuy = valueDifferenceToBuy / stockPrice;
+        add(stock, sharesToBuy, reBalanceDate);
+      }
+    }
   }
 
   @Override
-  public void savePortfolio() {
-    PortfolioWriter writer = new PortfolioWriter(name);
+  public void savePortfolio(String date) {
+    PortfolioWriter writer = new PortfolioWriter(name, date, "src/data/portfolios");
     for (Stock s : stocks.keySet()) {
-      // TODO: add date impl for this
-      writer.writeStock("", s.toString(), stocks.get(s), s.getPriceOnDate(""));
+      writer.writeStock(s.toString(), stocks.get(s));
     }
     writer.close();
   }
 
   @Override
-  public void loadPortfolio() {
-    try {
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser saxParser = factory.newSAXParser();
-      DefaultHandler reader = new PortfolioReader(name);
-      saxParser.parse("src/data/portfolios/" + name + ".xml", reader);
-    } catch (Exception e) {
-      e.printStackTrace(System.err);
-    }
-  }
-
-  @Override
   public void addTransaction(Transaction transaction) throws IllegalArgumentException {
-    // Ensure no transaction is before the latest transaction
-    if (!transactions.isEmpty() && transaction.getDate().isBefore(transactions.get(transactions.size() - 1).getDate())) {
-      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    // no transaction is before the latest transaction
+    if (!transactions.isEmpty() && transaction.getDate().
+            isBefore(transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be " +
+              "before the latest transaction date.");
+    }
+
+    // check if transaction is illegal within the same month
+    for (Transaction t : transactions) {
+      if (t.getStock().equals(transaction.getStock()) && t.getDate().getMonth()
+              == transaction.getDate().getMonth() && t.getDate().getYear()
+              == transaction.getDate().getYear()) {
+        if (transaction.getType().equalsIgnoreCase("sell")
+                && t.getType().equalsIgnoreCase("buy") && transaction.getShares()
+                > t.getShares()) {
+          throw new IllegalArgumentException("Cannot sell more shares " +
+                  "than the number of shares present in the same month.");
+        }
+      }
     }
 
     transactions.add(transaction);
-    transactions.sort(Comparator.naturalOrder());
+    transactions.sort(transaction);
 
     Stock stock = transaction.getStock();
     double shares = transaction.getShares();
 
     if (transaction.getType().equalsIgnoreCase("buy")) {
-      add(stock, shares);
+      stocks.put(stock, stocks.getOrDefault(stock, 0.0) + shares);
     } else if (transaction.getType().equalsIgnoreCase("sell")) {
-      remove(stock, shares);
+      double currentShares = stocks.get(stock);
+      if (shares > currentShares) {
+        throw new IllegalArgumentException("Cannot remove more shares than the " +
+                "number of shares present.");
+      }
+      if (currentShares - shares <= 0.001) {
+        stocks.remove(stock);
+      } else {
+        stocks.put(stock, currentShares - shares);
+      }
     } else {
       throw new IllegalArgumentException("Invalid transaction type.");
     }
   }
+
 
   @Override
   public List<Transaction> getTransactions() {

@@ -29,6 +29,26 @@ public interface Model {
   void makePortfolio(String name);
 
   /**
+   * Saves the portfolio to a .xml file. Files saved in this format can be loaded later, and are
+   * stored in the data/portfolios folder.
+   *
+   * @param name the name of the portfolio
+   * @param date the date to save for the stocks in the portfolio. Used to calculate the value of
+   *             the portfolio when loaded.
+   */
+  void savePortfolio(String name, String date);
+
+  /**
+   * Loads the portfolio from a .xml file.
+   *
+   * @param name the name of the portfolio
+   * @param path the path to the file. The file should be in .xml format and formatted correctly.
+   * @throws IllegalArgumentException if the file is not found or if the file is not formatted
+   *                                  correctly
+   */
+  void loadPortfolio(String name, String path) throws IllegalArgumentException;
+
+  /**
    * Gets the portfolios in the Hashmap with the names of the portfolios and
    * the collection of stocks within it.
    *

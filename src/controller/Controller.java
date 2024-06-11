@@ -34,6 +34,9 @@ public interface Controller {
    */
   Map<String, Portfolio> getPortfolios();
 
+  void savePortfolio(String name, String date);
+
+  void loadPortfolio(String name, String path);
   /**
    * Get the next input from the user.
    *

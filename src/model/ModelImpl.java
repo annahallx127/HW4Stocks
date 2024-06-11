@@ -1,5 +1,8 @@
 package model;
 
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,6 +14,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import parser.PortfolioReader;
 
 /**
  * Represents the model for the stock investment program. The model is responsible for storing
@@ -65,7 +74,7 @@ public class ModelImpl implements Model {
     apiCall(symbol);
 
     // If apiCall doesn't throw an exception, then the stock information was found and stored in the
-    // data package. We can create a new stock with the given symbol, and it will automatically
+    // data/api package. We can create a new stock with the given symbol, and it will automatically
     // assign its own values.
     Stock newStock = new ModelStock(symbol);
     stocks.put(symbol, newStock);
@@ -78,6 +87,34 @@ public class ModelImpl implements Model {
     portfolios.put(name, newPortfolio);
   }
 
+  @Override
+  public void savePortfolio(String name, String date) {
+    Portfolio p = portfolios.get(name);
+    if (p == null) {
+      throw new IllegalArgumentException("The portfolio does not exist.");
+    }
+    p.savePortfolio(date);
+  }
+
+  @Override
+  public void loadPortfolio(String name, String path) throws IllegalArgumentException {
+    // path is a directory - append the name of the portfolio to the path
+    if (Paths.get(path).toFile().isDirectory()) {
+      path = path + "/" + name + ".xml";
+    }
+
+    try {
+      SAXParserFactory factory = SAXParserFactory.newInstance();
+      SAXParser saxParser = factory.newSAXParser();
+      PortfolioReader reader = new PortfolioReader(name);
+      saxParser.parse(path, reader);
+      portfolios.put(reader.getPortfolio().getName(), reader.getPortfolio());
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("The portfolio could not be loaded: " + e.getMessage());
+    } catch (ParserConfigurationException | SAXException | IOException e) {
+      System.err.println("Error when parsing the file: " + e.getMessage());
+    }
+  }
 
   /**
    * Queries the AlphaVantage API to find the information on a given stock. The file returned is

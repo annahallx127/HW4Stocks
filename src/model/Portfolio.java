@@ -41,7 +41,7 @@ public interface Portfolio {
    * @param s      the stock to add to the portfolio.
    * @param shares the number of shares bought.
    */
-  void add(Stock s, double shares);
+  void add(Stock s, double shares, String date);
 
   /**
    * Removes a stock from the portfolio.
@@ -53,7 +53,7 @@ public interface Portfolio {
    *                                  number of shares owned, or if the stock is not
    *                                  in the portfolio.
    */
-  void remove(Stock s, double shares) throws IllegalArgumentException;
+  void remove(Stock s, double shares, String date) throws IllegalArgumentException;
 
   /**
    * Finds the total value of the portfolio on the given date.
@@ -84,17 +84,55 @@ public interface Portfolio {
    * date, and the total value of the portfolio at that date.
    *
    * @param date the user specified date of which to check the distribution
-   * @return the value distribution of the portfolio
+   * @return the value distribution of the portfolio at that date
    */
   String getValueDistribution(String date);
 
-
+  /**
+   * Determines the composition of a portfolio at a specific date. Taking into account that
+   * portfolios may change over time. The composition includes a list of the stocks and the number
+   * of shares of each stock.
+   *
+   * @param date the user specified date of which to check the composition
+   * @return the composition of the portfolio at that date
+   */
   String getCompositionAtDate(String date);
-  String getPerformanceOverTime(String startDate, String endDate);
 
-  void reBalancePortfolio();
-  void savePortfolio();
-  void loadPortfolio();
+  /**
+   * A visualization of how the portfolio has performed over a period of time. This chart includes
+   * the time stamp specification and a measure of the value of the portfolio at each time stamp
+   * using asterisks. The more asterisks there are next to the time stamp, the better the
+   * portfolio performed at that time. These asterisks represent the dollar amount of the
+   * portfolio, however many asterisks * the set dollar scale is a representation of the total
+   * value of the portfolio at that time stamp. Disclaimer: The numerical value of the calculation
+   * is not the exact value.
+   *
+   * @param startDate the user specified start date of which to examine the portfolio performance.
+   * @param endDate the user specified end date of which to examine the portfolio performance.
+   * @param scale the timescale on which to plot the graph
+   * @return a bar chart representation of the portfolio's performance over the specified
+   * time period.
+   */
+  String plotPerformanceOverTime(String startDate, String endDate, PlotScale scale);
+
+  /**
+   * A way for the user to shift the weights of their portfolio so that they are able to invest
+   * more or less in different stocks of their portfolio. The user is able to specify
+   * the weights of the stock so that a buy and sell transaction are made when this method
+   * is called. This involves selling some stock of companies that are over-represented to
+   * buy stock of companies that are under-represented. Since stock lose and gain value over time,
+   * re-balancing their portfolio will allow them to keep meeting their goals.
+   */
+  void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> weightsOfStocks);
+
+  /**
+   * Saves a portfolio to disk as an XML file of the same name. The format can be found in the
+   * design documentation, but generally saves the portfolios current stocks, number of shares, and,
+   * value on a given date.
+   *
+   * @param date the date to use as a reference for the portfolio's stocks
+   */
+  void savePortfolio(String date);
 
   /**
    * Adds a transaction to the portfolio.

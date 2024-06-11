@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import model.PlotScale;
 import model.Portfolio;
 import model.Stock;
+import model.Transaction;
 
 /**
  * A mock implementation of the Portfolio interface for testing purposes.
@@ -47,12 +50,12 @@ public class MockPortfolio implements Portfolio {
   }
 
   @Override
-  public void add(Stock s, double shares) {
+  public void add(Stock s, double shares, String date) {
     stocks.put(s, stocks.getOrDefault(s, 0.0) + shares);
   }
 
   @Override
-  public void remove(Stock s, double shares) {
+  public void remove(Stock s, double shares, String date) {
     double currentShares = stocks.getOrDefault(s, 0.0);
     if (currentShares < shares) {
       throw new IllegalArgumentException("Cannot remove more shares than present.");
@@ -117,22 +120,27 @@ public class MockPortfolio implements Portfolio {
   }
 
   @Override
-  public String getPerformanceOverTime(String startDate, String endDate) {
+  public String plotPerformanceOverTime(String startDate, String endDate, PlotScale scale) {
     return "";
   }
 
   @Override
-  public void reBalancePortfolio() {
+  public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> weightsOfStocks) {
 
   }
 
   @Override
-  public void savePortfolio() {
+  public void savePortfolio(String date) {
 
   }
 
   @Override
-  public void loadPortfolio() {
+  public void addTransaction(Transaction transaction) {
 
+  }
+
+  @Override
+  public List<Transaction> getTransactions() {
+    return List.of();
   }
 }

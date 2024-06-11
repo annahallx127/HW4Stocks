@@ -46,3 +46,5 @@ The 'Main' class and method are found in the controller package, and are respons
 the program. It creates a new instance of the controller, and then calls the go() method to start
 the program. It will read and append from Readable and Appendable objects, defaulting to the
 console.
+
+What we Changed/Added:

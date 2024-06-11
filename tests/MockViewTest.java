@@ -12,6 +12,8 @@ import view.ViewImpl;
 
 import static org.junit.Assert.assertEquals;
 
+
+/// test the controller here instead after switching
 public class MockViewTest {
   private MockModel model;
   private MockStock stock;

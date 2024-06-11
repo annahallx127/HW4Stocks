@@ -68,6 +68,16 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
+  public void savePortfolio(String name, String date) {
+    model.savePortfolio(name, date);
+  }
+
+  @Override
+  public void loadPortfolio(String name, String path) {
+    model.loadPortfolio(name, path);
+  }
+
+  @Override
   public String next() {
     Scanner s = new Scanner(in);
     return s.next();
