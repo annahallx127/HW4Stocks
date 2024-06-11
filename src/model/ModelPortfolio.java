@@ -8,7 +8,11 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,6 +34,8 @@ import parser.PortfolioWriter;
 public class ModelPortfolio implements Portfolio {
   private String name;
   private final HashMap<Stock, Double> stocks;
+  private final List<Transaction> transactions;
+
 
   /**
    * Constructs a new modelPortfolio with the specified name.
@@ -40,6 +46,8 @@ public class ModelPortfolio implements Portfolio {
   public ModelPortfolio(String name) {
     this.name = name;
     this.stocks = new HashMap<>();
+    this.transactions = new ArrayList<>();
+
   }
 
   @Override
@@ -193,7 +201,7 @@ public class ModelPortfolio implements Portfolio {
               Math.ceil(stockValue / totalValue) * 100);
       // math.ceil or math.floor?
 
-      distribution.put(stock.toString(),", " + stockInfo + "%");
+      distribution.put(stock.toString(), ", " + stockInfo + "%");
     }
 
     if (Math.abs(calculatedTotalValue - totalValue) > 0.0001) {
@@ -266,5 +274,32 @@ public class ModelPortfolio implements Portfolio {
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }
+  }
+
+  @Override
+  public void addTransaction(Transaction transaction) throws IllegalArgumentException {
+    // Ensure no transaction is before the latest transaction
+    if (!transactions.isEmpty() && transaction.getDate().isBefore(transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    }
+
+    transactions.add(transaction);
+    transactions.sort(Comparator.naturalOrder());
+
+    Stock stock = transaction.getStock();
+    double shares = transaction.getShares();
+
+    if (transaction.getType().equalsIgnoreCase("buy")) {
+      add(stock, shares);
+    } else if (transaction.getType().equalsIgnoreCase("sell")) {
+      remove(stock, shares);
+    } else {
+      throw new IllegalArgumentException("Invalid transaction type.");
+    }
+  }
+
+  @Override
+  public List<Transaction> getTransactions() {
+    return Collections.unmodifiableList(transactions);
   }
 }

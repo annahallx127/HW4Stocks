@@ -5,7 +5,6 @@ import model.Portfolio;
 import model.Stock;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Map;
 
@@ -88,7 +87,7 @@ public class ViewImpl implements View {
           viewPortfolio();
           break;
         case 6:
-           loadChosenPortfolio();
+//           loadChosenPortfolio();
           break;
         case 7:
           print("Exiting...");
@@ -396,6 +395,7 @@ public class ViewImpl implements View {
     print("You have removed: " + String.format("%.2f", numOfShares) + " shares of "
             + stockToRemove
             + " from the portfolio " + portfolio.getName() + "on" + intendedSellDate + "!\n");
+    portfolio.savePortfolio();
   }
 
 
@@ -462,7 +462,7 @@ public class ViewImpl implements View {
           plotPerformanceBarChart(portfolio);
           break;
         case 9:
-          savePortfolioToDevice(portfolio);
+//          savePortfolioToDevice(portfolio);
           break;
         case 10:
           return;
@@ -514,10 +514,10 @@ public class ViewImpl implements View {
 
   }
 
-
-  private void savePortfolioToDevice(Portfolio portfolio) {
-
-  }
+//
+//  private void savePortfolioToDevice(Portfolio portfolio) {
+//
+//  }
 
   private void reBalanceChosenPortfolio(Portfolio portfolio) {
 
@@ -527,8 +527,24 @@ public class ViewImpl implements View {
 
   }
 
-  @Override
-  public void loadChosenPortfolio() {
-
-  }
+  // should the user load the portfolio in the menu screen or in the portfolio menu screen?
+  // probably the first menu
+//  @Override
+//  public void loadChosenPortfolio() {
+//    print("Enter the name of the portfolio to load: ");
+//    String portfolioName = controller.nextLine();
+//    try {
+//      controller.loadPortfolio(portfolioName); // put the load portfolio into controller
+//      Portfolio loadedPortfolio = controller.getPortfolios().get(portfolioName);
+//      if (loadedPortfolio != null) {
+//        print("Portfolio '" + portfolioName + "' loaded successfully.");
+//        viewPortfolioChooseMenuScreen(loadedPortfolio);
+//      } else {
+//        print("Portfolio '" + portfolioName + "' does not exist.");
+//      }
+//    } catch (Exception e) {
+//      print("Error loading portfolio: " + e.getMessage());
+//    }
+//  }
+  // call the portfolio menu screen here and then save portfolio
 }

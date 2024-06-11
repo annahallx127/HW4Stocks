@@ -63,6 +63,12 @@ public class MockStock implements Stock {
     return prices.getOrDefault(date, 0.0);
   }
 
+  // fix this later os that it calls the ones in the api
+  @Override
+  public boolean isValidSymbol(String symbol) {
+    return true;
+  }
+
   /**
    * Manually set the price of the stock on the specified date.
    * For the purposes of mock testing only.

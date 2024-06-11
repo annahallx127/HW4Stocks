@@ -1,5 +1,6 @@
 package model;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,4 +96,18 @@ public interface Portfolio {
   void savePortfolio();
   void loadPortfolio();
 
+  /**
+   * Adds a transaction to the portfolio.
+   *
+   * @param transaction the transaction to add
+   * @throws IllegalArgumentException if the transaction date is before the latest transaction
+   */
+  void addTransaction(Transaction transaction);
+
+  /**
+   * Gets all transactions in the portfolio.
+   *
+   * @return a list of transactions
+   */
+  List<Transaction> getTransactions();
 }

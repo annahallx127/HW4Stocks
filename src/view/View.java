@@ -1,5 +1,7 @@
 package view;
 
+import model.Portfolio;
+
 /**
  * The View interface defines the methods required for interacting with the user in the stock
  * investment application. It handles user inputs, displays options and results, and manages
@@ -71,5 +73,7 @@ public interface View {
   /**
    * Allows the user to load and change a portfolio in the format specified to the application.
    */
-  void loadChosenPortfolio();
+//  void loadChosenPortfolio();
+
+//  void loadChosenPortfolio(Portfolio portfolio);
 }

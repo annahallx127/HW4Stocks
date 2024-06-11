@@ -315,8 +315,8 @@ public class MockView implements View {
   }
 
 
-  @Override
-  public void loadChosenPortfolio() {
-
-  }
+//  @Override
+//  public void loadChosenPortfolio() {
+//
+//  }
 }
