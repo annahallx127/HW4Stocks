@@ -96,4 +96,6 @@ public interface Stock {
    * @return the price of the stock at that date as a double
    */
   double getPriceOnDate(String date);
+
+  boolean isValidSymbol(String symbol);
 }

@@ -313,4 +313,10 @@ public class MockView implements View {
     print("Portfolio '" + name + "' created.");
     addAndBuyStock(portfolio);
   }
+
+
+  @Override
+  public void loadChosenPortfolio() {
+
+  }
 }

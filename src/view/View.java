@@ -67,4 +67,9 @@ public interface View {
    * them back to the menu screen.
    */
   void viewPortfolio();
+
+  /**
+   * Allows the user to load and change a portfolio in the format specified to the application.
+   */
+  void loadChosenPortfolio();
 }

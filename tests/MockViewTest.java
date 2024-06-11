@@ -12,22 +12,12 @@ import view.ViewImpl;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Test class for the MockView implementation.
- * This class contains unit tests to verify the functionality of the ViewImpl class,
- * ensuring that user interactions are handled correctly and that the appropriate
- * outputs are generated.
- */
 public class MockViewTest {
   private MockModel model;
   private MockStock stock;
   private StringWriter outContent;
   private ControllerImpl controller;
 
-  /**
-   * Sets up the application with values before each of the following tests.
-   * Initializes the mock model, stock, output content, and controller.
-   */
   @Before
   public void setUp() {
     model = new MockModel();
@@ -37,7 +27,6 @@ public class MockViewTest {
     model.addMockStock("AAPL", stock);
 
     outContent = new StringWriter();
-    controller = new ControllerImpl(new StringReader(""), outContent);
   }
 
   private void simulateUserInput(String input) {
@@ -45,7 +34,6 @@ public class MockViewTest {
     controller = new ControllerImpl(inContent, outContent);
   }
 
-  // private method to standardize the line separators for testing
   private String standardizeLineSeparators(String input) {
     return input.replace("\r\n", "\n").replace("\r", "\n");
   }
@@ -53,9 +41,7 @@ public class MockViewTest {
   @Test
   public void testCreatePortfolioAndAddStock() {
     simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n6\n");
-
     new ViewImpl(controller);
-
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(10, portfolio.getStocks().get(stock).intValue());
   }
@@ -63,44 +49,32 @@ public class MockViewTest {
   @Test
   public void testCalculateGainOrLoss() {
     simulateUserInput("1\nAAPL\n2021-01-01\n2021-01-31\n6\n");
-
     new ViewImpl(controller);
-
-    assertEquals(10.0, stock.gainedValue("2021-01-01",
-            "2021-01-31"), 0.01);
+    assertEquals(10.0, stock.gainedValue("2021-01-01", "2021-01-31"), 0.01);
   }
 
   @Test
   public void testViewPortfolio() {
     simulateUserInput("5\n1\n6\n");
-
     model.makePortfolio("MyPortfolio");
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     model.addPortfolio("MyPortfolio", portfolio);
-
     new ViewImpl(controller);
-
     assertEquals("The portfolio is empty!", portfolio.toString());
   }
 
   @Test
   public void testCalculateXDayMovingAverage() {
     simulateUserInput("2\nAAPL\n10\n2021-01-01\n6\n");
-
     new ViewImpl(controller);
-
-    assertEquals(155.0, stock.getMovingAverage(10,
-            "2021-01-01"), 0.01);
+    assertEquals(155.0, stock.getMovingAverage(10, "2021-01-01"), 0.01);
   }
 
   @Test
   public void testCalculateXDayCrossovers() {
     simulateUserInput("3\nAAPL\n10\n2021-01-01\n2021-01-31\n6\n");
-
     new ViewImpl(controller);
-
-    assertEquals("Mock crossover data", stock.getCrossovers("2021-01-01",
-            "2021-01-31", 10));
+    assertEquals("Mock crossover data", stock.getCrossovers("2021-01-01", "2021-01-31", 10));
   }
 
   @Test
@@ -130,8 +104,7 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput),
-            standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -161,8 +134,7 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput),
-            standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
@@ -192,14 +164,12 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput),
-            standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
   public void testInvalidDatesForMovingAverage() {
     simulateUserInput("2\nAAPL\n10\nINVALID_DATE\n6\n");
-
     new ViewImpl(controller);
 
     String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
@@ -211,8 +181,7 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: DISCLAIMER: if you have entered a date" +
-            " range where it falls on a weekend,\n" +
+            "Enter ticker symbol: DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
             "the nearest business day forward will be considered\n" +
             "Enter number of days: \n" +
             "Enter date (YYYY-MM-DD): \n" +
@@ -229,16 +198,13 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput),
-            standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
   public void testAddStockToPortfolio() {
     simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n1\nAAPL\n20\nno\n5\n6\n");
-
     new ViewImpl(controller);
-
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(30, portfolio.getStocks().get(stock).intValue());
   }
@@ -246,9 +212,7 @@ public class MockViewTest {
   @Test
   public void testRemoveStockFromPortfolio() {
     simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n2\nAAPL\n5\n5\n6\n");
-
     new ViewImpl(controller);
-
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(5, portfolio.getStocks().get(stock).intValue());
   }
@@ -256,9 +220,7 @@ public class MockViewTest {
   @Test
   public void testFindPortfolioValue() {
     simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n1\n3\n2021-01-31\n5\n6\n");
-
     new ViewImpl(controller);
-
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
     assertEquals(1600.0, portfolio.valueOfPortfolio("2021-01-31"), 0.001);
   }
@@ -277,8 +239,7 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: DISCLAIMER: If you have entered a weekend," +
-            " the date considered will be the friday before.\n" +
+            "Enter ticker symbol: DISCLAIMER: If you have entered a weekend, the date considered will be the friday before.\n" +
             "Enter date (YYYY-MM-DD): \n" +
             "Invalid date.\n" +
             "Isaac and Anna's Stock Investment Company\n" +
@@ -293,19 +254,15 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput),
-            standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 
   @Test
   public void testPrintPortfolio() {
     simulateUserInput("4\nMyPortfolio\nAAPL\n10\nno\n5\n6\n");
-
     new ViewImpl(controller);
-
     Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
-    assertEquals(standardizeLineSeparators("AAPL: 10 shares\n"),
-            standardizeLineSeparators(portfolio.toString()));
+    assertEquals(standardizeLineSeparators("AAPL: 10 shares\n"), standardizeLineSeparators(portfolio.toString()));
   }
 
   @Test
@@ -322,8 +279,7 @@ public class MockViewTest {
             "5. View Existing Portfolios\n" +
             "6. Exit Menu\n" +
             "Choose an option: \n" +
-            "Enter ticker symbol: DISCLAIMER: if you have entered a date range " +
-            "where it falls on a weekend,\n" +
+            "Enter ticker symbol: DISCLAIMER: if you have entered a date range where it falls on a weekend,\n" +
             "the nearest business day forward will be considered\n" +
             "Enter number of days: \n" +
             "Enter start date (YYYY-MM-DD): \n" +
@@ -340,7 +296,6 @@ public class MockViewTest {
             "Exiting...\n";
 
     String actualOutput = outContent.toString();
-    assertEquals(standardizeLineSeparators(expectedOutput),
-            standardizeLineSeparators(actualOutput));
+    assertEquals(standardizeLineSeparators(expectedOutput), standardizeLineSeparators(actualOutput));
   }
 }

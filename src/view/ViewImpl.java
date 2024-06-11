@@ -36,7 +36,7 @@ public class ViewImpl implements View {
 
   /**
    * Private function that prints a message to the output appendable.
-   * Appends the message followed by a new line seperator
+   * Appends the message followed by a new line separator
    * If an IOException occurs, it wraps the exception in a RuntimeException and rethrows it.
    *
    * @param message message the message to be printed
@@ -58,8 +58,9 @@ public class ViewImpl implements View {
       print("2. Calculate X-Day Moving Average");
       print("3. Calculate X-Day Crossovers");
       print("4. Create a New Portfolio");
-      print("5. View Existing Portfolios");
-      print("6. Exit Menu");
+      print("5. Portfolio Menu Screen");
+      print("6. Load Own Portfolio");
+      print("7. Exit Menu");
       print("Choose an option: ");
 
       int choice;
@@ -69,7 +70,6 @@ public class ViewImpl implements View {
         print("Invalid value. Please try again.");
         continue;
       }
-
 
       switch (choice) {
         case 1:
@@ -88,6 +88,9 @@ public class ViewImpl implements View {
           viewPortfolio();
           break;
         case 6:
+           loadChosenPortfolio();
+          break;
+        case 7:
           print("Exiting...");
           System.exit(0);
           break;
@@ -101,28 +104,50 @@ public class ViewImpl implements View {
   public void calculateGainOrLoss() {
     print("Enter ticker symbol: ");
     String ticker = controller.nextLine().toUpperCase();
-    Stock chosenStock;
+    Stock stock;
     try {
-      chosenStock = controller.getStock(ticker);
+      stock = controller.getStock(ticker);
+      stock.isValidSymbol(ticker);
     } catch (IllegalArgumentException e) {
       print(e.getMessage());
       return;
     }
 
-    if (chosenStock == null) {
-      print("Invalid ticker symbol.");
-      return;
+    String startDate;
+    do {
+      print("DISCLAIMER: If you have entered any non market date, the nearest market " +
+              "\ndate backwards will be considered");
+      print("Enter start date (YYYY-MM-DD): ");
+      startDate = controller.nextLine();
+      if (!stock.isValidDate(startDate)) {
+        try {
+          stock.isValidDate(startDate);
+        } catch (IllegalArgumentException e) {
+          print(e.getMessage());
+        }
+        print("Invalid start date. Please enter a valid market date.");
+      }
     }
+    while (!stock.isValidDate(startDate));
 
-    print("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
-            + "\nthe nearest business day forward will be considered");
-    print("Start Date (YYYY-MM-DD): ");
-    String startDate = controller.nextLine();
-    print("End Date (YYYY-MM-DD): ");
-    String endDate = controller.nextLine();
+    String endDate;
+    do {
+      print("Enter end date (YYYY-MM-DD): ");
+      endDate = controller.nextLine();
+      if (!stock.isValidDate(endDate)) {
+        try {
+          stock.isValidDate(endDate);
+        } catch (IllegalArgumentException e) {
+          print(e.getMessage());
+        }
+        print("Invalid end date. Please enter a valid market date.");
+      }
+    }
+    while (!stock.isValidDate(endDate));
+
     double gainOrLoss;
     try {
-      gainOrLoss = chosenStock.gainedValue(startDate, endDate);
+      gainOrLoss = stock.gainedValue(startDate, endDate);
     } catch (IllegalArgumentException e) {
       print(e.getMessage());
       return;
@@ -137,13 +162,9 @@ public class ViewImpl implements View {
     Stock stock;
     try {
       stock = controller.getStock(ticker);
+      stock.isValidSymbol(ticker);
     } catch (IllegalArgumentException e) {
       print(e.getMessage());
-      return;
-    }
-
-    if (stock == null) {
-      print("Invalid ticker symbol.");
       return;
     }
 
@@ -151,6 +172,8 @@ public class ViewImpl implements View {
             + "\nthe nearest business day forward will be considered");
     print("Enter number of days: ");
     int days = controller.nextInt();
+    print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+            "date backwards will be considered");
     print("Enter date (YYYY-MM-DD): ");
     String date = controller.nextLine();
 
@@ -162,7 +185,7 @@ public class ViewImpl implements View {
       } catch (IllegalArgumentException e) {
         print(e.getMessage());
       }
-      print("Invalid Date, ");
+      print("Invalid Date.");
     } else {
       print("The " + days + "-Day Moving Average, Starting on: " + date +
               " is " + stock.getMovingAverage(days, date));
@@ -173,9 +196,12 @@ public class ViewImpl implements View {
   public void calculateXDayCrossovers() {
     print("Enter ticker symbol: ");
     String ticker = controller.nextLine().toUpperCase();
-    Stock stock = controller.getStock(ticker);
-    if (stock == null) {
-      print("Invalid ticker symbol.");
+    Stock stock;
+    try {
+      stock = controller.getStock(ticker);
+      stock.isValidSymbol(ticker);
+    } catch (IllegalArgumentException e) {
+      print(e.getMessage());
       return;
     }
 
@@ -199,6 +225,8 @@ public class ViewImpl implements View {
 
     String startDate;
     do {
+      print("DISCLAIMER: If you have entered any non market date, the nearest market " +
+              "\ndate backwards will be considered");
       print("Enter start date (YYYY-MM-DD): ");
       startDate = controller.nextLine();
       if (!stock.isValidDate(startDate)) {
@@ -237,20 +265,29 @@ public class ViewImpl implements View {
 
   private void addAndBuyStock(Portfolio portfolio) {
     while (true) {
-      print("You are Buying this Stock at Date: " + LocalDate.now());
       print("Enter ticker symbol: ");
       String ticker = controller.nextLine().toUpperCase();
       Stock stock;
       try {
         stock = controller.getStock(ticker);
+        stock.isValidSymbol(ticker);
       } catch (IllegalArgumentException e) {
         print(e.getMessage());
         return;
       }
-      if (stock == null) {
-        print("Invalid ticker symbol.");
-        return;
-      }
+
+      String date;
+      do {
+        print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+                "\ndate backwards will be considered");
+        print("Enter date you would like to purchase on: ");
+        date = controller.nextLine();
+        if (!stock.isValidDate(date)) {
+          print("Invalid date. Please enter a valid market date.");
+        }
+      } while (!stock.isValidDate(date));
+
+      print("You are Buying this Stock at Date: " + date);
 
       print("Enter quantity: ");
       int quantity;
@@ -260,7 +297,6 @@ public class ViewImpl implements View {
         print("Invalid quantity. Please try again.");
         return;
       }
-
       if (quantity > 0) {
         portfolio.add(stock, quantity);
         print("You have added " + quantity + " shares of " + ticker.toUpperCase()
@@ -277,6 +313,7 @@ public class ViewImpl implements View {
       }
     }
   }
+
 
   @Override
   public void viewPortfolio() {
@@ -315,14 +352,81 @@ public class ViewImpl implements View {
     }
   }
 
+  private void sellStocks(Portfolio portfolio) {
+    print("Enter ticker symbol to remove: ");
+    String ticker = controller.nextLine().toUpperCase();
+    Stock stockToRemove;
+    try {
+      stockToRemove = controller.getStock(ticker);
+      stockToRemove.isValidSymbol(ticker);
+    } catch (IllegalArgumentException e) {
+      print(e.getMessage());
+      return;
+    }
+    print("Enter quantity: ");
+    double numOfShares = controller.nextInt();
+    try {
+      portfolio.remove(stockToRemove, numOfShares);
+    } catch (IllegalArgumentException e) {
+      print(e.getMessage());
+      return;
+    }
+
+    String intendedSellDate;
+
+    do {
+      print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+              "\ndate backwards will be considered");
+      print("Enter date you would like to purchase on: ");
+      intendedSellDate = controller.nextLine();
+      try {
+        intendedSellDate = controller.nextLine();
+        portfolio.isValidDateForPortfolio(intendedSellDate);
+      } catch (IllegalArgumentException e) {
+        print(e.getMessage());
+      }
+      if (!portfolio.isValidDateForPortfolio(intendedSellDate)) {
+        print("Invalid date. Please enter a valid market date.");
+      }
+    } while (!portfolio.isValidDateForPortfolio(intendedSellDate));
+
+
+    print("You are Selling this Stock at Date: " + intendedSellDate);
+
+    print("You have removed: " + String.format("%.2f", numOfShares) + " shares of "
+            + stockToRemove
+            + " from the portfolio " + portfolio.getName() + "on" + intendedSellDate + "!\n");
+  }
+
+
+  private void totalValueOfPortfolioAtDate(Portfolio portfolio) {
+    print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+            "\ndate backwards will be considered");
+    print("Enter date (YYYY-MM-DD): ");
+    String date = controller.nextLine();
+    double value;
+    try {
+      value = portfolio.valueOfPortfolio(date);
+    } catch (IllegalArgumentException e) {
+      print(e.getMessage());
+      return;
+    }
+    print("The value of the portfolio on " + date + " is: " + String.format("%.2f", value));
+  }
+
   private void viewPortfolioChooseMenuScreen(Portfolio portfolio) {
     while (true) {
       print("You are in the Portfolio: " + portfolio.getName());
-      print("1. Add a Stock");
-      print("2. Remove a Stock");
-      print("3. Find Portfolio Value");
-      print("4. View Entire Portfolio");
-      print("5. Go Back");
+      print("1. Buy shares of a Stock");
+      print("2. Sell shares of a Stock");
+      print("3. View Entire Portfolio (To Date)");
+      print("4. View Composition of Portfolio");
+      print("5. Re-Balance Portfolio");
+      print("6. Find Portfolio Value");
+      print("7. Find Distribution of Value");
+      print("8. View Performance Over Time");
+      print("9. Save Portfolio to Device");
+      print("10. Go Back");
 
       int option;
       try {
@@ -337,49 +441,30 @@ public class ViewImpl implements View {
           addAndBuyStock(portfolio);
           break;
         case 2:
-          print("Enter ticker symbol to remove: ");
-          String stockSymbol = controller.nextLine().toUpperCase();
-          Stock stockToRemove;
-          try {
-            stockToRemove = controller.getStock(stockSymbol);
-          } catch (IllegalArgumentException e) {
-            print(e.getMessage());
-            return;
-          }
-          if (stockToRemove == null) {
-            print("Invalid ticker symbol.");
-            return;
-          }
-          print("Enter quantity: ");
-          int numOfShares = controller.nextInt();
-          try {
-            portfolio.remove(stockToRemove, numOfShares);
-          } catch (IllegalArgumentException e) {
-            print(e.getMessage());
-            return;
-          }
-          print("You have removed: " + numOfShares + " shares of "
-                  + stockToRemove.toString().toUpperCase()
-                  + " from the portfolio " + portfolio.getName() + "!\n");
+          sellStocks(portfolio);
           break;
         case 3:
-          print("DISCLAIMER: If you have entered a weekend, the date considered will be the " +
-                  "friday before.");
-          print("Enter date (YYYY-MM-DD): ");
-          String date = controller.nextLine();
-          double value;
-          try {
-            value = portfolio.valueOfPortfolio(date);
-          } catch (IllegalArgumentException e) {
-            print(e.getMessage());
-            return;
-          }
-          print("The value of the portfolio on " + date + " is: " + value);
-          break;
-        case 4:
           print(portfolio.toString());
           break;
+        case 4:
+          viewCompositionOfPortfolioAtAnyDate(portfolio);
+          break;
         case 5:
+          reBalanceChosenPortfolio(portfolio);
+          break;
+        case 6:
+          totalValueOfPortfolioAtDate(portfolio);
+          break;
+        case 7:
+          findDistributionValueAtDate(portfolio);
+          break;
+        case 8:
+          plotPerformanceBarChart(portfolio);
+          break;
+        case 9:
+          savePortfolioToDevice(portfolio);
+          break;
+        case 10:
           return;
         default:
           print("Invalid choice. Please try again.");
@@ -395,5 +480,55 @@ public class ViewImpl implements View {
     Portfolio portfolio = controller.getPortfolios().get(name);
     print("Portfolio '" + name + "' created.");
     addAndBuyStock(portfolio);
+    portfolio.savePortfolio();
+    // save the portfolio
+  }
+
+  // need a way to save the dates so the methods can look back at them
+
+  private void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio) {
+
+  }
+  private void findDistributionValueAtDate(Portfolio portfolio) {
+    String intendedDate;
+
+    do {
+      print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+              "\ndate backwards will be considered");
+      print("Enter date you would like to purchase on: ");
+      intendedDate = controller.nextLine();
+      try {
+        intendedDate = controller.nextLine();
+        portfolio.isValidDateForPortfolio(intendedDate);
+      } catch (IllegalArgumentException e) {
+        print(e.getMessage());
+      }
+      if (!portfolio.isValidDateForPortfolio(intendedDate)) {
+        print("Invalid date. Please enter a valid market date.");
+      }
+    } while (!portfolio.isValidDateForPortfolio(intendedDate));
+
+    print("Here is the value distribution of your portfolio at date: " + intendedDate);
+
+    portfolio.getValueDistribution(intendedDate);
+
+  }
+
+
+  private void savePortfolioToDevice(Portfolio portfolio) {
+
+  }
+
+  private void reBalanceChosenPortfolio(Portfolio portfolio) {
+
+  }
+
+  private void plotPerformanceBarChart(Portfolio portfolio) {
+
+  }
+
+  @Override
+  public void loadChosenPortfolio() {
+
   }
 }

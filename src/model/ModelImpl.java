@@ -39,8 +39,8 @@ import java.util.Map;
  * </p>
  */
 public class ModelImpl implements Model {
-  HashMap<String, Stock> stocks;
-  HashMap<String, Portfolio> portfolios;
+  private final HashMap<String, Stock> stocks;
+  private final HashMap<String, Portfolio> portfolios;
 
   public ModelImpl() {
     stocks = new HashMap<>();
@@ -50,7 +50,7 @@ public class ModelImpl implements Model {
   @Override
   public Stock get(String symbol) throws IllegalArgumentException {
     // if present in data package, get the stock
-    if (Files.exists(Paths.get("src/data/" + symbol + ".csv"))) {
+    if (Files.exists(Paths.get("src/data/api" + symbol + ".csv"))) {
       Stock newStock = new ModelStock(symbol);
       stocks.put(symbol, newStock);
       return newStock;
@@ -86,7 +86,7 @@ public class ModelImpl implements Model {
    *
    * <p>
    * This method should only be called when stock data is missing from the cached database {@code
-   * ~/src/data}.
+   * ~/src/data/api}.
    * Over reliance on the API can and will result in rate-limiting from the query server.
    * Each API key is limited to 25 calls per day.
    * </p>
@@ -151,12 +151,14 @@ public class ModelImpl implements Model {
   }
 
   private static BufferedWriter getBufferedWriter(String symbol) throws IOException {
-    File file = Paths.get("src/data/" + symbol + ".csv").toFile();
+    File file = Paths.get("src/data/api" + symbol + ".csv").toFile();
     return new BufferedWriter(new FileWriter(file));
   }
 
+  // TODO: map returns a direct reference - need to return a copy but also be able to modify the
+  // TODO: map in the model after removing a stock from a portfolio.
   @Override
   public Map<String, Portfolio> getPortfolios() {
-    return Map.copyOf(portfolios);
+    return portfolios;
   }
 }

@@ -17,9 +17,9 @@ import model.Stock;
  */
 public class MockPortfolio implements Portfolio {
 
-  private final String name;
+  private String name;
 
-  private final Map<Stock, Integer> stocks = new HashMap<>();
+  private final Map<Stock, Double> stocks;
 
   /**
    * Constructs a new MockPortfolio with the specified name.
@@ -29,10 +29,15 @@ public class MockPortfolio implements Portfolio {
    */
   public MockPortfolio(String name) {
     this.name = name;
+    this.stocks = new HashMap<>();
   }
 
   @Override
-  public Map<Stock, Integer> getStocks() {
+  public void setName(String name) {
+    this.name = name;
+  }
+  @Override
+  public Map<Stock, Double> getStocks() {
     return Map.copyOf(stocks);
   }
 
@@ -42,13 +47,13 @@ public class MockPortfolio implements Portfolio {
   }
 
   @Override
-  public void add(Stock s, int shares) {
-    stocks.put(s, stocks.getOrDefault(s, 0) + shares);
+  public void add(Stock s, double shares) {
+    stocks.put(s, stocks.getOrDefault(s, 0.0) + shares);
   }
 
   @Override
-  public void remove(Stock s, int shares) {
-    int currentShares = stocks.getOrDefault(s, 0);
+  public void remove(Stock s, double shares) {
+    double currentShares = stocks.getOrDefault(s, 0.0);
     if (currentShares < shares) {
       throw new IllegalArgumentException("Cannot remove more shares than present.");
     } else if (currentShares == shares) {
@@ -72,7 +77,7 @@ public class MockPortfolio implements Portfolio {
     }
 
     StringBuilder sb = new StringBuilder();
-    for (Map.Entry<Stock, Integer> entry : stocks.entrySet()) {
+    for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
       sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares")
               .append(System.lineSeparator());
     }
@@ -99,5 +104,35 @@ public class MockPortfolio implements Portfolio {
     } catch (DateTimeParseException e) {
       return false;
     }
+  }
+
+  @Override
+  public String getValueDistribution(String date) {
+    return "";
+  }
+
+  @Override
+  public String getCompositionAtDate(String date) {
+    return "";
+  }
+
+  @Override
+  public String getPerformanceOverTime(String startDate, String endDate) {
+    return "";
+  }
+
+  @Override
+  public void reBalancePortfolio() {
+
+  }
+
+  @Override
+  public void savePortfolio() {
+
+  }
+
+  @Override
+  public void loadPortfolio() {
+
   }
 }

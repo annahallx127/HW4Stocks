@@ -15,7 +15,14 @@ public interface Portfolio {
    *
    * @return a map of the stocks in the portfolio
    */
-  Map<Stock, Integer> getStocks();
+  Map<Stock, Double> getStocks();
+
+  /**
+   * Sets the name of the portfolio.
+   *
+   * @param name the name of the portfolio.
+   */
+  void setName(String name);
 
   /**
    * Gets the name of the portfolio that the user created.
@@ -25,12 +32,15 @@ public interface Portfolio {
   String getName();
 
   /**
-   * Adds a stock to the portfolio.
+   * Adds a stock to the portfolio. Users should not be able to add a partial share of a stock, nor
+   * should they be able to add a stock with a negative number of shares. However, this method is
+   * also used to balance the portfolio, so the number of shares may be a floating point number if
+   * the portfolio is being rebalanced.
    *
    * @param s      the stock to add to the portfolio.
    * @param shares the number of shares bought.
    */
-  void add(Stock s, int shares);
+  void add(Stock s, double shares);
 
   /**
    * Removes a stock from the portfolio.
@@ -42,7 +52,7 @@ public interface Portfolio {
    *                                  number of shares owned, or if the stock is not
    *                                  in the portfolio.
    */
-  void remove(Stock s, int shares) throws IllegalArgumentException;
+  void remove(Stock s, double shares) throws IllegalArgumentException;
 
   /**
    * Finds the total value of the portfolio on the given date.
@@ -66,4 +76,23 @@ public interface Portfolio {
    * @return true if the date is a valid date, false otherwise.
    */
   boolean isValidDateForPortfolio(String date);
+
+  /**
+   * Finds the value distribution of a portfolio at a given date.
+   * Returns a String of the stocks that are valid on that date, the stock values at that
+   * date, and the total value of the portfolio at that date.
+   *
+   * @param date the user specified date of which to check the distribution
+   * @return the value distribution of the portfolio
+   */
+  String getValueDistribution(String date);
+
+
+  String getCompositionAtDate(String date);
+  String getPerformanceOverTime(String startDate, String endDate);
+
+  void reBalancePortfolio();
+  void savePortfolio();
+  void loadPortfolio();
+
 }

@@ -2,6 +2,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import model.Model;
+import model.ModelStock;
 import model.Stock;
 import model.ModelImpl;
 
@@ -30,6 +31,14 @@ public class ModelStockUnitTests {
     assertEquals("AAPL", stock.toString());
   }
 
+  @Test
+  public void testStockGetInvalidSymbol() {
+    try {
+      stock = new ModelStock("INVALID");
+    } catch (IllegalArgumentException e) {
+      assertEquals("Invalid stock symbol.", e.getMessage());
+    }
+  }
   @Test
   public void testStockGainedValueSameDay() {
     try {

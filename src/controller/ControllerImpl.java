@@ -57,6 +57,11 @@ public class ControllerImpl implements Controller {
     return model.getPortfolios();
   }
 
+  // TODO: find solution for setting portfolio from copy
+//  public void setPortfolio() {
+//    model.setPortfolio();
+//  }
+
   @Override
   public void makePortfolio(String name) {
     model.makePortfolio(name);
@@ -72,6 +77,12 @@ public class ControllerImpl implements Controller {
   public int nextInt() {
     Scanner s = new Scanner(in);
     return s.nextInt();
+  }
+
+  @Override
+  public double nextDouble() {
+    Scanner s = new Scanner(in);
+    return s.nextDouble();
   }
 
   @Override

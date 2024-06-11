@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a stock in the stock investment program. A stock has a symbol and information about
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 public class ModelStock implements Stock {
   private final String symbol;
   private final ArrayList<String> apiInfo;
+  private final Set<String> validSymbols;
 
   /**
    * Constructs a modelStock object with the specified ticker symbol.
@@ -31,22 +34,23 @@ public class ModelStock implements Stock {
   public ModelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
+    String csvFile = "src/data/listing_status.csv";
+    validSymbols = parseValidSymbols(csvFile);
+
     readFile();
 
-    // Remove the header line - "timestamp,open,high,low,close,volume"
-    // for testing - timestamp,open,high,low,close,volume,
-    // Gain over 5 days,5-day moving average,30-day moving average,30-day crossover
+    // Remove the header line
     this.apiInfo.remove(0);
   }
 
   private void readFile() {
-    try (FileReader fileReader = new FileReader("src/data/" + this.symbol + ".csv");
+    try (FileReader fileReader = new FileReader("src/data/api" + this.symbol + ".csv");
          BufferedReader br = new BufferedReader(fileReader)) {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }
       if (this.apiInfo.isEmpty()) {
-        File file = new File("src/data/" + this.symbol + ".csv");
+        File file = new File("src/data/api" + this.symbol + ".csv");
         file.delete();
         throw new IllegalArgumentException("No results found for stock " + symbol + ".");
       }
@@ -265,6 +269,8 @@ public class ModelStock implements Stock {
         date = date.minusDays(1);
       } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
         date = date.minusDays(2);
+      } else {
+        date = date.minusDays(1);
       }
       if (date.isBefore(LocalDate.parse(apiInfo.get(apiInfo.size() - 1).split(",")[0]))) {
         throw new IllegalArgumentException("No valid market dates available.");
@@ -272,5 +278,35 @@ public class ModelStock implements Stock {
     }
 
     return date.toString();
+  }
+
+  public static Set<String> parseValidSymbols(String filePath) {
+    Set<String> validSymbols = new HashSet<>();
+    String line;
+
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+      line = br.readLine();
+
+      while ((line = br.readLine()) != null) {
+        String[] columns = line.split(",");
+        String symbol = columns[0].trim();
+        if (!symbol.isEmpty()) {
+          validSymbols.add(symbol);
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return validSymbols;
+  }
+
+  @Override
+  public boolean isValidSymbol(String symbol) {
+    if (validSymbols.contains(symbol)) {
+      return true;
+    } else {
+      throw new IllegalArgumentException("Invalid Symbol.");
+    }
   }
 }

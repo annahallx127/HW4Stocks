@@ -50,6 +50,12 @@ public interface Controller {
   int nextInt();
 
   /**
+   * Get the next double from the user.
+   *
+   * @return the next input from the user as a double.
+   */
+  double nextDouble();
+  /**
    * Skips the next line of input from the user.
    * Used to skip the newline character after a command.
    *
@@ -65,7 +71,7 @@ public interface Controller {
   Appendable getAppendable();
 
   /**
-   * Tells the model to create a new portfolio with the given name.
+   * Creates a new portfolio in the model with the given name.
    *
    * @param name the name of the portfolio to create.
    */

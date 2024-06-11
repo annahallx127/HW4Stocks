@@ -6,7 +6,11 @@ import model.Stock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 /**
  * Test class for the Portfolio implementation within the Model.
@@ -49,7 +53,7 @@ public class ModelPortfolioUnitTests {
     assertEquals(5, portfolio.getStocks().get(stock2).intValue());
 
     portfolio.remove(stock2, 5);
-    assertEquals(null, portfolio.getStocks().get(stock2));
+    assertNull(portfolio.getStocks().get(stock2));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -95,6 +99,7 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.add(stock1, 10);
       portfolio.remove(stock1, 14);
+      ;
     } catch (IllegalArgumentException e) {
       assertEquals("Cannot remove more shares than the number of shares present.",
               e.getMessage());
@@ -226,6 +231,35 @@ public class ModelPortfolioUnitTests {
     testPortfolio.add(stock2, 3);
 
     assertEquals(testPortfolio.getStocks(), portfolio.getStocks());
+  }
+
+  @Test
+  public void testGetValueDistribution() {
+    portfolio.add(stock1, 3);
+    portfolio.add(stock2, 3);
+
+    Portfolio testPortfolio;
+    model.makePortfolio("New Portfolio");
+    testPortfolio = model.getPortfolios().get("New Portfolio");
+
+    testPortfolio.add(stock1, 3);
+    testPortfolio.add(stock2, 3);
+    assertEquals(testPortfolio.getValueDistribution("2024-06-03"),
+            portfolio.getValueDistribution("2024-06-03"));
+  }
+
+  @Test
+  public void testGetValueDistributionContents() {
+    portfolio.add(stock1, 3); //194.0300 per share @date --> 582.09
+    portfolio.add(stock2, 3); //174.4200 per share @date --> 523.26
+    // total value 1,105.35
+
+    String valueDistribution = portfolio.getValueDistribution("2024-06-03");
+    System.out.println(valueDistribution);
+
+    assertTrue(valueDistribution.contains("AAPL: 582.09, 53%"));
+    assertTrue(valueDistribution.contains("GOOG: 523.26, 47%"));
+    assertTrue(valueDistribution.contains("Total Portfolio Value: 1105.35"));
   }
 
 }
