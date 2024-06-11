@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public interface Portfolio {
    * @param s      the stock to add to the portfolio.
    * @param shares the number of shares bought.
    */
-  void add(Stock s, double shares);
+  void add(Stock s, double shares, LocalDate date);
 
   /**
    * Removes a stock from the portfolio.
@@ -53,7 +54,7 @@ public interface Portfolio {
    *                                  number of shares owned, or if the stock is not
    *                                  in the portfolio.
    */
-  void remove(Stock s, double shares) throws IllegalArgumentException;
+  void remove(Stock s, double shares, LocalDate date) throws IllegalArgumentException;
 
   /**
    * Finds the total value of the portfolio on the given date.

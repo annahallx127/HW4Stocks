@@ -66,30 +66,39 @@ public class ModelPortfolio implements Portfolio {
   }
 
   @Override
-  public void add(Stock s, double shares) {
+  public void add(Stock s, double shares, LocalDate date) {
     if (shares <= 0) {
-      throw new IllegalArgumentException("Shares added must be one or more.");
+      throw new IllegalArgumentException("Shares must be greater than zero.");
     }
-    stocks.put(s, stocks.getOrDefault(s, 0.0) + shares);
+
+    // Check if the transaction date is legal
+    if (!transactions.isEmpty() && date.isBefore(transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    }
+
+    Transaction transaction = new ModelTransaction(date, s, shares, "buy");
+    addTransaction(transaction);
   }
 
+
   @Override
-  public void remove(Stock s, double shares) throws IllegalArgumentException {
-    if (!stocks.containsKey(s)) {
-      throw new IllegalArgumentException("Cannot remove a stock that doesn't exist.");
+  public void remove(Stock s, double shares, LocalDate date) throws IllegalArgumentException {
+    if (shares <= 0) {
+      throw new IllegalArgumentException("Shares removed must be greater than zero.");
     }
 
-    double currentShares = stocks.get(s);
+    // Ensure no transaction is before the latest transaction
+    if (!transactions.isEmpty() && date.isBefore(transactions.get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    }
+
+    double currentShares = stocks.getOrDefault(s, 0.0);
     if (shares > currentShares) {
-      throw new IllegalArgumentException("Cannot remove more shares than "
-              + "the number of shares present.");
+      throw new IllegalArgumentException("Cannot remove more shares than the number of shares present.");
     }
 
-    if (currentShares - shares <= 0.001) {
-      stocks.remove(s);
-    } else {
-      stocks.put(s, currentShares - shares);
-    }
+    Transaction transaction = new ModelTransaction(date, s, shares, "sell");
+    addTransaction(transaction);
   }
 
   @Override
@@ -283,20 +292,38 @@ public class ModelPortfolio implements Portfolio {
       throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
     }
 
+    // Check if transaction is illegal within the same month
+    for (Transaction t : transactions) {
+      if (t.getStock().equals(transaction.getStock()) && t.getDate().getMonth() == transaction.getDate().getMonth() && t.getDate().getYear() == transaction.getDate().getYear()) {
+        if (transaction.getType().equalsIgnoreCase("sell") && t.getType().equalsIgnoreCase("buy") && transaction.getShares() > t.getShares()) {
+          throw new IllegalArgumentException("Cannot sell more shares than the number of shares present in the same month.");
+        }
+      }
+    }
+
     transactions.add(transaction);
-    transactions.sort(Comparator.naturalOrder());
+    transactions.sort(transaction);
 
     Stock stock = transaction.getStock();
     double shares = transaction.getShares();
 
     if (transaction.getType().equalsIgnoreCase("buy")) {
-      add(stock, shares);
+      stocks.put(stock, stocks.getOrDefault(stock, 0.0) + shares);
     } else if (transaction.getType().equalsIgnoreCase("sell")) {
-      remove(stock, shares);
+      double currentShares = stocks.get(stock);
+      if (shares > currentShares) {
+        throw new IllegalArgumentException("Cannot remove more shares than the number of shares present.");
+      }
+      if (currentShares - shares <= 0.001) {
+        stocks.remove(stock);
+      } else {
+        stocks.put(stock, currentShares - shares);
+      }
     } else {
       throw new IllegalArgumentException("Invalid transaction type.");
     }
   }
+
 
   @Override
   public List<Transaction> getTransactions() {
