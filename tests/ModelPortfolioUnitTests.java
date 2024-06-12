@@ -101,7 +101,6 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.add(stock1, 10, "2024-06-02");
       portfolio.remove(stock1, 14, "2024-06-02");
-      ;
     } catch (IllegalArgumentException e) {
       assertEquals("Cannot remove more shares than the number of shares present.",
               e.getMessage());
@@ -287,7 +286,7 @@ public class ModelPortfolioUnitTests {
     portfolioAfterReBalance.add(stock2, 4.86382009, "2024-06-03");
 
     assertEquals(portfolioAfterReBalance.valueOfPortfolio("2024-06-03"),
-            portfolio.valueOfPortfolio("2024-06-03"));
+            portfolio.valueOfPortfolio("2024-06-03"), 0.001);
     assertEquals(portfolioAfterReBalance.getValueDistribution("2024-06-03"),
             portfolio.getValueDistribution("2024-06-03"));
     // can check by checking get value distribution

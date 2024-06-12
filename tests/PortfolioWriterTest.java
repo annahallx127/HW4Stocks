@@ -7,14 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import javax.xml.stream.XMLStreamException;
-
-import model.ModelPortfolio;
-import model.Portfolio;
-import parser.PortfolioReader;
 import parser.PortfolioWriter;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
