@@ -234,6 +234,9 @@ public class ModelPortfolio implements Portfolio {
   public String getCompositionAtDate(String date) {
     LocalDate validDate = getValidMarketDateWeekend(date);
 
+    if (!transactions.isEmpty() && validDate.isBefore(transactions.get(0).getDate())) {
+      return "No transactions have been made in this portfolio yet.";
+    }
     try {
       isValidDateForPortfolio(validDate.toString());
     } catch (IllegalArgumentException e) {

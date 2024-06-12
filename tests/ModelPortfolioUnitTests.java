@@ -329,7 +329,8 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.remove(stock1, 4, "2024-05-22");
     } catch (IllegalArgumentException e) {
-      assertEquals("Transaction date cannot be before the latest transaction date.", e.getMessage());
+      assertEquals("Transaction date cannot be before the latest transaction date.",
+              e.getMessage());
     }
   }
 
@@ -342,7 +343,8 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.remove(stock1, 4, "2024-06-04");
     } catch (IllegalArgumentException e) {
-      assertEquals("Transaction date cannot be before the latest transaction date.", e.getMessage());
+      assertEquals("Transaction date cannot be before the latest transaction date.",
+              e.getMessage());
     }
   }
 
@@ -412,6 +414,14 @@ public class ModelPortfolioUnitTests {
 
     String expectedString2 = "GOOG: 10 shares" + System.lineSeparator();
     assertEquals(expectedString2, portfolio.getCompositionAtDate("2022-10-13"));
+  }
+
+  @Test
+  public void testCompositionOfPortfolioBeforeTransaction() {
+    portfolio.add(stock1, 10, "2024-06-06");
+
+    assertEquals("No transactions have been made in this portfolio yet.",
+            portfolio.getCompositionAtDate("2024-06-03"));
   }
 
 
