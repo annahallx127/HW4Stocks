@@ -35,8 +35,8 @@ public class PortfolioWriterTest {
   @Test
   public void testPortfolioWriter() {
     writer = new PortfolioWriter("portfolioTest", "2024-06-06", test.getAbsolutePath());
-    writer.writeStock( "AAPL", 1, 194.4800);
-    writer.writeStock("GOOG", 2, 178.3500);
+    writer.writeStock( "AAPL", 1);
+    writer.writeStock("GOOG", 2);
     writer.close();
     // TODO: write portfolioTest.xml for assert
     assertTrue(Files.exists(Path.of(pathToWrite)));
