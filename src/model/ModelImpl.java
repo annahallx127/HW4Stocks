@@ -188,7 +188,7 @@ public class ModelImpl implements Model {
   }
 
   private static BufferedWriter getBufferedWriter(String symbol) throws IOException {
-    File file = Paths.get("src/data/api" + symbol + ".csv").toFile();
+    File file = Paths.get("src/data/api/" + symbol + ".csv").toFile();
     return new BufferedWriter(new FileWriter(file));
   }
 

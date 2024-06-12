@@ -82,8 +82,8 @@ public class ModelPortfolioUnitTests {
     portfolio.add(stock1, 10, "2024-06-03");
     portfolio.add(stock2, 20,"2024-06-03");
 
-    String expectedString = "AAPL: 10 shares" + System.lineSeparator()
-            + "GOOG: 20 shares" + System.lineSeparator();
+    String expectedString = "AAPL: 10.0 shares" + System.lineSeparator()
+            + "GOOG: 20.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.toString());
   }
 
@@ -110,6 +110,7 @@ public class ModelPortfolioUnitTests {
   @Test
   public void testAddMaxToPortfolio2() {
     portfolio.add(stock2, 1000000000, "2024-06-02");
+    // TODO: double will read 1.0E9 - need to truncate
     String expectedString = "GOOG: 1000000000 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.toString());
   }
@@ -134,11 +135,11 @@ public class ModelPortfolioUnitTests {
     testPortfolio = model.getPortfolios().get("New Portfolio");
     testPortfolio.add(stock2, 100, "2024-06-02");
 
-    String expectedString = "GOOG: 100 shares" + System.lineSeparator();
+    String expectedString = "GOOG: 100.0 shares" + System.lineSeparator();
     assertEquals(expectedString, testPortfolio.toString());
 
     testPortfolio.remove(stock2, 10, "2024-06-02");
-    String expectedString2 = "GOOG: 90 shares" + System.lineSeparator();
+    String expectedString2 = "GOOG: 90.0 shares" + System.lineSeparator();
     assertEquals(expectedString2, testPortfolio.toString());
   }
 
@@ -194,7 +195,7 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.add(stock2, 0, "2024-06-03");
     } catch (IllegalArgumentException e) {
-      assertEquals("Shares added must be one or more.", e.getMessage());
+      assertEquals("Shares must be greater than zero.", e.getMessage());
     }
   }
 
@@ -204,7 +205,7 @@ public class ModelPortfolioUnitTests {
     portfolio.remove(stock1, 3, "2024-06-03");
     portfolio.add(stock2, 4, "2024-06-03");
 
-    String expectedString = "GOOG: 4 shares" + System.lineSeparator();
+    String expectedString = "GOOG: 4.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.toString());
   }
 

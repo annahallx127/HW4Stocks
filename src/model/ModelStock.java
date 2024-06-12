@@ -44,13 +44,13 @@ public class ModelStock implements Stock {
   }
 
   private void readFile() {
-    try (FileReader fileReader = new FileReader("src/data/api" + this.symbol + ".csv");
+    try (FileReader fileReader = new FileReader("src/data/api/" + this.symbol + ".csv");
          BufferedReader br = new BufferedReader(fileReader)) {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }
       if (this.apiInfo.isEmpty()) {
-        File file = new File("src/data/api" + this.symbol + ".csv");
+        File file = new File("src/data/api/" + this.symbol + ".csv");
         file.delete();
         throw new IllegalArgumentException("No results found for stock " + symbol + ".");
       }
@@ -273,7 +273,7 @@ public class ModelStock implements Stock {
       } else {
         date = date.minusDays(1);
       }
-      if (date.isBefore(LocalDate.parse(apiInfo.getLast().split(",")[0]))) {
+      if (date.isBefore(LocalDate.parse(apiInfo.get(apiInfo.size()-1).split(",")[0]))) {
         throw new IllegalArgumentException("No valid market dates available.");
       }
     }
