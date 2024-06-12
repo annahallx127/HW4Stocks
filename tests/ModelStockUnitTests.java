@@ -39,6 +39,7 @@ public class ModelStockUnitTests {
       assertEquals("Invalid stock symbol.", e.getMessage());
     }
   }
+
   @Test
   public void testStockGainedValueSameDay() {
     try {
@@ -80,12 +81,8 @@ public class ModelStockUnitTests {
 
   @Test
   public void testStockGainedValueOpenIntoClosed() {
-    try {
-      assertEquals(0.0, stock.gainedValue("2024-03-31",
-              "2024-06-01"), 0.01);
-    } catch (IllegalArgumentException e) {
-      assertEquals("Dates must be valid market days.", e.getMessage());
-    }
+    assertEquals(20.77, stock.gainedValue("2024-03-31",
+            "2024-06-01"), 0.01);
   }
 
   @Test

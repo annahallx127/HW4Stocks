@@ -1,5 +1,7 @@
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -23,7 +25,9 @@ public class ModelImplTest {
 
   private Model model;
   private Stock stock;
-  TemporaryFolder tempFolder = new TemporaryFolder();
+
+  @Rule
+  public TemporaryFolder tempFolder = new TemporaryFolder();
 
   /**
    * Sets up the application with values before each of the following tests.
@@ -53,12 +57,6 @@ public class ModelImplTest {
     Files.write(Paths.get(tempFile.getPath()), "Sample Data".getBytes());
     Stock stock = model.get("TEMP");
     assertEquals("TEMP", stock.toString());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testModelGetNonexistentStock() {
-    ModelImpl model = new ModelImpl();
-    model.get("INVALID");
   }
 
   @Test

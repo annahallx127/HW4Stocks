@@ -133,7 +133,7 @@ public class ModelImpl implements Model {
    */
   private void apiCall(String symbol) throws IllegalArgumentException {
 
-    final String apiKey = "8E787NZ9TE3Y4ZI4";
+    final String apiKey = "09I1ESM2FDLI0Y6D";
     // extra API Key: OTYUTQ7V96CNWN4C
     // High volume API key: 09I1ESM2FDLI0Y6D
     URL url;
@@ -188,7 +188,7 @@ public class ModelImpl implements Model {
   }
 
   private static BufferedWriter getBufferedWriter(String symbol) throws IOException {
-    File file = Paths.get("src/data/api" + symbol + ".csv").toFile();
+    File file = Paths.get("src/data/api/" + symbol + ".csv").toFile();
     return new BufferedWriter(new FileWriter(file));
   }
 
