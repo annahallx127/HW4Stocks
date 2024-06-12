@@ -186,7 +186,7 @@ public class ModelPortfolioUnitTests {
     assertEquals(expectedValue, portfolio.valueOfPortfolio("2024-06-02"), 0.01);
 
     portfolio.add(stock1, 3, "2024-06-02");
-    double expectedValue2 = (6 * 192.2500);
+    double expectedValue2 = (6 * 194.0300);
     assertEquals(expectedValue2, portfolio.valueOfPortfolio("2024-06-03"), 0.01);
   }
 
