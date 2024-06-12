@@ -169,7 +169,7 @@ public class ModelPortfolioUnitTests {
 
   @Test
   public void testValueOfPortfolioOnHoliday() {
-    portfolio.add(stock1, 3, "2024-12-05");
+    portfolio.add(stock1, 3, "2022-12-05");
     double expectedValue = (3 * 193.6000);
     assertEquals(expectedValue, portfolio.valueOfPortfolio("2023-12-25"), 0.01);
 
@@ -365,14 +365,14 @@ public class ModelPortfolioUnitTests {
     portfolio.remove(stock1, 4, "2024-06-03");
     portfolio.add(stock1, 10, "2024-06-03");
 
-    String expectedString = "AAPL: 16 shares" + System.lineSeparator();
+    String expectedString = "AAPL: 16.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.toString());
   }
 
   @Test
   public void testCompositionOfPortfolio() {
     portfolio.add(stock1, 10, "2023-10-13");
-    String expectedString = "AAPL: 10 shares" + System.lineSeparator();
+    String expectedString = "AAPL: 10.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.getCompositionAtDate("2024-06-04"));
   }
 
@@ -382,13 +382,13 @@ public class ModelPortfolioUnitTests {
     portfolio.add(stock1, 10, "2024-05-22");
 
 
-    String expectedString = "AAPL: 20 shares" + System.lineSeparator();
+    String expectedString = "AAPL: 20.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.getCompositionAtDate("2024-05-22"));
 
     portfolio.remove(stock1, 3, "2024-06-03");
 
-    String expectedString2 = "AAPL: 17 shares" + System.lineSeparator();
-    assertEquals(expectedString2, portfolio.getCompositionAtDate("2024-05-22"));
+    String expectedString2 = "AAPL: 17.0 shares" + System.lineSeparator();
+    assertEquals(expectedString2, portfolio.getCompositionAtDate("2024-06-04"));
 
   }
 
@@ -397,21 +397,34 @@ public class ModelPortfolioUnitTests {
     portfolio.add(stock1, 10, "2023-10-13");
     portfolio.add(stock2, 10, "2024-05-22");
 
-    String expectedString = "AAPL: 10 shares" + System.lineSeparator() +
-            "GOOG: 10 shares" + System.lineSeparator();
+    String expectedString = "AAPL: 10.0 shares" + System.lineSeparator() +
+            "GOOG: 10.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.getCompositionAtDate("2024-05-22"));
   }
 
   @Test
   public void testCompositionOfPortfolioBetweenTransactions2() {
+    portfolio.add(stock2, 10, "2022-05-22");
+    portfolio.add(stock1, 10, "2023-10-13");
+
+    String expectedString = "AAPL: 10.0 shares" + System.lineSeparator() +
+            "GOOG: 10.0 shares" + System.lineSeparator();
+    assertEquals(expectedString, portfolio.getCompositionAtDate("2024-05-22"));
+
+    String expectedString2 = "GOOG: 10.0 shares" + System.lineSeparator();
+    assertEquals(expectedString2, portfolio.getCompositionAtDate("2022-10-13"));
+  }
+
+  @Test (expected = IllegalArgumentException.class)
+  public void testCompositionOfPortfolioThrowTransactionBeforeLatestTransaction() {
     portfolio.add(stock1, 10, "2023-10-13");
     portfolio.add(stock2, 10, "2022-05-22");
 
-    String expectedString = "AAPL: 10 shares" + System.lineSeparator() +
-            "GOOG: 10 shares" + System.lineSeparator();
+    String expectedString = "AAPL: 10.0 shares" + System.lineSeparator() +
+            "GOOG: 10.0 shares" + System.lineSeparator();
     assertEquals(expectedString, portfolio.getCompositionAtDate("2024-05-22"));
 
-    String expectedString2 = "GOOG: 10 shares" + System.lineSeparator();
+    String expectedString2 = "GOOG: 10.0 shares" + System.lineSeparator();
     assertEquals(expectedString2, portfolio.getCompositionAtDate("2022-10-13"));
   }
 

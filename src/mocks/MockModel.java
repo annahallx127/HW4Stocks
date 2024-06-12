@@ -31,6 +31,16 @@ public class MockModel implements Model {
     portfolios.put(name, portfolio);
   }
 
+  @Override
+  public void savePortfolio(String name, String date) {
+
+  }
+
+  @Override
+  public void loadPortfolio(String name, String path) throws IllegalArgumentException {
+
+  }
+
   /**
    * Puts the portfolio into the collection of portfolios/Map.
    *

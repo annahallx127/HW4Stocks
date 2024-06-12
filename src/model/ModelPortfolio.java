@@ -237,11 +237,6 @@ public class ModelPortfolio implements Portfolio {
     if (!transactions.isEmpty() && validDate.isBefore(transactions.get(0).getDate())) {
       return "No transactions have been made in this portfolio yet.";
     }
-    try {
-      isValidDateForPortfolio(validDate.toString());
-    } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
-    }
 
     Map<Stock, Double> portfolioComposition = new HashMap<>();
     for (Transaction transaction : transactions) {
@@ -249,23 +244,26 @@ public class ModelPortfolio implements Portfolio {
         Stock stock = transaction.getStock();
         double shares = transaction.getShares();
         if (transaction.getType().equalsIgnoreCase("buy")) {
-          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock, 0.0));
+          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock, 0.0) + shares);
         } else if (transaction.getType().equalsIgnoreCase("sell")) {
-          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock, 0.0));
+          double currentShares = portfolioComposition.getOrDefault(stock, 0.0);
+          portfolioComposition.put(stock, currentShares - shares);
+          if (portfolioComposition.get(stock) <= 0) {
+            portfolioComposition.remove(stock);
+          }
         }
-        // if transaction type is sell, it should remove? so the composition type doesn't matter?
-
       }
     }
 
     StringBuilder result = new StringBuilder();
     for (Map.Entry<Stock, Double> entry : portfolioComposition.entrySet()) {
-      result.append(entry.getKey().toString()).append(": ").
-              append(entry.getValue()).append(" shares").append(System.lineSeparator());
+      result.append(entry.getKey().toString()).append(": ")
+              .append(entry.getValue()).append(" shares").append(System.lineSeparator());
     }
 
     return result.toString();
   }
+
 
   // check for valid date in view or here?
   // plots the asterisk
@@ -331,13 +329,13 @@ public class ModelPortfolio implements Portfolio {
       throw new IllegalArgumentException("Error: The total weight of all stocks must add up to 100%.");
     }
 
-    double totalValue = valueOfPortfolio(reBalanceDate.toString());
+    double totalValue = valueOfPortfolio(reBalanceDate);
 
     Map<Stock, Double> currentValues = new HashMap<>();
     for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
       Stock stock = entry.getKey();
       double shares = entry.getValue();
-      double stockPrice = stock.getPriceOnDate(reBalanceDate.toString());
+      double stockPrice = stock.getPriceOnDate(reBalanceDate);
       currentValues.put(stock, shares * stockPrice);
     }
 
@@ -351,7 +349,7 @@ public class ModelPortfolio implements Portfolio {
     for (Stock stock : targetValues.keySet()) {
       double currentValue = currentValues.getOrDefault(stock, 0.0);
       double targetValue = targetValues.get(stock);
-      double stockPrice = stock.getPriceOnDate(reBalanceDate.toString());
+      double stockPrice = stock.getPriceOnDate(reBalanceDate);
 
       //sell
       if (currentValue > targetValue) {

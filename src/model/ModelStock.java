@@ -238,11 +238,12 @@ public class ModelStock implements Stock {
   @Override
   public double getPriceOnDate(String date) {
     double price = 0.0;
+
+    date = getNearestMarketDate(date);
+
     if (!isValidDate(date)) {
       throw new IllegalArgumentException("Invalid date.");
     }
-
-    date = getNearestMarketDate(date);
 
     for (String entry : apiInfo) {
       if (entry.contains(date)) {
@@ -272,7 +273,7 @@ public class ModelStock implements Stock {
       } else {
         date = date.minusDays(1);
       }
-      if (date.isBefore(LocalDate.parse(apiInfo.get(apiInfo.size() - 1).split(",")[0]))) {
+      if (date.isBefore(LocalDate.parse(apiInfo.getLast().split(",")[0]))) {
         throw new IllegalArgumentException("No valid market dates available.");
       }
     }

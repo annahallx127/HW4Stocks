@@ -81,8 +81,9 @@ public class PortfolioReader extends DefaultHandler {
     } else if (bStock) {
       try {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate validDate = LocalDate.parse(date, formatter);
         Stock stock = new ModelStock(symbol);
-        portfolio.add(stock, shares, LocalDate.parse(date, formatter));
+        portfolio.add(stock, shares, validDate.toString());
         this.reset();
         bStock = false;
       } catch (DateTimeParseException | IllegalArgumentException e) {
