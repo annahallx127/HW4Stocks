@@ -144,12 +144,22 @@ public class ModelPortfolio implements Portfolio {
 
   @Override
   public double valueOfPortfolio(String date) {
+    LocalDate newDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     LocalDate validDate = getValidMarketDateWeekend(date);
 
     // if date is before the first transaction date, return 0
-    if (!transactions.isEmpty() && validDate.isBefore(transactions.get(0).getDate())) {
+    if (!transactions.isEmpty() && validDate.isBefore(transactions.get(0).getDate()) &&  newDate != transactions.get(transactions.size() - 1).getDate()) {
       return 0.0;
     }
+
+    if (validDate == transactions.get(transactions.size() - 1).getDate()) {
+      return transactions.get(transactions.size() - 1).getStock().getPriceOnDate(validDate.toString()) * transactions.get(transactions.size() - 1).getShares();
+    }
+//    // check if the date is the same as the latest transaction date
+//    LocalDate latestTransactionDate = transactions.isEmpty() ? null : transactions.get(transactions.size() - 1).getDate();
+//    if (latestTransactionDate != null && validDate.equals(latestTransactionDate)) {
+//      return transactions.get(transactions.size() - 1).getShares();
+//    }
 
     double value = 0.0;
     for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
@@ -160,6 +170,7 @@ public class ModelPortfolio implements Portfolio {
     }
     return value;
   }
+
 
   @Override
   public boolean isValidDateForPortfolio(String date) {
