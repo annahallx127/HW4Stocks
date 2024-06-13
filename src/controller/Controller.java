@@ -1,82 +1,64 @@
 package controller;
 
-import java.io.IOException;
 import java.util.Map;
 
-import model.Portfolio;
+import controller.ControllerCommand;
 import model.Stock;
+import model.Portfolio;
 
 /**
- * The controller interface for the program.
- * Used to start the program and begin the user interface.
- * Contains the necessary methods to interact with the user.
+ * Interface for the stock controller in the stock trading application.
+ * This interface defines the methods needed to manipulate stocks and portfolios.
  */
 public interface Controller {
 
   /**
-   * Start the controller and begin the program.
+   * Executes a given stock command.
+   *
+   * @param command the command to execute.
    */
-  void controllerGo();
+  void executeCommand(ControllerCommand command);
 
   /**
-   * Get a stock with the given symbol from the model.
+   * Displays a message using the view.
    *
-   * @param symbol the symbol of the stock to get.
-   * @return the stock with the given symbol.
-   * @throws IllegalArgumentException if the stock is not found by the model.
+   * @param message the message to be displayed.
    */
-  Stock getStock(String symbol) throws IllegalArgumentException;
+  void displayMessage(String message);
 
   /**
-   * Get a map of portfolios from the model.
+   * Displays an error message using the view.
    *
-   * @return the map of portfolios with the given name.
+   * @param message the error message to be displayed.
    */
+  void displayError(String message);
+
+  /**
+   * Retrieves a stock by its ticker symbol.
+   *
+   * @param ticker the ticker symbol of the stock.
+   * @return the Stock object.
+   */
+  Stock getStock(String ticker);
+
+//  /**
+//   * Creates a new portfolio with a given name.
+//   *
+//   * @param name the name of the new portfolio.
+//   * @return the newly created Portfolio object.
+//   */
+//  Portfolio createPortfolio(String name, String date);
+
   Map<String, Portfolio> getPortfolios();
+
+  void makePortfolio(String name);
 
   void savePortfolio(String name, String date);
 
+  /**
+   * Loads a portfolio based on its name.
+   *
+   * @param name the name of the portfolio to load.
+   */
   void loadPortfolio(String name, String path);
-  /**
-   * Get the next input from the user.
-   *
-   * @return the next input from the user.
-   * @throws IOException if the input cannot be read.
-   */
-  String next() throws IOException;
-
-  /**
-   * Get the next int from the user.
-   *
-   * @return the next input from the user as an int.
-   */
-  int nextInt();
-
-  /**
-   * Get the next double from the user.
-   *
-   * @return the next input from the user as a double.
-   */
-  double nextDouble();
-  /**
-   * Skips the next line of input from the user.
-   * Used to skip the newline character after a command.
-   *
-   * @return the next input from the user as a string.
-   */
-  String nextLine();
-
-  /**
-   * Get the appendable object for the controller.
-   *
-   * @return the appendable object for the controller.
-   */
-  Appendable getAppendable();
-
-  /**
-   * Creates a new portfolio in the model with the given name.
-   *
-   * @param name the name of the portfolio to create.
-   */
-  void makePortfolio(String name);
 }

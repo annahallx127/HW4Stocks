@@ -417,8 +417,6 @@ public class ModelPortfolioUnitTests {
     portfolioAfterReBalance.add(stock2, 7.44972306, "2024-06-03");
     assertEquals(portfolioAfterReBalance.getValueDistribution("2024-06-09"),
             portfolio.getValueDistribution("2024-06-09"));
-
-
   }
 
   // if the user decides to remove stocks before the date they last changed it, it throws

@@ -1,14 +1,12 @@
 package controller;
 
 import java.util.Map;
-import java.util.Scanner;
 
+import controller.ControllerCommand;
 import model.Model;
-import model.ModelImpl;
 import model.Portfolio;
 import model.Stock;
 import view.View;
-import view.ViewImpl;
 
 /**
  * Represents the controller for the stock investment program. The controller is responsible for
@@ -23,8 +21,8 @@ import view.ViewImpl;
  */
 
 public class ControllerImpl implements Controller {
-  private final Readable in;
-  private final Appendable out;
+//  private final Readable in;
+//  private final Appendable out;
   private Model model;
   private View view;
 
@@ -36,16 +34,17 @@ public class ControllerImpl implements Controller {
    * @param out the output target for displaying messages
    */
   public ControllerImpl(Readable in, Appendable out) {
-    this.in = in;
-    this.out = out;
-    this.model = new ModelImpl();
-    this.view = new ViewImpl(this);
+    this.view = view;
+//    this.in = in;
+//    this.out = out;
+//    this.model = new ModelImpl();
+//    this.view = new ViewImpl(this);
   }
 
-  @Override
-  public void controllerGo() {
-    view.run();
-  }
+//  @Override
+//  public void controllerGo() {
+//    view.run();
+//  }
 
   @Override
   public Stock getStock(String symbol) throws IllegalArgumentException {
@@ -77,33 +76,23 @@ public class ControllerImpl implements Controller {
     model.loadPortfolio(name, path);
   }
 
-  @Override
-  public String next() {
-    Scanner s = new Scanner(in);
-    return s.next();
+
+//  public Appendable getAppendable() {
+//    return out;
+//  }
+  public void executeCommand(ControllerCommand command) {
+    command.execute(this);
   }
 
   @Override
-  public int nextInt() {
-    Scanner s = new Scanner(in);
-    return s.nextInt();
+  public void displayMessage(String message) {
+    view.print(message);
   }
 
-  @Override
-  public double nextDouble() {
-    Scanner s = new Scanner(in);
-    return s.nextDouble();
-  }
 
   @Override
-  public String nextLine() {
-    Scanner s = new Scanner(in);
-    return s.nextLine();
-  }
-
-  @Override
-  public Appendable getAppendable() {
-    return out;
+  public void displayError(String message) {
+    view.print("Error: " + message);
   }
 
 
