@@ -47,8 +47,8 @@ import parser.PortfolioReader;
  * </p>
  */
 public class ModelImpl implements Model {
-  private final HashMap<String, Stock> stocks;
-  private final HashMap<String, Portfolio> portfolios;
+  private final Map<String, Stock> stocks;
+  private final Map<String, Portfolio> portfolios;
 
   public ModelImpl() {
     stocks = new HashMap<>();

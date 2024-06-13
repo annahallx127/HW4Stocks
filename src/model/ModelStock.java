@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Set;
  */
 public class ModelStock implements Stock {
   private final String symbol;
-  private final ArrayList<String> apiInfo;
+  private final List<String> apiInfo;
   private final Set<String> validSymbols;
 
   /**
@@ -328,6 +329,22 @@ public class ModelStock implements Stock {
 
   @Override
   public String plot(String dateStart, String dateEnd, PlotInterval interval) {
-    return "";
+
+    switch (interval) {
+      case DAYS:
+        return "DAYS";
+      case WEEKS:
+        return "WEEKS";
+      case MONTHS:
+        return "MONTHS";
+      case YEARS:
+        return "YEARS";
+      case FIVE_YEARS:
+        return "FIVE_YEARS";
+      case TEN_YEARS:
+        return "TEN_YEARS";
+    }
+
+    return null;
   }
 }

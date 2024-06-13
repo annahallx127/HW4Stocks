@@ -15,6 +15,7 @@ import model.Portfolio;
 import model.Stock;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test class for the ModelImpl implementation.
@@ -49,6 +50,7 @@ public class ModelImplTest {
     Files.deleteIfExists(Paths.get("src/data/AAPL.csv"));
     Stock stock = model.get("AAPL");
     assertEquals("AAPL", stock.toString());
+    assertTrue(Files.exists(Paths.get("src/data/AAPL.csv")));
   }
 
   @Test

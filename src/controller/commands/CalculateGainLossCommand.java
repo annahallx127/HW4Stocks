@@ -23,7 +23,7 @@ public class CalculateGainLossCommand implements ControllerCommand {
       Stock stock = controller.getStock(ticker);
       double gainOrLoss = stock.gainedValue(startDate, endDate);
       controller.displayMessage("Gain/Loss for " + ticker.toUpperCase()
-              + " from " + startDate + " to " + endDate + " is: $" + gainOrLoss);
+              + " from " + startDate + " to " + endDate + " is: $" + String.format("%.2f", gainOrLoss));
     } catch (IllegalArgumentException e) {
       controller.displayError(e.getMessage());
     }
