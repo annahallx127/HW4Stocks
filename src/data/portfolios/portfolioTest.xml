@@ -1,0 +1,10 @@
+<portfolioTest date="2024-06-06">
+    <stock index="0">
+        <symbol>AAPL</symbol>
+        <shares>1.0</shares>
+    </stock>
+    <stock index="1">
+        <symbol>GOOG</symbol>
+        <shares>2.0</shares>
+    </stock>
+</portfolioTest>

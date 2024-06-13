@@ -1,24 +1,20 @@
 package parser;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.File;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import model.ModelPortfolio;
 import model.ModelStock;
 import model.Portfolio;
 import model.Stock;
 
-public class PortfolioReader extends DefaultHandler {
+/**
+ * A class that reads a stock portfolio from a file. The portfolio is read in XML format.
+ */
+public class PortfolioReader extends StockReader {
   private Portfolio portfolio;
   private final String name;
   private StringBuilder data;
@@ -26,10 +22,8 @@ public class PortfolioReader extends DefaultHandler {
   private String date;
   private String symbol;
   private double shares;
-  private boolean bPortfolio = false;
   private boolean bStock = false;
   private boolean bSymbol = false;
-  private boolean bDate = false;
   private boolean bShares = false;
 
   public PortfolioReader(String name) {
@@ -49,13 +43,11 @@ public class PortfolioReader extends DefaultHandler {
 
   @Override
   public void startElement(String uri, String localName, String qName, Attributes attributes) {
-    if (qName.equalsIgnoreCase("portfolio")) {
+    if (qName.equalsIgnoreCase(name)) {
       startDocument();
-      bPortfolio = true;
+      date = attributes.getValue("date");
     } else if (qName.equalsIgnoreCase("stock")) {
       bStock = true;
-    } else if (qName.equalsIgnoreCase("date")) {
-      bDate = true;
     } else if (qName.equalsIgnoreCase("symbol")) {
       bSymbol = true;
     } else if (qName.equalsIgnoreCase("shares")) {
@@ -66,15 +58,9 @@ public class PortfolioReader extends DefaultHandler {
 
   @Override
   public void endElement(String uri, String localName, String qName) {
-    if (bPortfolio) {
-      portfolio = new ModelPortfolio(data.toString());
-      bPortfolio = false;
-    } else if (bSymbol) {
+    if (bSymbol) {
       symbol = data.toString();
       bSymbol = false;
-    } else if (bDate) {
-      date = data.toString();
-      bDate = false;
     } else if (bShares) {
       shares = Double.parseDouble(data.toString());
       bShares = false;
@@ -87,18 +73,18 @@ public class PortfolioReader extends DefaultHandler {
         this.reset();
         bStock = false;
       } catch (DateTimeParseException | IllegalArgumentException e) {
-        throw new IllegalArgumentException(e.getMessage());
+        e.printStackTrace(System.err);
       }
     }
   }
 
-  private void reset() {
-    symbol = "";
-    date = "";
-    shares = 0.0;
-  }
-
+  @Override
   public Portfolio getPortfolio() {
     return portfolio;
+  }
+
+  private void reset() {
+    symbol = "";
+    shares = 0.0;
   }
 }

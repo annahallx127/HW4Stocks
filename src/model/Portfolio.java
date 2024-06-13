@@ -148,4 +148,19 @@ public interface Portfolio {
    * @return a list of transactions
    */
   List<Transaction> getTransactions();
+
+  /**
+   * Checks if the portfolio is equal to another object.
+   *
+   * @param o the object to compare to
+   * @return true if the portfolio is equal to the object, false otherwise
+   */
+  boolean equals(Object o);
+
+  /**
+   * Gets the hash code of the portfolio.
+   *
+   * @return the hash code of the portfolio
+   */
+  int hashCode();
 }

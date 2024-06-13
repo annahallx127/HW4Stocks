@@ -144,7 +144,7 @@ public class ModelStock implements Stock {
         }
       }
     }
-    if (ret.isEmpty()) {
+    if (ret.length() == 0) {
       return ret.append("None!").append(System.lineSeparator()).toString();
     }
     return ret.toString();
@@ -303,11 +303,26 @@ public class ModelStock implements Stock {
   }
 
   @Override
-  public boolean isValidSymbol(String symbol) {
-    if (validSymbols.contains(symbol)) {
-      return true;
-    } else {
+  public void isValidSymbol(String symbol) throws IllegalArgumentException {
+    if (!validSymbols.contains(symbol)) {
       throw new IllegalArgumentException("Invalid Symbol.");
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ModelStock modelStock = (ModelStock) o;
+    return symbol.equals(modelStock.symbol);
+  }
+
+  @Override
+  public int hashCode() {
+    return symbol.hashCode();
   }
 }
