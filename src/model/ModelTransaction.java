@@ -36,14 +36,6 @@ public class ModelTransaction implements Transaction {
     return type;
   }
 
-  // 0 if dates are equal --> valid transaction
-  // < 0 if this date is less than other date
-  // > 0 this date is greater than other date --> valid transaction?
-  @Override
-  public int compareTo(Transaction other) {
-    return this.date.compareTo(other.getDate());
-  }
-
   @Override
   public String toString() {
     return "Transaction{" +
@@ -54,28 +46,4 @@ public class ModelTransaction implements Transaction {
             '}';
   }
 
-  @Override
-  public int compare(Transaction o1, Transaction o2) {
-    return 0;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ModelTransaction that = (ModelTransaction) o;
-    return Double.compare(that.shares, shares) == 0 &&
-            date.equals(that.date) &&
-            stock.equals(that.stock) &&
-            type.equals(that.type);
-  }
-
-  @Override
-  public int hashCode() {
-    return date.hashCode() + stock.hashCode() + type.hashCode();
-  }
 }

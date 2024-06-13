@@ -3,7 +3,7 @@ package model;
 import java.time.LocalDate;
 import java.util.Comparator;
 
-public interface Transaction extends Comparator<Transaction> {
+public interface Transaction {
   /**
    * Gets the date of the transaction.
    *
@@ -31,6 +31,4 @@ public interface Transaction extends Comparator<Transaction> {
    * @return the type of transaction
    */
   String getType();
-
-  int compareTo(Transaction other);
 }

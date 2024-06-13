@@ -1,47 +1,29 @@
 package mocks;
 
+import model.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.PlotInterval;
-import model.Portfolio;
-import model.Stock;
-import model.Transaction;
-
-/**
- * A mock implementation of the Portfolio interface for testing purposes.
- * This class simulates the behavior of a real portfolio, managing a collection
- * of stocks and their associated share counts. It provides methods to add and
- * remove stocks, calculate the portfolio's value on a specific date, and validate dates.
- */
 public class MockPortfolio implements Portfolio {
-
   private String name;
+  private Map<Stock, Double> stocks = new HashMap<>();
+  private List<Transaction> transactions = new ArrayList<>();
 
-  private final Map<Stock, Double> stocks;
-
-  /**
-   * Constructs a new MockPortfolio with the specified name.
-   * Initializes the portfolio with the given name.
-   *
-   * @param name the name of the portfolio
-   */
   public MockPortfolio(String name) {
     this.name = name;
-    this.stocks = new HashMap<>();
   }
 
   @Override
   public void setName(String name) {
     this.name = name;
   }
+
   @Override
   public Map<Stock, Double> getStocks() {
-    return Map.copyOf(stocks);
+    return new HashMap<>(stocks);
   }
 
   @Override
@@ -51,26 +33,95 @@ public class MockPortfolio implements Portfolio {
 
   @Override
   public void add(Stock s, double shares, String date) {
+    if (shares <= 0) throw new IllegalArgumentException("Shares must be positive.");
     stocks.put(s, stocks.getOrDefault(s, 0.0) + shares);
+    transactions.add(new MockTransaction(LocalDate.parse(date), s, shares, "buy"));
   }
 
   @Override
   public void remove(Stock s, double shares, String date) {
-    double currentShares = stocks.getOrDefault(s, 0.0);
-    if (currentShares < shares) {
-      throw new IllegalArgumentException("Cannot remove more shares than present.");
-    } else if (currentShares == shares) {
-      stocks.remove(s);
-    } else {
-      stocks.put(s, currentShares - shares);
+    Double currentShares = stocks.get(s);
+    if (currentShares == null || currentShares < shares) {
+      throw new IllegalArgumentException("Not enough shares to sell.");
     }
+    stocks.put(s, currentShares - shares);
+    transactions.add(new MockTransaction(LocalDate.parse(date), s, shares, "sell"));
   }
 
   @Override
   public double valueOfPortfolio(String date) {
     return stocks.entrySet().stream()
-            .mapToDouble(entry -> entry.getKey().getPriceOnDate(date) * entry.getValue())
+            .mapToDouble(e -> e.getKey().getPriceOnDate(date) * e.getValue())
             .sum();
+  }
+
+  @Override
+  public boolean isValidDateForPortfolio(String date) {
+    LocalDate parsedDate = LocalDate.parse(date);
+    return !(parsedDate.getDayOfWeek().getValue() == 6 || parsedDate.getDayOfWeek().getValue() == 7);
+  }
+
+  @Override
+  public String getValueDistribution(String date) {
+    double totalValue = valueOfPortfolio(date);
+    StringBuilder distribution = new StringBuilder();
+    stocks.forEach((stock, shares) -> {
+      double value = stock.getPriceOnDate(date) * shares;
+      double percentage = value / totalValue * 100;
+      distribution.append(stock.toString()).append(": $").append(String.format("%.2f", value))
+              .append(" (").append(String.format("%.2f", percentage)).append("%)\n");
+    });
+    return distribution.toString();
+  }
+
+  @Override
+  public String getCompositionAtDate(String date) {
+    StringBuilder composition = new StringBuilder();
+    stocks.forEach((stock, shares) -> composition.append(stock.toString())
+            .append(": ").append(shares)
+            .append(" shares\n"));
+    return composition.toString();
+  }
+
+  @Override
+  public String plot(String dateStart, String dateEnd, PlotInterval scale) {
+    return "Plot from " + dateStart + " to " + dateEnd + " with interval " + scale;
+  }
+
+  @Override
+  public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> targetWeights) {
+    double totalValue = valueOfPortfolio(reBalanceDate);
+
+    targetWeights.forEach((stock, weight) -> {
+      double targetValue = totalValue * weight / 100.0;
+      double currentShares = stocks.getOrDefault(stock, 0.0);
+      double stockPrice = stock.getPriceOnDate(reBalanceDate);
+      double targetShares = targetValue / stockPrice;
+
+      if (targetShares > currentShares) {
+        stocks.put(stock, targetShares);
+      } else {
+        stocks.put(stock, targetShares);
+      }
+    });
+
+    stocks.keySet().retainAll(targetWeights.keySet());
+  }
+
+
+  @Override
+  public void savePortfolio(String date) {
+    System.out.println("Portfolio saved on " + date + " with current stock holdings.");
+  }
+
+  @Override
+  public void addTransaction(Transaction transaction) {
+    transactions.add(transaction);
+  }
+
+  @Override
+  public List<Transaction> getTransactions() {
+    return new ArrayList<>(transactions);
   }
 
   @Override
@@ -78,69 +129,11 @@ public class MockPortfolio implements Portfolio {
     if (stocks.isEmpty()) {
       return "The portfolio is empty!";
     }
-
     StringBuilder sb = new StringBuilder();
     for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
-      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares")
-              .append(System.lineSeparator());
+      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares\n");
     }
     return sb.toString();
   }
-
-  @Override
-  public boolean isValidDateForPortfolio(String date) {
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    try {
-      LocalDate parsedDate = LocalDate.parse(date, formatter);
-      if (parsedDate.isAfter(LocalDate.now())) {
-        throw new IllegalArgumentException("Date cannot be in the future.");
-      }
-
-      for (Stock stock : stocks.keySet()) {
-        if (stock.isValidDate(date)) {
-          return true;
-        }
-      }
-
-      throw new IllegalArgumentException("Date must be a valid market day.");
-    } catch (DateTimeParseException e) {
-      return false;
-    }
-  }
-
-  @Override
-  public String getValueDistribution(String date) {
-    return "";
-  }
-
-  @Override
-  public String getCompositionAtDate(String date) {
-    return "";
-  }
-
-  @Override
-  public String plot(String dateStart, String dateEnd, PlotInterval scale) {
-    return "";
-  }
-
-  @Override
-  public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> weightsOfStocks) {
-
-  }
-
-  @Override
-  public void savePortfolio(String date) {
-
-  }
-
-  @Override
-  public void addTransaction(Transaction transaction) {
-
-  }
-
-  @Override
-  public List<Transaction> getTransactions() {
-    return List.of();
-  }
 }
+

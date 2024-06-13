@@ -1,10 +1,12 @@
 package controller;
 
 import java.util.Map;
+import java.util.Scanner;
 
 import controller.ControllerCommand;
 import model.Stock;
 import model.Portfolio;
+import view.View;
 
 /**
  * Interface for the stock controller in the stock trading application.
@@ -61,4 +63,9 @@ public interface Controller {
    * @param name the name of the portfolio to load.
    */
   void loadPortfolio(String name, String path);
+
+  /**
+   * Runs the main interaction loop, taking user commands and executing them.
+   */
+  void runController(Controller controller, View view, Scanner scanner);
 }

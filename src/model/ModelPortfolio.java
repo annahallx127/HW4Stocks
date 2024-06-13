@@ -28,7 +28,7 @@ import static model.PlotInterval.DAYS;
  */
 public class ModelPortfolio implements Portfolio {
   private String name;
-  private final HashMap<Stock, Double> stocks;
+  private final Map<Stock, Double> stocks;
   private final List<Transaction> transactions;
 
 
