@@ -1,5 +1,7 @@
 package controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -80,7 +82,7 @@ public class ControllerMain {
         }
       } catch (Exception e) {
         view.print("Error: " + e.getMessage());
-        scanner.nextLine();  // Consume any other stray input
+        scanner.nextLine();
       }
     }
   }
@@ -98,11 +100,33 @@ public class ControllerMain {
     }
 
     String startDate;
+    LocalDate validDate;
+    int year;
+    int month;
+    int day;
     do {
       System.out.println("DISCLAIMER: If you have entered any non market date, the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter start date (YYYY-MM-DD): ");
-      startDate = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
+      try {
+        validDate = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = LocalDate.of(year, month, day);
+
+      startDate = validDate.toString();
+
       if (!stock.isValidDate(startDate)) {
         try {
           stock.isValidDate(startDate);
@@ -115,9 +139,29 @@ public class ControllerMain {
     while (!stock.isValidDate(startDate));
 
     String endDate;
+    LocalDate validDate2;
+    int year2;
+    int month2;
+    int day2;
     do {
       System.out.println("Enter end date (YYYY-MM-DD): ");
-      endDate = scanner.nextLine();
+      System.out.println("Enter a valid year (YYYY): ");
+      year2 = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month2 = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day2 = scanner.nextInt();
+
+      try {
+        validDate = LocalDate.of(year2, month2, day2);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      endDate = validDate.toString();
+
+
       if (!stock.isValidDate(endDate)) {
         try {
           stock.isValidDate(endDate);
@@ -153,7 +197,22 @@ public class ControllerMain {
     System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
             "date backwards will be considered");
     System.out.println("Enter date (YYYY-MM-DD): ");
-    String date = scanner.nextLine();
+    System.out.println("Enter valid Year (YYYY): ");
+    int year = scanner.nextInt();
+    System.out.println("Enter valid Month (MM): ");
+    int month = scanner.nextInt()
+    System.out.println("Enter valid Day (DD): ");
+    int day = scanner.nextInt();
+
+    LocalDate validDate;
+    try {
+      validDate = LocalDate.of(year, month, day);
+    } catch (DateTimeParseException e) {
+      System.out.println("Invalid date. Please enter a valid date.");
+      return;
+    }
+
+    String date = validDate.toString();
 
     if (days <= 0) {
       System.out.println("Quantity must be greater than 0 and a whole number");
@@ -201,11 +260,33 @@ public class ControllerMain {
     }
 
     String startDate;
+    LocalDate validDate;
+    int year;
+    int month;
+    int day;
     do {
       System.out.println("DISCLAIMER: If you have entered any non market date, the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter start date (YYYY-MM-DD): ");
-      startDate = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
+      try {
+        validDate = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = LocalDate.of(year, month, day);
+
+      startDate = validDate.toString();
+
       if (!stock.isValidDate(startDate)) {
         try {
           stock.isValidDate(startDate);
@@ -218,9 +299,29 @@ public class ControllerMain {
     while (!stock.isValidDate(startDate));
 
     String endDate;
+    LocalDate validDate2;
+    int year2;
+    int month2;
+    int day2;
     do {
       System.out.println("Enter end date (YYYY-MM-DD): ");
-      endDate = scanner.nextLine();
+      System.out.println("Enter a valid year (YYYY): ");
+      year2 = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month2 = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day2 = scanner.nextInt();
+
+      try {
+        validDate = LocalDate.of(year2, month2, day2);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      endDate = validDate.toString();
+
+
       if (!stock.isValidDate(endDate)) {
         try {
           stock.isValidDate(endDate);
@@ -254,11 +355,32 @@ public class ControllerMain {
       }
 
       String date;
+      LocalDate validDate;
+      int year;
+      int month;
+      int day;
       do {
         System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
                 "\ndate backwards will be considered");
         System.out.println("Enter date you would like to purchase on (YYYY-MM-DD): ");
-        date = scanner.nextLine();
+        System.out.println("Enter a valid year (YYYY): ");
+        year = scanner.nextInt();
+        System.out.println("Enter a valid month (MM): ");
+        month = scanner.nextInt();
+        System.out.println("Enter a valid day (DD): ");
+        day = scanner.nextInt();
+
+        try {
+          validDate = LocalDate.of(year, month, day);
+        } catch (DateTimeParseException e) {
+          System.out.println("Invalid date. Please enter a valid date.");
+          return;
+        }
+
+        validDate = LocalDate.of(year, month, day);
+
+        date = validDate.toString();
+
         if (!stock.isValidDate(date)) {
           System.out.println("Invalid date. Please enter a valid market date.");
         }
@@ -349,7 +471,7 @@ public class ControllerMain {
           findDistributionValueAtDate(portfolio, controller, scanner);
           break;
         case 8:
-          plotPerformanceBarChart(portfolio);
+          handlePlotPerformanceBarChart(portfolio);
           break;
         case 9:
 //          savePortfolioToDevice(portfolio);
@@ -401,23 +523,42 @@ public class ControllerMain {
 
   private static void sellStocks(Portfolio portfolio, Controller controller, Scanner scanner) {
 
-    String intendedSellDate;
+    LocalDate date;
+    String validDate;
+    int year;
+    int month;
+    int day;
 
     do {
       System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
-      intendedSellDate = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
       try {
-        intendedSellDate = scanner.nextLine();
-        portfolio.isValidDateForPortfolio(intendedSellDate);
+        date = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = date.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-      if (!portfolio.isValidDateForPortfolio(intendedSellDate)) {
+      if (!portfolio.isValidDateForPortfolio(validDate)) {
         System.out.println("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(intendedSellDate));
+    } while (!portfolio.isValidDateForPortfolio(validDate));
+
 
     System.out.println("Enter ticker symbol to remove: ");
     String ticker = scanner.nextLine().toUpperCase();
@@ -433,51 +574,90 @@ public class ControllerMain {
     double numOfShares = scanner.nextInt();
 
 
-    System.out.println("You are Selling this Stock at Date: " + intendedSellDate);
-    ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, intendedSellDate);
+    System.out.println("You are Selling this Stock at Date: " + validDate);
+    ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, validDate);
     controller.executeCommand(command);
   }
 
   private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio, Controller controller, Scanner scanner) {
-
-    String date;
+    LocalDate date;
+    String validDate;
+    int year;
+    int month;
+    int day;
 
     do {
       System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
-      date = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
       try {
-        date = scanner.nextLine();
-        portfolio.isValidDateForPortfolio(date);
+        date = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = date.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-      if (!portfolio.isValidDateForPortfolio(date)) {
+      if (!portfolio.isValidDateForPortfolio(validDate)) {
         System.out.println("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(date));
+    } while (!portfolio.isValidDateForPortfolio(validDate));
 
-    ControllerCommand command = new ViewCompositionCommand(portfolio.getName(), date);
+
+    ControllerCommand command = new ViewCompositionCommand(portfolio.getName(), validDate);
     controller.executeCommand(command);
   }
 
   private static void reBalanceChosenPortfolio(Portfolio portfolio, Controller controller, Scanner scanner) {
-    String date;
+    LocalDate date;
+    String validDate;
+    int year;
+    int month;
+    int day;
 
     do {
-      System.out.println("DISCLAIMER: This program does not support re-balancing on a weekend! Please choose a valid market Date");
+      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+              "\ndate backwards will be considered");
       System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
-      date = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
       try {
-        portfolio.isValidDateForPortfolio(date);
+        date = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = date.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-      if (!portfolio.isValidDateForPortfolio(date)) {
+      if (!portfolio.isValidDateForPortfolio(validDate)) {
         System.out.println("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(date));
+    } while (!portfolio.isValidDateForPortfolio(validDate));
+
 
     Map<Stock, Integer> targetWeights = new HashMap<>();
     System.out.println("Enter the weights for each stock in your portfolio. Weights must total to 100%.");
@@ -499,56 +679,106 @@ public class ControllerMain {
       return;
     }
 
-    ControllerCommand command = new ReBalancePortfolioCommand(date, portfolio.getName(), targetWeights);
+    ControllerCommand command = new ReBalancePortfolioCommand(validDate, portfolio.getName(), targetWeights);
     controller.executeCommand(command);
   }
 
   private static void totalValueOfPortfolioAtDate(Portfolio portfolio, Controller controller, Scanner scanner) {
-    String date;
+    LocalDate date;
+    String validDate;
+    int year;
+    int month;
+    int day;
 
     do {
       System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
-      date = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
       try {
-        date = scanner.nextLine();
-        portfolio.isValidDateForPortfolio(date);
+        date = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = date.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-      if (!portfolio.isValidDateForPortfolio(date)) {
+      if (!portfolio.isValidDateForPortfolio(validDate)) {
         System.out.println("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(date));
+    } while (!portfolio.isValidDateForPortfolio(validDate));
 
-    ControllerCommand command = new PortfolioValueCommand(portfolio.getName(), date);
+
+    ControllerCommand command = new PortfolioValueCommand(portfolio.getName(), validDate);
     controller.executeCommand(command);
   }
 
 
   private static void findDistributionValueAtDate(Portfolio portfolio, Controller controller, Scanner scanner) {
-    String date;
+    LocalDate date;
+    String validDate;
+    int year;
+    int month;
+    int day;
 
     do {
       System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
-      date = scanner.nextLine();
+
+      System.out.println("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      System.out.println("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      System.out.println("Enter a valid day (DD): ");
+      day = scanner.nextInt();
+
       try {
-        date = scanner.nextLine();
-        portfolio.isValidDateForPortfolio(date);
+        date = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please enter a valid date.");
+        date = null;
+      }
+
+      validDate = date.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
         System.out.println(e.getMessage());
       }
-      if (!portfolio.isValidDateForPortfolio(date)) {
+      if (!portfolio.isValidDateForPortfolio(validDate)) {
         System.out.println("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(date));
+    } while (!portfolio.isValidDateForPortfolio(validDate));
 
-    ControllerCommand command = new DistributionValueCommand(portfolio.getName(), date);
+    ControllerCommand command = new DistributionValueCommand(portfolio.getName(), validDate);
     controller.executeCommand(command);
   }
 
+  private static void handleLoadPortfolio(Controller controller, Scanner scanner) {
+    System.out.println("Enter the name of the portfolio to load: ");
+    String portfolioName = scanner.nextLine();
+
+    ControllerCommand command = new LoadPortfolioCommand(portfolioName);
+    controller.executeCommand(command);
+
+  }
+
+  private static void handlePlotPerformanceBarChart(Portfolio portfolio,
+                                                    Controller controller, Scanner scanner) {
+
+  }
 
 }
