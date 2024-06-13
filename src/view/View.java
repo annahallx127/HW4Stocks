@@ -11,12 +11,12 @@ import model.Portfolio;
  */
 public interface View {
 
-  /**
-   * Initiates the view and presents the user with options.
-   * Loads the next menu based off of user inputs.
-   * Handles the main interaction loop with the user.
-   */
-  void run();
+//  /**
+//   * Initiates the view and presents the user with options.
+//   * Loads the next menu based off of user inputs.
+//   * Handles the main interaction loop with the user.
+//   */
+//  void run();
 
   void print(String message);
 }

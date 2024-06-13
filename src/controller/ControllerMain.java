@@ -27,68 +27,75 @@ public class ControllerMain {
    */
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
-    Appendable out = System.out;
-    View view = new ViewImpl(out);
+    View view = new ViewImpl(System.out);
     ModelImpl model = new ModelImpl();
-    Controller controller = new ControllerImpl(view, scanner, out);
+    Controller controller = new ControllerImpl(model, view, scanner, System.out);
 
+    mainMenuLoop(controller, view, scanner);
+  }
+
+  private static void mainMenuLoop(Controller controller, View view, Scanner scanner) {
     while (true) {
-      view.print("Isaac and Anna's Stock Investment Company");
-      view.print("Choose an Option From the Menu:");
-      view.print("1. Calculate Gain or Loss of a Stock");
-      view.print("2. Calculate X-Day Moving Average");
-      view.print("3. Calculate X-Day Crossovers");
-      view.print("4. Create a New Portfolio");
-      view.print("5. Portfolio Menu Screen");
-      view.print("6. Load Own Portfolio");
-      view.print("7. Exit Menu");
-      view.print("Choose an option:");
-
-      int choice;
-      try {
-        choice = scanner.nextInt();
-      } catch (InputMismatchException e) {
-        view.print("Invalid value. Please try again.");
-        continue;
+      printMainMenu(view);
+      int choice = getUserInput(scanner);
+      if (choice == 7) {
+        view.print("Exiting...");
+        break;
       }
-
-      try {
-        switch (choice) {
-          case 1:
-            handleCalculateGainOrLoss(controller, scanner);
-            break;
-          case 2:
-            handleCalculateXDayMovingAverage(controller, scanner);
-            break;
-          case 3:
-            r
-            handleCalculateXDayCrossovers(controller, scanner);
-            break;
-          case 4:
-            handleCreatePortfolio(controller, scanner);
-            break;
-          case 5:
-            handleViewPortfolio(controller, scanner);
-            break;
-          case 6:
-            handleLoadPortfolio(controller, scanner);
-            break;
-          case 7:
-            view.print("Exiting...");
-            System.exit(0);
-            break;
-          default:
-            view.print("Invalid Operation!");
-        }
-      } catch (Exception e) {
-        view.print("Error: " + e.getMessage());
-        scanner.nextLine();
-      }
+      handleUserChoice(controller, scanner, view, choice);
     }
   }
 
-  private static void handleCalculateGainOrLoss(Controller controller, Scanner scanner) {
+  private static void printMainMenu(View view) {
+    view.print("Isaac and Anna's Stock Investment Company");
+    view.print("Choose an Option From the Menu:");
+    view.print("1. Calculate Gain or Loss of a Stock");
+    view.print("2. Calculate X-Day Moving Average");
+    view.print("3. Calculate X-Day Crossovers");
+    view.print("4. Create a New Portfolio");
+    view.print("5. Portfolio Menu Screen");
+    view.print("6. Load Own Portfolio");
+    view.print("7. Exit Menu");
+    view.print("Choose an option:");
+  }
+
+  private static int getUserInput(Scanner scanner) {
+    try {
+      return scanner.nextInt();
+    } catch (InputMismatchException e) {
+      scanner.nextLine();
+      return -1;
+    }
+  }
+
+  private static void handleUserChoice(Controller controller, Scanner scanner, View view, int choice) {
+    switch (choice) {
+      case 1:
+        handleCalculateGainOrLoss(controller, scanner, view);
+        break;
+      case 2:
+        handleCalculateXDayMovingAverage(controller, scanner, view);
+        break;
+      case 3:
+        handleCalculateXDayCrossovers(controller, scanner, view);
+        break;
+      case 4:
+        handleCreatePortfolio(controller, scanner, view);
+        break;
+      case 5:
+        handleViewPortfolio(controller, scanner, view);
+        break;
+      case 6:
+        handleLoadPortfolio(controller, scanner, view);
+        break;
+      default:
+        view.print("Invalid Operation!");
+    }
+  }
+
+  private static void handleCalculateGainOrLoss(Controller controller, Scanner scanner, View view) {
     System.out.println("Enter ticker symbol: ");
+    scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stock;
     try {
@@ -178,8 +185,9 @@ public class ControllerMain {
   }
 
 
-  private static void handleCalculateXDayMovingAverage(Controller controller, Scanner scanner) {
+  private static void handleCalculateXDayMovingAverage(Controller controller, Scanner scanner, View view) {
     System.out.println("Enter ticker symbol: ");
+    scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stock;
     try {
@@ -200,7 +208,7 @@ public class ControllerMain {
     System.out.println("Enter valid Year (YYYY): ");
     int year = scanner.nextInt();
     System.out.println("Enter valid Month (MM): ");
-    int month = scanner.nextInt()
+    int month = scanner.nextInt();
     System.out.println("Enter valid Day (DD): ");
     int day = scanner.nextInt();
 
@@ -229,8 +237,9 @@ public class ControllerMain {
     controller.executeCommand(command);
   }
 
-  private static void handleCalculateXDayCrossovers(Controller controller, Scanner scanner) {
+  private static void handleCalculateXDayCrossovers(Controller controller, Scanner scanner, View view) {
     System.out.println("Enter ticker symbol: ");
+    scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stock;
     try {
@@ -313,13 +322,13 @@ public class ControllerMain {
       day2 = scanner.nextInt();
 
       try {
-        validDate = LocalDate.of(year2, month2, day2);
+        validDate2 = LocalDate.of(year2, month2, day2);
       } catch (DateTimeParseException e) {
         System.out.println("Invalid date. Please enter a valid date.");
         return;
       }
 
-      endDate = validDate.toString();
+      endDate = validDate2.toString();
 
 
       if (!stock.isValidDate(endDate)) {
@@ -407,6 +416,7 @@ public class ControllerMain {
       }
 
       System.out.println("Do you want to add another stock? (yes/no): ");
+      scanner.nextLine();
       String response = scanner.nextLine().trim().toLowerCase();
       if (!response.equals("yes")) {
         break;
@@ -414,12 +424,20 @@ public class ControllerMain {
     }
   }
 
-  private static void handleCreatePortfolio(Controller controller, Scanner scanner) {
+  private static void handleCreatePortfolio(Controller controller, Scanner scanner, View view) {
     System.out.println("Enter a name for your portfolio: ");
+    scanner.nextLine();
     String name = scanner.nextLine();
 
     Portfolio portfolio = controller.getPortfolios().get(name);
-
+    if (portfolio == null) {
+      // If the portfolio does not exist, create it and add to the controller's management
+      controller.makePortfolio(name);
+      portfolio = controller.getPortfolios().get(name);
+      view.print("New portfolio created: " + name);
+    } else {
+      view.print("Portfolio already exists.");
+    }
     ControllerCommand command = new CreatePortfolioCommand(name);
     controller.executeCommand(command);
 
@@ -471,7 +489,7 @@ public class ControllerMain {
           findDistributionValueAtDate(portfolio, controller, scanner);
           break;
         case 8:
-          handlePlotPerformanceBarChart(portfolio);
+          handlePlotPerformanceBarChart(portfolio, controller, scanner);
           break;
         case 9:
 //          savePortfolioToDevice(portfolio);
@@ -484,7 +502,7 @@ public class ControllerMain {
     }
   }
 
-  private static void handleViewPortfolio(Controller controller, Scanner scanner) {
+  private static void handleViewPortfolio(Controller controller, Scanner scanner, View view) {
     Map<String, Portfolio> portfolios = controller.getPortfolios();
     if (portfolios.isEmpty()) {
       System.out.println("No portfolios available. Please create one first.");
@@ -767,12 +785,12 @@ public class ControllerMain {
     controller.executeCommand(command);
   }
 
-  private static void handleLoadPortfolio(Controller controller, Scanner scanner) {
-    System.out.println("Enter the name of the portfolio to load: ");
-    String portfolioName = scanner.nextLine();
-
-    ControllerCommand command = new LoadPortfolioCommand(portfolioName);
-    controller.executeCommand(command);
+  private static void handleLoadPortfolio(Controller controller, Scanner scanner, View view) {
+//    System.out.println("Enter the name of the portfolio to load: ");
+//    String portfolioName = scanner.nextLine();
+//
+//    ControllerCommand command = new LoadPortfolioCommand(portfolioName);
+//    controller.executeCommand(command);
 
   }
 

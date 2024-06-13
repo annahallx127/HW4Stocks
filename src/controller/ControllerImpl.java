@@ -1,8 +1,10 @@
 package controller;
 
 import java.util.Map;
+import java.util.Scanner;
 
 import model.Model;
+import model.ModelPortfolio;
 import model.Portfolio;
 import model.Stock;
 import view.View;
@@ -20,8 +22,9 @@ import view.View;
  */
 
 public class ControllerImpl implements Controller {
-//  private final Readable in;
-//  private final Appendable out;
+
+  private final Scanner scanner;
+  private final Appendable out;
   private Model model;
   private View view;
 
@@ -32,14 +35,13 @@ public class ControllerImpl implements Controller {
    * @param in  the input source for user interactions
    * @param out the output target for displaying messages
    */
-  public ControllerImpl(Readable in, Appendable out) {
-    this.view = view;
-//    this.in = in;
-//    this.out = out;
-//    this.model = new ModelImpl();
-//    this.view = new ViewImpl(this);
-  }
 
+  public ControllerImpl(Model model, View view, Scanner scanner, Appendable out) {
+    this.model = model;
+    this.view = view;
+    this.scanner = scanner;
+    this.out = out;
+  }
 //  @Override
 //  public void controllerGo() {
 //    view.run();
@@ -63,6 +65,7 @@ public class ControllerImpl implements Controller {
   @Override
   public void makePortfolio(String name) {
     model.makePortfolio(name);
+    model.getPortfolios().put(name, new ModelPortfolio(name));
   }
 
   @Override

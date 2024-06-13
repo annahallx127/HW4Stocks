@@ -287,42 +287,43 @@ public class ModelPortfolio implements Portfolio {
   // plots the asterisk
   @Override
   public String plot(String dateStart, String dateEnd, PlotInterval scale) {
-    int asterisks = 1;
-    LocalDate validStartDate = getValidMarketDateWeekend(dateStart);
-    LocalDate validEndDate = getValidMarketDateWeekend(dateEnd);
-    StringBuilder sb = new StringBuilder();
-    sb.append("Performance of Portfolio: ").append(name).append(" from ")
-            .append(dateEnd).append(" to ").append(dateStart)
-            .append(System.lineSeparator()).append(System.lineSeparator());
-    try {
-      isValidDateForPortfolio(validStartDate.toString());
-      isValidDateForPortfolio(validEndDate.toString());
-    } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
-    }
-
-    switch (scale) {
-      case DAYS:
-        // 7 - number of valid days
-        for (int i = 0; i < 7; i++) {
-          LocalDate currentDate = validStartDate.minusDays(i);
-          if (currentDate.isBefore(validEndDate)) {
-            double totalValue = valueOfPortfolio(currentDate.toString());
-            sb.append(currentDate).append(": ").append("*".repeat(DAYS.scale(totalValue)))
-                    .append(System.lineSeparator());
-          }
-        }
-        sb.append("Scale: * = $").append(DAYS.scale()).append(System.lineSeparator());
-      case WEEKS:
-      case MONTHS:
-      case YEARS:
-      case FIVE_YEARS:
-      case TEN_YEARS:
-      default:
-        return "Invalid scale.";
-    }
-
-    return sb.toString();
+//    int asterisks = 1;
+//    LocalDate validStartDate = getValidMarketDateWeekend(dateStart);
+//    LocalDate validEndDate = getValidMarketDateWeekend(dateEnd);
+//    StringBuilder sb = new StringBuilder();
+//    sb.append("Performance of Portfolio: ").append(name).append(" from ")
+//            .append(dateEnd).append(" to ").append(dateStart)
+//            .append(System.lineSeparator()).append(System.lineSeparator());
+//    try {
+//      isValidDateForPortfolio(validStartDate.toString());
+//      isValidDateForPortfolio(validEndDate.toString());
+//    } catch (IllegalArgumentException e) {
+//      System.out.println(e.getMessage());
+//    }
+//
+//    switch (scale) {
+//      case DAYS:
+//        // 7 - number of valid days
+//        for (int i = 0; i < 7; i++) {
+//          LocalDate currentDate = validStartDate.minusDays(i);
+//          if (currentDate.isBefore(validEndDate)) {
+//            double totalValue = valueOfPortfolio(currentDate.toString());
+//            sb.append(currentDate).append(": ").append("*".repeat(DAYS.scale(totalValue)))
+//                    .append(System.lineSeparator());
+//          }
+//        }
+//        sb.append("Scale: * = $").append(DAYS.scale()).append(System.lineSeparator());
+//      case WEEKS:
+//      case MONTHS:
+//      case YEARS:
+//      case FIVE_YEARS:
+//      case TEN_YEARS:
+//      default:
+//        return "Invalid scale.";
+//    }
+//
+//    return sb.toString();
+    return "";
   }
 
 
