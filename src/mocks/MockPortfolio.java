@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.PlotScale;
+import model.PlotInterval;
 import model.Portfolio;
 import model.Stock;
 import model.Transaction;
@@ -120,7 +120,7 @@ public class MockPortfolio implements Portfolio {
   }
 
   @Override
-  public String plotPerformanceOverTime(String startDate, String endDate, PlotScale scale) {
+  public String plot(String dateStart, String dateEnd, PlotInterval scale) {
     return "";
   }
 

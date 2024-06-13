@@ -1,7 +1,10 @@
 package model;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import static model.PlotInterval.DAYS;
 
 /**
  * Represents a portfolio in the stock investment program. Every portfolio can have multiple stocks
@@ -107,13 +110,13 @@ public interface Portfolio {
    * value of the portfolio at that time stamp. Disclaimer: The numerical value of the calculation
    * is not the exact value.
    *
-   * @param startDate the user specified start date of which to examine the portfolio performance.
-   * @param endDate the user specified end date of which to examine the portfolio performance.
-   * @param scale the timescale on which to plot the graph
+   * @param dateStart the date at which to start examining the portfolio's performance.
+   * @param dateEnd   the date at which to stop examining the portfolio's performance.
+   * @param scale     the timescale on which to plot the graph.
    * @return a bar chart representation of the portfolio's performance over the specified
    * time period.
    */
-  String plotPerformanceOverTime(String startDate, String endDate, PlotScale scale);
+  String plot(String dateStart, String dateEnd, PlotInterval scale);
 
   /**
    * A way for the user to shift the weights of their portfolio so that they are able to invest

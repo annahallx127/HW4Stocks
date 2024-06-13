@@ -55,4 +55,32 @@ public interface Model {
    * @return a Map of all existing portfolios and its components
    */
   Map<String, Portfolio> getPortfolios();
+
+  /**
+   * Plots the graph of the stock with the given symbol.
+   *
+   * @param symbol    the symbol of the stock. Must be a valid stock symbol.
+   * @param dateStart the start date of the graph. Must be a valid date in the format "YYYY-MM-DD".
+   *                  Must be before the stock's last date.
+   * @param dateEnd   the end date of the graph. Must be a valid date in the format "YYYY-MM-DD".
+   * @param interval  the interval of the graph. Must be a valid interval.
+   * @throws IllegalArgumentException if the symbol is not a valid stock symbol, if the dates are
+   *                                  not valid, or if the start date is after the end date.
+   */
+  String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval)
+          throws IllegalArgumentException;
+
+  /**
+   * Plots the graph of the portfolio with the given name.
+   *
+   * @param name      the name of the portfolio. Must be a valid portfolio name.
+   * @param dateStart the start date of the graph. Must be a valid date in the format
+   *                  "YYYY-MM-DD".
+   * @param dateEnd   the end date of the graph. Must be a valid date in the format "YYYY-MM-DD".
+   * @param interval  the interval of the graph. Must be a valid interval.
+   * @throws IllegalArgumentException if the portfolio name is not valid, or if the dates are not
+   *                                  valid.
+   */
+  String plotPortfolio(String name, String dateStart, String dateEnd, PlotInterval interval)
+          throws IllegalArgumentException;
 }

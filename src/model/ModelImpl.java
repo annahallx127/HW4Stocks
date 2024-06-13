@@ -1,7 +1,6 @@
 package model;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -197,5 +196,33 @@ public class ModelImpl implements Model {
   @Override
   public Map<String, Portfolio> getPortfolios() {
     return portfolios;
+  }
+
+  @Override
+  public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval)
+          throws IllegalArgumentException {
+    Stock stock = this.get(symbol);
+
+    try {
+      return stock.plot(dateStart, dateEnd, interval);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
+  @Override
+  public String plotPortfolio(String name, String dateStart, String dateEnd, PlotInterval interval)
+          throws IllegalArgumentException {
+    Portfolio portfolio = portfolios.get(name);
+
+    if (portfolio == null) {
+      throw new IllegalArgumentException("The portfolio does not exist.");
+    }
+
+    try {
+      return portfolio.plot(dateStart, dateEnd, interval);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
   }
 }

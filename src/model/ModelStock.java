@@ -325,4 +325,9 @@ public class ModelStock implements Stock {
   public int hashCode() {
     return symbol.hashCode();
   }
+
+  @Override
+  public String plot(String dateStart, String dateEnd, PlotInterval interval) {
+    return "";
+  }
 }

@@ -8,11 +8,14 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import parser.PortfolioWriter;
+
+import static model.PlotInterval.DAYS;
 
 /**
  * Represents a portfolio in the stock investment program. Each portfolio has a name and manages a
@@ -145,29 +148,41 @@ public class ModelPortfolio implements Portfolio {
 
   @Override
   public double valueOfPortfolio(String date) {
+
+    if (!isValidDateForPortfolio(date)) {
+      throw new IllegalArgumentException("Cannot check portfolio value on weekend, please enter a market date");
+    }
     LocalDate newDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     LocalDate validDate = getValidMarketDateWeekend(date);
 
-    //checks if it is the same date as the transaction
-    if (newDate.equals(transactions.get(transactions.size() - 1).getDate())) {
-      return transactions.get(transactions.size() - 1).getStock().
-              getPriceOnDate(validDate.toString()) * transactions.
-              get(transactions.size() - 1).getShares();
+
+    // This map will hold the effective shares of each stock up to the valid date.
+    Map<Stock, Double> effectiveShares = new HashMap<>();
+
+    // Aggregate shares from all transactions up to and including the valid date.
+    for (Transaction transaction : transactions) {
+      if (!transaction.getDate().isAfter(validDate)) {
+        Stock stock = transaction.getStock();
+        double shares = transaction.getShares();
+        if ("sell".equalsIgnoreCase(transaction.getType())) {
+          shares = -shares;  // Negate shares if the transaction is a sell.
+        }
+        effectiveShares.merge(stock, shares, Double::sum);
+      }
     }
 
-    if (!transactions.isEmpty() && validDate.isBefore(transactions.
-            get(0).getDate())) {
-      return 0.0;
-    }
-
-    double value = 0.0;
-    for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
+    double totalValue = 0.0;
+    // Calculate the total value based on the aggregated shares.
+    for (Map.Entry<Stock, Double> entry : effectiveShares.entrySet()) {
       Stock stock = entry.getKey();
       double shares = entry.getValue();
-      double stockPrice = stock.getPriceOnDate(validDate.toString());
-      value += stockPrice * shares;
+      if (shares > 0) {  // Only calculate value for positive shares.
+        double stockPrice = stock.getPriceOnDate(validDate.toString());
+        totalValue += stockPrice * shares;
+      }
     }
-    return value;
+
+    return totalValue;
   }
 
 
@@ -191,7 +206,6 @@ public class ModelPortfolio implements Portfolio {
     return true;
   }
 
-  // changes over time / after rebalancing
   @Override
   public String getValueDistribution(String date) {
     LocalDate validDate = getValidMarketDateWeekend(date);
@@ -200,45 +214,39 @@ public class ModelPortfolio implements Portfolio {
       isValidDateForPortfolio(validDate.toString());
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
+      return "Invalid date for portfolio operations: " + validDate;
     }
-    double totalValue = valueOfPortfolio(validDate.toString());
+
+    double totalValue = 0.0;
+    Map<Stock, Double> stockValues = new HashMap<>();
+
+    for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
+      Stock stock = entry.getKey();
+      double shares = entry.getValue();
+      double stockPrice = stock.getPriceOnDate(validDate.toString());
+      double stockValue = shares * stockPrice;
+      stockValues.put(stock, stockValue);
+      totalValue += stockValue;
+    }
 
     if (totalValue == 0) {
       return "The value of the portfolio is 0 at this date, it is empty";
     }
 
     Map<String, String> distribution = new HashMap<>();
-
-    double calculatedTotalValue = 0.0;
-    for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
-      Stock stock = entry.getKey();
-      double shares = entry.getValue();
-      double stockPrice = stock.getPriceOnDate(validDate.toString());
-      double stockValue = stockPrice * shares;
-      calculatedTotalValue += stockValue;
-      String stockInfo = String.format("$%.4f (%.2f%%)", stockValue,
-              Math.floor(stockValue / totalValue) * 100);
-      // math.ceil or math.floor?
-
-      distribution.put(stock.toString(), ", " + stockInfo + "%");
+    for (Map.Entry<Stock, Double> entry : stockValues.entrySet()) {
+      double stockValue = entry.getValue();
+      double percentage = stockValue / totalValue * 100;
+      distribution.put(entry.getKey().toString(), String.format("$%.2f (%.2f%%)", stockValue, percentage));
     }
 
-    if (Math.abs(calculatedTotalValue - totalValue) > 0.0001) {
-      throw new IllegalArgumentException(
-              "Total Distribution Value != Total Value of Portfolio");
-    }
-
-    distribution.put("Total Portfolio Value", String.format("$%.4f", totalValue));
-    // could change to have no format, j do tostring
-
-    StringBuilder result = new StringBuilder();
+    StringBuilder result = new StringBuilder("Total Portfolio Value: ").append(String.format("$%.2f\n", totalValue));
     for (Map.Entry<String, String> entry : distribution.entrySet()) {
       result.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
     }
 
     return result.toString();
   }
-
 
   @Override
   public String getCompositionAtDate(String date) {
@@ -274,107 +282,89 @@ public class ModelPortfolio implements Portfolio {
     return result.toString();
   }
 
-
+  // TODO: put this in an extended class after refactoring
   // check for valid date in view or here?
   // plots the asterisk
   @Override
-  public String plotPerformanceOverTime(String startDate, String endDate, PlotScale scale) {
-
-    LocalDate validStartDate = getValidMarketDateWeekend(startDate);
-    LocalDate validEndDate = getValidMarketDateWeekend(endDate);
-
+  public String plot(String dateStart, String dateEnd, PlotInterval scale) {
+    int asterisks = 1;
+    LocalDate validStartDate = getValidMarketDateWeekend(dateStart);
+    LocalDate validEndDate = getValidMarketDateWeekend(dateEnd);
+    StringBuilder sb = new StringBuilder();
+    sb.append("Performance of Portfolio: ").append(name).append(" from ")
+            .append(dateEnd).append(" to ").append(dateStart)
+            .append(System.lineSeparator()).append(System.lineSeparator());
     try {
-      isValidDateForPortfolio(validEndDate.toString());
       isValidDateForPortfolio(validStartDate.toString());
+      isValidDateForPortfolio(validEndDate.toString());
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }
 
-    return "";
+    switch (scale) {
+      case DAYS:
+        // 7 - number of valid days
+        for (int i = 0; i < 7; i++) {
+          LocalDate currentDate = validStartDate.minusDays(i);
+          if (currentDate.isBefore(validEndDate)) {
+            double totalValue = valueOfPortfolio(currentDate.toString());
+            sb.append(currentDate).append(": ").append("*".repeat(DAYS.scale(totalValue)))
+                    .append(System.lineSeparator());
+          }
+        }
+        sb.append("Scale: * = $").append(DAYS.scale()).append(System.lineSeparator());
+      case WEEKS:
+      case MONTHS:
+      case YEARS:
+      case FIVE_YEARS:
+      case TEN_YEARS:
+      default:
+        return "Invalid scale.";
+    }
+
+    return sb.toString();
   }
 
-  // weights must be whole numbers
-  // can make it chronological
-  // takes a specified date
-  // weight cannot be negative
-  // if weight is 0? then it gets rid of stock?
-  // for the view, specify to the user the format
-  // ask go through the portfolio and ask the user the weight of each stock
-  // then store it into a hashmap
-  // if they haven't entered a weight in for a stock..?
+
   @Override
   public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> targetWeights) {
-
     LocalDate intendedDate = LocalDate.parse(reBalanceDate, DateTimeFormatter.ISO_LOCAL_DATE);
 
-    if (transactions.isEmpty() && intendedDate.isBefore(
-            transactions.get(transactions.size() - 1).getDate())) {
-      throw new IllegalArgumentException("ReBalance date cannot be before the latest transaction.");
+    if (intendedDate.getDayOfWeek() == DayOfWeek.SATURDAY || intendedDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+      throw new IllegalArgumentException("This program does not support re-balancing a" +
+              " portfolio on a non market date! Please enter a valid date.");
     }
-
-    try {
-      isValidDateForPortfolio(reBalanceDate.toString());
-    } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
-    }
-
-    // if not in date format? is this needed
-//    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//    String dateCheck = reBalanceDate.toString();
-//    LocalDate parsedDate = LocalDate.parse(dateCheck, formatter);
-//
-//    if (intendedDate != parsedDate) {
-//      throw new IllegalArgumentException("Invalid date format.");
-//    }
-
-    for (Map.Entry<Stock, Integer> entry : targetWeights.entrySet()) {
-      int weight = entry.getValue();
-      if (weight < 0 || weight > 100) {
-        throw new IllegalArgumentException("Each weight must target weight must be between 0 and 100");
-      }
-    }
-
-    int totalWeight = targetWeights.values().stream().mapToInt(Integer::intValue).sum();
-    if (totalWeight != 100) {
-      throw new IllegalArgumentException("Error: The total weight of all stocks must add up to 100%.");
-    }
-
     double totalValue = valueOfPortfolio(reBalanceDate);
 
     Map<Stock, Double> currentValues = new HashMap<>();
-    for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
-      Stock stock = entry.getKey();
-      double shares = entry.getValue();
+    stocks.forEach((stock, shares) -> {
       double stockPrice = stock.getPriceOnDate(reBalanceDate);
       currentValues.put(stock, shares * stockPrice);
-    }
+    });
 
-    Map<Stock, Double> targetValues = new HashMap<>();
     for (Map.Entry<Stock, Integer> entry : targetWeights.entrySet()) {
       Stock stock = entry.getKey();
-      int intendedWeight = entry.getValue();
-      targetValues.put(stock, totalValue * intendedWeight / 100);
-    }
-
-    for (Stock stock : targetValues.keySet()) {
+      int targetWeight = entry.getValue();
+      double targetValue = totalValue * targetWeight / 100.0;
       double currentValue = currentValues.getOrDefault(stock, 0.0);
-      double targetValue = targetValues.get(stock);
       double stockPrice = stock.getPriceOnDate(reBalanceDate);
 
-      //sell
-      if (currentValue > targetValue) {
-        double valueDifferenceToSell = currentValue - targetValue;
-        double sharesToSell = valueDifferenceToSell/stockPrice;
-        remove(stock, sharesToSell, reBalanceDate);
-      }
+      double targetShares = targetValue / stockPrice;
 
-      //buy
-      if (currentValue < targetValue) {
-        double valueDifferenceToBuy = targetValue - currentValue;
-        double sharesToBuy = valueDifferenceToBuy / stockPrice;
-        add(stock, sharesToBuy, reBalanceDate);
+      if (targetWeight == 0) {
+        stocks.remove(stock);
+      } else if (currentValue > targetValue) {
+        double excessValue = currentValue - targetValue;
+        double sharesToSell = excessValue / stockPrice;
+        stocks.put(stock, stocks.get(stock) - sharesToSell);
+      } else if (currentValue < targetValue) {
+        double shortfallValue = targetValue - currentValue;
+        double sharesToBuy = shortfallValue / stockPrice;
+        stocks.put(stock, stocks.getOrDefault(stock, 0.0) + sharesToBuy);
       }
     }
+
+    stocks.keySet().retainAll(targetWeights.keySet());
   }
 
   @Override
@@ -386,77 +376,51 @@ public class ModelPortfolio implements Portfolio {
       }
       writer.close();
     } catch (IOException e) {
-      throw new IllegalArgumentException("Error saving portfolio: " + e.getMessage());
+      throw new IllegalArgumentException("Could not save portfolio: " + e.getMessage());
     }
   }
 
   @Override
   public void addTransaction(Transaction transaction) throws IllegalArgumentException {
-    // no transaction is before the latest transaction
-    if (!transactions.isEmpty() && transaction.getDate().
-            isBefore(transactions.get(transactions.size() - 1).getDate())) {
-      throw new IllegalArgumentException("Transaction date cannot be " +
-              "before the latest transaction date.");
-    }
+    if (!"rebalance".equalsIgnoreCase(transaction.getType())) {
+      if (!transactions.isEmpty() && transaction.getDate().isBefore(transactions.get(transactions.size() - 1).getDate())) {
+        throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+      }
 
-    // check if transaction is illegal within the same month
-    for (Transaction t : transactions) {
-      if (t.getStock().equals(transaction.getStock()) && t.getDate().getMonth()
-              == transaction.getDate().getMonth() && t.getDate().getYear()
-              == transaction.getDate().getYear()) {
-        if (transaction.getType().equalsIgnoreCase("sell")
-                && t.getType().equalsIgnoreCase("buy") && transaction.getShares()
-                > t.getShares()) {
-          throw new IllegalArgumentException("Cannot sell more shares " +
-                  "than the number of shares present in the same month.");
+      for (Transaction t : transactions) {
+        if (t.getStock().equals(transaction.getStock()) &&
+                t.getDate().getMonth() == transaction.getDate().getMonth() &&
+                t.getDate().getYear() == transaction.getDate().getYear()) {
+          if ("sell".equalsIgnoreCase(transaction.getType()) &&
+                  "buy".equalsIgnoreCase(t.getType()) &&
+                  transaction.getShares() > t.getShares()) {
+            throw new IllegalArgumentException("Cannot sell more shares than were bought in the same month.");
+          }
         }
       }
-    }
 
-    transactions.add(transaction);
-    transactions.sort(transaction);
+      transactions.add(transaction);
+      transactions.sort(Comparator.comparing(Transaction::getDate));
+    }
 
     Stock stock = transaction.getStock();
     double shares = transaction.getShares();
-
-    if (transaction.getType().equalsIgnoreCase("buy")) {
-      stocks.put(stock, stocks.getOrDefault(stock, 0.0) + shares);
-    } else if (transaction.getType().equalsIgnoreCase("sell")) {
-      double currentShares = stocks.get(stock);
+    if ("buy".equalsIgnoreCase(transaction.getType()) || "rebalance".equalsIgnoreCase(transaction.getType())) {
+      stocks.merge(stock, shares, Double::sum);
+    } else if ("sell".equalsIgnoreCase(transaction.getType())) {
+      double currentShares = stocks.getOrDefault(stock, 0.0);
       if (shares > currentShares) {
-        throw new IllegalArgumentException("Cannot remove more shares than the " +
-                "number of shares present.");
+        throw new IllegalArgumentException("Cannot remove more shares than the number present.");
       }
-      if (currentShares - shares <= 0.001) {
+      stocks.merge(stock, -shares, Double::sum);
+      if (stocks.get(stock) <= 0.001) {
         stocks.remove(stock);
-      } else {
-        stocks.put(stock, currentShares - shares);
       }
-    } else {
-      throw new IllegalArgumentException("Invalid transaction type.");
     }
   }
 
   @Override
   public List<Transaction> getTransactions() {
-    return List.copyOf(transactions);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ModelPortfolio)) {
-      return false;
-    }
-    ModelPortfolio that = (ModelPortfolio) o;
-    return name.equals(that.name) && stocks.equals(that.stocks)
-            && transactions.equals(that.transactions);
-  }
-
-  @Override
-  public int hashCode() {
-    return name.hashCode() + stocks.hashCode() + transactions.hashCode();
+    return Collections.unmodifiableList(transactions);
   }
 }

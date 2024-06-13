@@ -3,6 +3,7 @@ package mocks;
 import java.util.HashMap;
 import java.util.Map;
 
+import model.PlotInterval;
 import model.Stock;
 
 /**
@@ -66,6 +67,11 @@ public class MockStock implements Stock {
   // fix this later os that it calls the ones in the api
   @Override
   public void isValidSymbol(String symbol) {
+  }
+
+  @Override
+  public String plot(String dateStart, String dateEnd, PlotInterval interval) {
+    return "";
   }
 
   /**

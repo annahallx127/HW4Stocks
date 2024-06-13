@@ -1,24 +1,13 @@
 package model;
 
-public enum PlotScale {
+public enum PlotInterval {
   DAYS(7), WEEKS(4), MONTHS(12), YEARS(10),
   FIVE_YEARS(5), TEN_YEARS(5);
 
   final int baseRows;
 
-  PlotScale(int baseRows) {
+  PlotInterval(int baseRows) {
     this.baseRows = baseRows;
-  }
-
-  /**
-   * The number of rows the plot chart should show. If the number of rows is less than the baseRows,
-   * then this method returns the maximum number of rows for the stock.
-   *
-   * @param stock the stock that should be processed
-   * @return the number of rows this plot should have
-   */
-  public int numRows(Stock stock) {
-    return 0;
   }
 
   /**
@@ -28,7 +17,7 @@ public enum PlotScale {
    *
    * @return the base scale as an int
    */
-  public int baseScale() {
+  public int scale(double totalValue) {
     return baseRows;
   }
 }

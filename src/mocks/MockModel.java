@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.Model;
+import model.PlotInterval;
 import model.Portfolio;
 import model.Stock;
 
@@ -54,6 +55,16 @@ public class MockModel implements Model {
   @Override
   public Map<String, Portfolio> getPortfolios() {
     return Map.copyOf(portfolios);
+  }
+
+  @Override
+  public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval) throws IllegalArgumentException {
+    return "";
+  }
+
+  @Override
+  public String plotPortfolio(String name, String dateStart, String dateEnd, PlotInterval interval) throws IllegalArgumentException {
+    return "";
   }
 
   /**
