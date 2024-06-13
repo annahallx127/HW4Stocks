@@ -480,11 +480,14 @@ public class ControllerImpl implements Controller {
       if (quantity > 0) {
         portfolio.add(stock, quantity, date);
         System.out.println("You have added " + quantity + " shares of " + ticker.toUpperCase()
-                + " to your portfolio!");
+                + " to portfolio: " + portfolio.getName() + "!");
       } else {
         System.out.println("Quantity must be greater than 0 and a whole number, please try again.");
         return;
       }
+
+      controller.getPortfolios().put(portfolio.getName(), portfolio);
+      portfolio.savePortfolio(date);
 
       System.out.println("Do you want to add another stock? (yes/no): ");
       scanner.nextLine();
@@ -666,6 +669,9 @@ public class ControllerImpl implements Controller {
     System.out.println("You are Selling this Stock at Date: " + validDate);
     ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, validDate);
     controller.executeCommand(command);
+    controller.getPortfolios().put(portfolio.getName(), portfolio);
+    portfolio.savePortfolio(validDate);
+
   }
 
   private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio, Controller controller, Scanner scanner) {
@@ -718,8 +724,8 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
-              "\ndate backwards will be considered");
+      System.out.println("DISCLAIMER: This program will not allow you to re-balance on a non " +
+              "market date! If you have entered a non-market date, please try again.");
       System.out.println("Enter date you would like to re-balance on (YYYY-MM-DD): ");
 
       System.out.println("Enter a valid year (YYYY): ");
@@ -750,8 +756,8 @@ public class ControllerImpl implements Controller {
 
 
     Map<Stock, Integer> targetWeights = new HashMap<>();
-    System.out.println("Enter the weights for each stock in your portfolio. Weights must total to 100%.");
-    scanner.nextLine();
+    System.out.println("Enter the weights for each stock in your portfolio. Weights must total to" +
+            " 100%. ");
     scanner.nextLine();
 
     int totalWeight = 0;
