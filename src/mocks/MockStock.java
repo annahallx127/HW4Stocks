@@ -65,8 +65,7 @@ public class MockStock implements Stock {
 
   // fix this later os that it calls the ones in the api
   @Override
-  public boolean isValidSymbol(String symbol) {
-    return true;
+  public void isValidSymbol(String symbol) {
   }
 
   /**

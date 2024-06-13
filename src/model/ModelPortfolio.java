@@ -1,5 +1,6 @@
 package model;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -378,11 +379,15 @@ public class ModelPortfolio implements Portfolio {
 
   @Override
   public void savePortfolio(String date) {
-    PortfolioWriter writer = new PortfolioWriter(name, date, "src/data/portfolios");
-    for (Stock s : stocks.keySet()) {
-      writer.writeStock(s.toString(), stocks.get(s));
+    try {
+      PortfolioWriter writer = new PortfolioWriter(name, date, "src/data/portfolios");
+      for (Stock s : stocks.keySet()) {
+        writer.writeStock(s.toString(), stocks.get(s));
+      }
+      writer.close();
+    } catch (IOException e) {
+      throw new IllegalArgumentException("Error saving portfolio: " + e.getMessage());
     }
-    writer.close();
   }
 
   @Override
@@ -432,9 +437,26 @@ public class ModelPortfolio implements Portfolio {
     }
   }
 
-
   @Override
   public List<Transaction> getTransactions() {
-    return Collections.unmodifiableList(transactions);
+    return List.copyOf(transactions);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ModelPortfolio)) {
+      return false;
+    }
+    ModelPortfolio that = (ModelPortfolio) o;
+    return name.equals(that.name) && stocks.equals(that.stocks)
+            && transactions.equals(that.transactions);
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode() + stocks.hashCode() + transactions.hashCode();
   }
 }

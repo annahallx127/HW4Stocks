@@ -97,5 +97,26 @@ public interface Stock {
    */
   double getPriceOnDate(String date);
 
-  boolean isValidSymbol(String symbol);
+  /**
+   * Checks if the symbol is a valid symbol.
+   *
+   * @param symbol the symbol to check.
+   * @throws IllegalArgumentException if the symbol is not valid.
+   */
+  void isValidSymbol(String symbol) throws IllegalArgumentException;
+
+  /**
+   * Checks if this stock is equal to the given object.
+   *
+   * @param o the object to compare this stock to.
+   * @return true if the object is equal to this stock, false otherwise.
+   */
+  boolean equals(Object o);
+
+  /**
+   * Returns a hash code value for the stock.
+   *
+   * @return a hash code value for this stock.
+   */
+  int hashCode();
 }
