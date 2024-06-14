@@ -58,11 +58,6 @@ public class MockModel implements Model {
   }
 
   @Override
-  public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval) throws IllegalArgumentException {
-    return "";
-  }
-
-  @Override
   public String plotPortfolio(String name, String dateStart, String dateEnd, PlotInterval interval) throws IllegalArgumentException {
     return "";
   }

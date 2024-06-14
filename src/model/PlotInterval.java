@@ -6,24 +6,46 @@ package model;
  * include days, weeks, months, years, five years, and ten years.
  */
 public enum PlotInterval {
-  DAYS(7), WEEKS(4), MONTHS(12), YEARS(10),
-  FIVE_YEARS(5), TEN_YEARS(5);
+  DAYS, WEEKS, MONTHS, YEARS, FIVE_YEARS, TEN_YEARS;
 
-  private final int baseRows;
-  private static final int baseValue = 10;
-  private static final int targetFirstValueAsterisks = 5;
+  // the min resolution for the plot
+  private static final int MIN_RESOLUTION = 100;
+  // the max resolution for the plot
+  private static final int MAX_RESOLUTION = 1000;
+  // the target resolution for the plot
+  private int targetResolution;
 
-  PlotInterval(int baseRows) {
-    this.baseRows = baseRows;
+  PlotInterval() {
+    targetResolution = MIN_RESOLUTION;
   }
 
   /**
-   * The base scale for each asterisk of the x-axis on the plot chart. Used to calculate
+   * The asterisk scale for each asterisk of the x-axis on the plot chart. Used to calculate
    * what the relative scale factor should be when taking into account the total portfolio's value.
    *
-   * @return the base scale as an int
+   * @return the asterisk scale as an int
    */
-  public int scale(double totalValue) {
-    return (int) (totalValue / targetFirstValueAsterisks);
+  public int scaleFactor(double totalValue) {
+    return (int) (totalValue / targetResolution);
+  }
+
+  /**
+   * Set the resolution for the plot chart. The resolution is the difference between the start
+   * date's value and the end date's value.
+   *
+   * @param startDateValue the value of the portfolio at the start date
+   * @param endDateValue   the value of the portfolio at the end date
+   */
+  public void setResolution(double startDateValue, double endDateValue) {
+    targetResolution = (int) Math.abs(endDateValue - startDateValue);
+  }
+
+  /**
+   * Get the target resolution for the plot chart.
+   *
+   * @return the target resolution as an int
+   */
+  public int getTargetResolution() {
+    return targetResolution;
   }
 }

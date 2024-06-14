@@ -1,5 +1,6 @@
 import model.Model;
 import model.ModelImpl;
+import model.PlotInterval;
 import model.Portfolio;
 import model.Stock;
 
@@ -24,6 +25,7 @@ public class ModelPortfolioUnitTests {
   private Model model;
   private Stock stock1;
   private Stock stock2;
+  private Stock stock3;
 
   /**
    * Sets up the application with values before each of the following tests.
@@ -36,6 +38,7 @@ public class ModelPortfolioUnitTests {
     portfolio = model.getPortfolios().get("Test Portfolio");
     stock1 = model.get("AAPL");
     stock2 = model.get("GOOG");
+    stock3 = model.get("TSLA");
   }
 
   @Test
@@ -547,5 +550,16 @@ public class ModelPortfolioUnitTests {
             portfolio.getCompositionAtDate("2024-06-03"));
   }
 
+  @Test
+  public void testPlotDays() {
+    portfolio.add(stock1, 10, "2024-06-06");
+    portfolio.add(stock3, 10, "2024-06-06");
 
+    String expectedString = "'Test Portfolio' from 2024-06-06 to 2024-05-06" + System.lineSeparator()
+            + "2024-06-06: **************************************************" + System.lineSeparator()
+            + "Scale: * = $10" + System.lineSeparator();
+
+    assertEquals(expectedString,
+            portfolio.plot("2024-06-06", "2024-06-06", PlotInterval.DAYS));
+  }
 }

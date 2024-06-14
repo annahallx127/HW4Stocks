@@ -326,25 +326,4 @@ public class ModelStock implements Stock {
   public int hashCode() {
     return symbol.hashCode();
   }
-
-  @Override
-  public String plot(String dateStart, String dateEnd, PlotInterval interval) {
-
-    switch (interval) {
-      case DAYS:
-        return "DAYS";
-      case WEEKS:
-        return "WEEKS";
-      case MONTHS:
-        return "MONTHS";
-      case YEARS:
-        return "YEARS";
-      case FIVE_YEARS:
-        return "FIVE_YEARS";
-      case TEN_YEARS:
-        return "TEN_YEARS";
-    }
-
-    return null;
-  }
 }

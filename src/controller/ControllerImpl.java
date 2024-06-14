@@ -12,6 +12,7 @@ import controller.commands.CreatePortfolioCommand;
 import controller.commands.CrossoverCommand;
 import controller.commands.DistributionValueCommand;
 import controller.commands.MovingAverageCommand;
+import controller.commands.PlotPortfolioCommand;
 import controller.commands.PortfolioValueCommand;
 import controller.commands.ReBalancePortfolioCommand;
 import controller.commands.SellStockCommand;
@@ -21,6 +22,7 @@ import model.ModelPortfolio;
 import model.Portfolio;
 import model.Stock;
 import view.View;
+import model.PlotInterval;
 
 /**
  * Represents the controller for the stock investment program. The controller is responsible for
@@ -38,8 +40,8 @@ public class ControllerImpl implements Controller {
 
   private final Scanner scanner;
   private final Appendable out;
-  private Model model;
-  private View view;
+  private final Model model;
+  private static View view;
 
   public ControllerImpl(Model model, View view, Scanner scanner, Appendable out) {
     this.model = model;
@@ -153,7 +155,7 @@ public class ControllerImpl implements Controller {
   }
 
   private static void handleCalculateGainOrLoss(Controller controller, Scanner scanner, View view) {
-    System.out.println("Enter ticker symbol: ");
+    view.print("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stock;
@@ -161,7 +163,7 @@ public class ControllerImpl implements Controller {
       stock = controller.getStock(ticker);
       stock.isValidSymbol(ticker);
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      view.print(e.getMessage());
       return;
     }
 
@@ -171,21 +173,21 @@ public class ControllerImpl implements Controller {
     int month;
     int day;
     do {
-      System.out.println("DISCLAIMER: If you have entered any non market date, the nearest market " +
+      view.print("DISCLAIMER: If you have entered any non market date, the nearest market " +
               "\ndate backwards will be considered");
-      System.out.println("Enter start date (YYYY-MM-DD): ");
+      view.print("Enter start date (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         validDate = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -197,9 +199,9 @@ public class ControllerImpl implements Controller {
         try {
           stock.isValidDate(startDate);
         } catch (IllegalArgumentException e) {
-          System.out.println(e.getMessage());
+          view.print(e.getMessage());
         }
-        System.out.println("Invalid start date. Please enter a valid market date.");
+        view.print("Invalid start date. Please enter a valid market date.");
       }
     }
     while (!stock.isValidDate(startDate));
@@ -210,18 +212,18 @@ public class ControllerImpl implements Controller {
     int month2;
     int day2;
     do {
-      System.out.println("Enter end date (YYYY-MM-DD): ");
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter end date (YYYY-MM-DD): ");
+      view.print("Enter a valid year (YYYY): ");
       year2 = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month2 = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day2 = scanner.nextInt();
 
       try {
         validDate = LocalDate.of(year2, month2, day2);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -232,9 +234,9 @@ public class ControllerImpl implements Controller {
         try {
           stock.isValidDate(endDate);
         } catch (IllegalArgumentException e) {
-          System.out.println(e.getMessage());
+          view.print(e.getMessage());
         }
-        System.out.println("Invalid end date. Please enter a valid market date.");
+        view.print("Invalid end date. Please enter a valid market date.");
       }
     }
     while (!stock.isValidDate(endDate));
@@ -245,7 +247,7 @@ public class ControllerImpl implements Controller {
 
 
   private static void handleCalculateXDayMovingAverage(Controller controller, Scanner scanner, View view) {
-    System.out.println("Enter ticker symbol: ");
+    view.print("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stock;
@@ -253,43 +255,43 @@ public class ControllerImpl implements Controller {
       stock = controller.getStock(ticker);
       stock.isValidSymbol(ticker);
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      view.print(e.getMessage());
       return;
     }
 
-    System.out.println("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
+    view.print("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
             + "\nthe nearest business day forward will be considered");
-    System.out.println("Enter number of days: ");
+    view.print("Enter number of days: ");
     int days = scanner.nextInt();
-    System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+    view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
             "date backwards will be considered");
-    System.out.println("Enter date (YYYY-MM-DD): ");
-    System.out.println("Enter valid Year (YYYY): ");
+    view.print("Enter date (YYYY-MM-DD): ");
+    view.print("Enter valid Year (YYYY): ");
     int year = scanner.nextInt();
-    System.out.println("Enter valid Month (MM): ");
+    view.print("Enter valid Month (MM): ");
     int month = scanner.nextInt();
-    System.out.println("Enter valid Day (DD): ");
+    view.print("Enter valid Day (DD): ");
     int day = scanner.nextInt();
 
     LocalDate validDate;
     try {
       validDate = LocalDate.of(year, month, day);
     } catch (DateTimeParseException e) {
-      System.out.println("Invalid date. Please enter a valid date.");
+      view.print("Invalid date. Please enter a valid date.");
       return;
     }
 
     String date = validDate.toString();
 
     if (days <= 0) {
-      System.out.println("Quantity must be greater than 0 and a whole number");
+      view.print("Quantity must be greater than 0 and a whole number");
     } else if (!stock.isValidDate(date)) {
       try {
         stock.isValidDate(date);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
       }
-      System.out.println("Invalid Date.");
+      view.print("Invalid Date.");
     }
 
     ControllerCommand command = new MovingAverageCommand(ticker, days, date);
@@ -297,7 +299,7 @@ public class ControllerImpl implements Controller {
   }
 
   private static void handleCalculateXDayCrossovers(Controller controller, Scanner scanner, View view) {
-    System.out.println("Enter ticker symbol: ");
+    view.print("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stock;
@@ -305,26 +307,26 @@ public class ControllerImpl implements Controller {
       stock = controller.getStock(ticker);
       stock.isValidSymbol(ticker);
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      view.print(e.getMessage());
       return;
     }
 
-    System.out.println("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
+    view.print("DISCLAIMER: if you have entered a date range where it falls on a weekend,"
             + "\nthe nearest business day forward will be considered");
-    System.out.println("Enter number of days: ");
+    view.print("Enter number of days: ");
     int days;
 
     try {
       days = scanner.nextInt();
     } catch (InputMismatchException e) {
-      System.out.println("Invalid number. Please try again.");
+      view.print("Invalid number. Please try again.");
       return;
     }
 
     try {
       Integer.parseInt(String.valueOf(days));
     } catch (NumberFormatException e) {
-      System.out.println("Invalid number. Please try again.");
+      view.print("Invalid number. Please try again.");
     }
 
     String startDate;
@@ -333,21 +335,21 @@ public class ControllerImpl implements Controller {
     int month;
     int day;
     do {
-      System.out.println("DISCLAIMER: If you have entered any non market date, the nearest market " +
+      view.print("DISCLAIMER: If you have entered any non market date, the nearest market " +
               "\ndate backwards will be considered");
-      System.out.println("Enter start date (YYYY-MM-DD): ");
+      view.print("Enter start date (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         validDate = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -359,9 +361,9 @@ public class ControllerImpl implements Controller {
         try {
           stock.isValidDate(startDate);
         } catch (IllegalArgumentException e) {
-          System.out.println(e.getMessage());
+          view.print(e.getMessage());
         }
-        System.out.println("Invalid start date. Please enter a valid market date.");
+        view.print("Invalid start date. Please enter a valid market date.");
       }
     }
     while (!stock.isValidDate(startDate));
@@ -372,18 +374,18 @@ public class ControllerImpl implements Controller {
     int month2;
     int day2;
     do {
-      System.out.println("Enter end date (YYYY-MM-DD): ");
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter end date (YYYY-MM-DD): ");
+      view.print("Enter a valid year (YYYY): ");
       year2 = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month2 = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day2 = scanner.nextInt();
 
       try {
         validDate2 = LocalDate.of(year2, month2, day2);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -394,15 +396,15 @@ public class ControllerImpl implements Controller {
         try {
           stock.isValidDate(endDate);
         } catch (IllegalArgumentException e) {
-          System.out.println(e.getMessage());
+          view.print(e.getMessage());
         }
-        System.out.println("Invalid end date. Please enter a valid market date.");
+        view.print("Invalid end date. Please enter a valid market date.");
       }
     }
     while (!stock.isValidDate(endDate));
 
     if (days <= 0) {
-      System.out.println("Quantity must be greater than 0 and a whole number");
+      view.print("Quantity must be greater than 0 and a whole number");
     }
 
     ControllerCommand command = new CrossoverCommand(ticker, days, startDate, endDate);
@@ -411,14 +413,14 @@ public class ControllerImpl implements Controller {
 
   private static void addAndBuyStock(Portfolio portfolio, Controller controller, Scanner scanner) {
     while (true) {
-      System.out.println("Enter ticker symbol: ");
+      view.print("Enter ticker symbol: ");
       String ticker = scanner.nextLine().toUpperCase();
       Stock stock;
       try {
         stock = controller.getStock(ticker);
         stock.isValidSymbol(ticker);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
         return;
       }
 
@@ -428,20 +430,20 @@ public class ControllerImpl implements Controller {
       int month;
       int day;
       do {
-        System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+        view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
                 "\ndate backwards will be considered");
-        System.out.println("Enter date you would like to purchase on (YYYY-MM-DD): ");
-        System.out.println("Enter a valid year (YYYY): ");
+        view.print("Enter date you would like to purchase on (YYYY-MM-DD): ");
+        view.print("Enter a valid year (YYYY): ");
         year = scanner.nextInt();
-        System.out.println("Enter a valid month (MM): ");
+        view.print("Enter a valid month (MM): ");
         month = scanner.nextInt();
-        System.out.println("Enter a valid day (DD): ");
+        view.print("Enter a valid day (DD): ");
         day = scanner.nextInt();
 
         try {
           validDate = LocalDate.of(year, month, day);
         } catch (DateTimeParseException e) {
-          System.out.println("Invalid date. Please enter a valid date.");
+          view.print("Invalid date. Please enter a valid date.");
           return;
         }
 
@@ -450,34 +452,34 @@ public class ControllerImpl implements Controller {
         date = validDate.toString();
 
         if (!stock.isValidDate(date)) {
-          System.out.println("Invalid date. Please enter a valid market date.");
+          view.print("Invalid date. Please enter a valid market date.");
         }
       } while (!stock.isValidDate(date));
 
-      System.out.println("You are Buying this Stock at Date: " + date);
+      view.print("You are Buying this Stock at Date: " + date);
 
-      System.out.println("Enter quantity: ");
+      view.print("Enter quantity: ");
       int quantity;
       try {
         quantity = scanner.nextInt();
       } catch (InputMismatchException e) {
-        System.out.println("Invalid quantity. Please try again.");
+        view.print("Invalid quantity. Please try again.");
         return;
       }
 
       if (quantity > 0) {
         portfolio.add(stock, quantity, date);
-        System.out.println("You have added " + quantity + " shares of " + ticker.toUpperCase()
+        view.print("You have added " + quantity + " shares of " + ticker.toUpperCase()
                 + " to portfolio: " + portfolio.getName() + "!");
       } else {
-        System.out.println("Quantity must be greater than 0 and a whole number, please try again.");
+        view.print("Quantity must be greater than 0 and a whole number, please try again.");
         return;
       }
 
       controller.getPortfolios().put(portfolio.getName(), portfolio);
       portfolio.savePortfolio(date);
 
-      System.out.println("Do you want to add another stock? (yes/no): ");
+      view.print("Do you want to add another stock? (yes/no): ");
       scanner.nextLine();
       String response = scanner.nextLine().trim().toLowerCase();
       if (!response.equals("yes")) {
@@ -487,7 +489,7 @@ public class ControllerImpl implements Controller {
   }
 
   private static void handleCreatePortfolio(Controller controller, Scanner scanner, View view) {
-    System.out.println("Enter a name for your portfolio: ");
+    view.print("Enter a name for your portfolio: ");
     scanner.nextLine();
     String name = scanner.nextLine();
 
@@ -508,30 +510,30 @@ public class ControllerImpl implements Controller {
     try {
       addAndBuyStock(portfolio, controller, scanner);
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      view.print(e.getMessage());
       return;
     }
   }
 
   private static void viewPortfolioChooseMenuScreen(Portfolio portfolio, Controller controller, Scanner scanner) {
     while (true) {
-      System.out.println("You are in the Portfolio: " + portfolio.getName());
-      System.out.println("1. Buy shares of a Stock");
-      System.out.println("2. Sell shares of a Stock");
-      System.out.println("3. View Entire Portfolio (To Date)");
-      System.out.println("4. View Composition of Portfolio");
-      System.out.println("5. Re-Balance Portfolio");
-      System.out.println("6. Find Portfolio Value");
-      System.out.println("7. Find Distribution of Value");
-      System.out.println("8. View Performance Over Time");
-      System.out.println("9. Go Back");
+      view.print("You are in the Portfolio: " + portfolio.getName());
+      view.print("1. Buy shares of a Stock");
+      view.print("2. Sell shares of a Stock");
+      view.print("3. View Entire Portfolio (To Date)");
+      view.print("4. View Composition of Portfolio");
+      view.print("5. Re-Balance Portfolio");
+      view.print("6. Find Portfolio Value");
+      view.print("7. Find Distribution of Value");
+      view.print("8. View Performance Over Time");
+      view.print("9. Go Back");
 
       int option;
       try {
         option = scanner.nextInt();
         scanner.nextLine();
       } catch (InputMismatchException e) {
-        System.out.println("Invalid option. Please try again.");
+        view.print("Invalid option. Please try again.");
         return;
       }
 
@@ -543,7 +545,7 @@ public class ControllerImpl implements Controller {
           sellStocks(portfolio, controller, scanner);
           break;
         case 3:
-          System.out.println(portfolio.toString());
+          view.print(portfolio.toString());
           break;
         case 4:
           viewCompositionOfPortfolioAtAnyDate(portfolio, controller, scanner);
@@ -563,7 +565,7 @@ public class ControllerImpl implements Controller {
         case 9:
           return;
         default:
-          System.out.println("Invalid choice. Please try again.");
+          view.print("Invalid choice. Please try again.");
       }
     }
   }
@@ -571,36 +573,36 @@ public class ControllerImpl implements Controller {
   private static void handleViewPortfolio(Controller controller, Scanner scanner, View view) {
     Map<String, Portfolio> portfolios = controller.getPortfolios();
     if (portfolios.isEmpty()) {
-      System.out.println("No portfolios available. Please create one first.");
+      view.print("No portfolios available. Please create one first.");
       return;
     }
 
-    System.out.println("Available Portfolios:");
+    view.print("Available Portfolios:");
     int i = 1;
     for (String name : portfolios.keySet()) {
-      System.out.println(i + ". " + name);
+      view.print(i + ". " + name);
       i++;
     }
-    System.out.println(i + ". Go Back");
+    view.print(i + ". Go Back");
 
-    System.out.println("Choose a portfolio to view: ");
+    view.print("Choose a portfolio to view: ");
     int option;
     try {
       option = scanner.nextInt();
     } catch (InputMismatchException e) {
-      System.out.println("Invalid option. Please try again.");
+      view.print("Invalid option. Please try again.");
       return;
     }
 
     if (option > 0 && option <= portfolios.size()) {
       String selectedPortfolioName = (String) portfolios.keySet().toArray()[option - 1];
       Portfolio portfolio = portfolios.get(selectedPortfolioName);
-      System.out.println(portfolio.toString());
+      view.print(portfolio.toString());
       viewPortfolioChooseMenuScreen(portfolio, controller, scanner);
     } else if (option == portfolios.size() + 1) {
       return;
     } else {
-      System.out.println("Invalid choice. Please try again.");
+      view.print("Invalid choice. Please try again.");
     }
   }
 
@@ -614,21 +616,21 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
-      System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
+      view.print("Enter date you would like to sell on (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         date = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -636,15 +638,15 @@ public class ControllerImpl implements Controller {
       try {
         portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
       }
       if (!portfolio.isValidDateForPortfolio(validDate)) {
-        System.out.println("Invalid date. Please enter a valid market date.");
+        view.print("Invalid date. Please enter a valid market date.");
       }
     } while (!portfolio.isValidDateForPortfolio(validDate));
 
 
-    System.out.println("Enter ticker symbol to remove: ");
+    view.print("Enter ticker symbol to remove: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stockToRemove;
@@ -652,19 +654,19 @@ public class ControllerImpl implements Controller {
       stockToRemove = controller.getStock(ticker);
       stockToRemove.isValidSymbol(ticker);
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      view.print(e.getMessage());
       return;
     }
-    System.out.println("Enter quantity (cannot be fractional): ");
+    view.print("Enter quantity (cannot be fractional): ");
 
     double numOfShares;
     try {
       numOfShares = scanner.nextInt();
     } catch (IllegalArgumentException e) {
-      System.out.println(e.getMessage());
+      view.print(e.getMessage());
       return;
     }
-    System.out.println("You are Selling this Stock at Date: " + validDate);
+    view.print("You are Selling this Stock at Date: " + validDate);
     ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, validDate);
     controller.executeCommand(command);
     controller.getPortfolios().put(portfolio.getName(), portfolio);
@@ -679,21 +681,21 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
-      System.out.println("Enter date you would like to view composition on (YYYY-MM-DD): ");
+      view.print("Enter date you would like to view composition on (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         date = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -701,10 +703,10 @@ public class ControllerImpl implements Controller {
       try {
         portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
       }
       if (!portfolio.isValidDateForPortfolio(validDate)) {
-        System.out.println("Invalid date. Please enter a valid market date.");
+        view.print("Invalid date. Please enter a valid market date.");
       }
     } while (!portfolio.isValidDateForPortfolio(validDate));
 
@@ -721,21 +723,21 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: This program will not allow you to re-balance on a non " +
+      view.print("DISCLAIMER: This program will not allow you to re-balance on a non " +
               "market date! If you have entered a non-market date, please try again.");
-      System.out.println("Enter date you would like to re-balance on (YYYY-MM-DD): ");
+      view.print("Enter date you would like to re-balance on (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         date = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -743,27 +745,27 @@ public class ControllerImpl implements Controller {
       try {
         portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
         return;
       }
       if (!portfolio.isValidDateForPortfolio(validDate)) {
-        System.out.println("Invalid date. Please enter a valid market date.");
+        view.print("Invalid date. Please enter a valid market date.");
       }
     } while (!portfolio.isValidDateForPortfolio(validDate));
 
 
     Map<Stock, Integer> targetWeights = new HashMap<>();
-    System.out.println("Enter the weights for each stock in your portfolio. Weights must total to" +
+    view.print("Enter the weights for each stock in your portfolio. Weights must total to" +
             " 100%. ");
     scanner.nextLine();
 
     int totalWeight = 0;
     for (Stock stock : portfolio.getStocks().keySet()) {
-      System.out.println("Enter weight for " + portfolio.getStocks().keySet());
+      view.print("Enter weight for " + portfolio.getStocks().keySet());
       int weight = scanner.nextInt();
       scanner.nextLine();
       while (weight < 0 || weight > 100) {
-        System.out.println("Invalid weight. Please enter a value between 0 and 100.");
+        view.print("Invalid weight. Please enter a value between 0 and 100.");
         weight = scanner.nextInt();
       }
       targetWeights.put(stock, weight);
@@ -771,7 +773,7 @@ public class ControllerImpl implements Controller {
     }
 
     if (totalWeight != 100) {
-      System.out.println("The total weight must be exactly 100%. You entered a total of " + totalWeight + "%.");
+      view.print("The total weight must be exactly 100%. You entered a total of " + totalWeight + "%.");
       return;
     }
 
@@ -787,21 +789,21 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
-      System.out.println("Enter date you would like to get value on (YYYY-MM-DD): ");
+      view.print("Enter date you would like to get value on (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         date = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -809,11 +811,11 @@ public class ControllerImpl implements Controller {
       try {
         portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
         return;
       }
       if (!portfolio.isValidDateForPortfolio(validDate)) {
-        System.out.println("Invalid date. Please enter a valid market date.");
+        view.print("Invalid date. Please enter a valid market date.");
       }
     } while (!portfolio.isValidDateForPortfolio(validDate));
 
@@ -831,21 +833,21 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
               "\ndate backwards will be considered");
-      System.out.println("Enter date you would like to find distribution on (YYYY-MM-DD): ");
+      view.print("Enter date you would like to find distribution on (YYYY-MM-DD): ");
 
-      System.out.println("Enter a valid year (YYYY): ");
+      view.print("Enter a valid year (YYYY): ");
       year = scanner.nextInt();
-      System.out.println("Enter a valid month (MM): ");
+      view.print("Enter a valid month (MM): ");
       month = scanner.nextInt();
-      System.out.println("Enter a valid day (DD): ");
+      view.print("Enter a valid day (DD): ");
       day = scanner.nextInt();
 
       try {
         date = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
-        System.out.println("Invalid date. Please enter a valid date.");
+        view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
@@ -853,11 +855,11 @@ public class ControllerImpl implements Controller {
       try {
         portfolio.isValidDateForPortfolio(validDate);
       } catch (IllegalArgumentException e) {
-        System.out.println(e.getMessage());
+        view.print(e.getMessage());
         return;
       }
       if (!portfolio.isValidDateForPortfolio(validDate)) {
-        System.out.println("Invalid date. Please enter a valid market date.");
+        view.print("Invalid date. Please enter a valid market date.");
       }
     } while (!portfolio.isValidDateForPortfolio(validDate));
 
@@ -866,8 +868,8 @@ public class ControllerImpl implements Controller {
   }
 
   private static void handleLoadPortfolio(Controller controller, Scanner scanner, View view) {
-    System.out.println("Enter the name of the portfolio to load: ");
-    System.out.println("Format should just be the NAMEOFYOURPORTFOLIO (all in one line): ");
+    view.print("Enter the name of the portfolio to load: ");
+    view.print("Format should just be the NAMEOFYOURPORTFOLIO (all in one line): ");
 
     scanner.nextLine();
     String portfolioName = scanner.nextLine();
@@ -876,13 +878,13 @@ public class ControllerImpl implements Controller {
       controller.loadPortfolio(portfolioName, "src/data/portfolios");
       Portfolio loadedPortfolio = controller.getPortfolios().get(portfolioName);
       if (loadedPortfolio != null) {
-        System.out.println("Portfolio '" + portfolioName + "' loaded successfully.");
+        view.print("Portfolio '" + portfolioName + "' loaded successfully.");
         viewPortfolioChooseMenuScreen(loadedPortfolio, controller, scanner);
       } else {
-        System.out.println("Portfolio '" + portfolioName + "' does not exist.");
+        view.print("Portfolio '" + portfolioName + "' does not exist.");
       }
     } catch (Exception e) {
-      System.out.println("Error loading portfolio: " + e.getMessage());
+      view.print("Error loading portfolio: " + e.getMessage());
     }
   }
 
@@ -890,10 +892,90 @@ public class ControllerImpl implements Controller {
   private static void handlePlotPerformanceBarChart(Portfolio portfolio,
                                                     Controller controller, Scanner scanner) {
 
+    LocalDate startDate;
+    String validDate;
+    int year;
+    int month;
+    int day;
+    do {
+      view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+              "\ndate backwards will be considered");
+      view.print("Enter start date (YYYY-MM-DD): ");
+      view.print("Enter a valid year (YYYY): ");
+      year = scanner.nextInt();
+      view.print("Enter a valid month (MM): ");
+      month = scanner.nextInt();
+      view.print("Enter a valid day (DD): ");
+      day = scanner.nextInt();
 
+      try {
+        startDate = LocalDate.of(year, month, day);
+      } catch (DateTimeParseException e) {
+        view.print("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate = startDate.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate);
+      } catch (IllegalArgumentException e) {
+        view.print(e.getMessage());
+        return;
+      }
+      if (!portfolio.isValidDateForPortfolio(validDate)) {
+        view.print("Invalid date. Please enter a valid market date.");
+      }
+    } while (!portfolio.isValidDateForPortfolio(validDate));
+
+    LocalDate endDate;
+    String validDate2;
+    int year2;
+    int month2;
+    int day2;
+    do {
+      view.print("DISCLAIMER: If you have entered a non market date, the nearest market " +
+              "\ndate backwards will be considered");
+      view.print("Enter end date (YYYY-MM-DD): ");
+      view.print("Enter a valid year (YYYY): ");
+      year2 = scanner.nextInt();
+      view.print("Enter a valid month (MM): ");
+      month2 = scanner.nextInt();
+      view.print("Enter a valid day (DD): ");
+      day2 = scanner.nextInt();
+
+      try {
+        endDate = LocalDate.of(year2, month2, day2);
+      } catch (DateTimeParseException e) {
+        view.print("Invalid date. Please enter a valid date.");
+        return;
+      }
+
+      validDate2 = endDate.toString();
+      try {
+        portfolio.isValidDateForPortfolio(validDate2);
+      } catch (IllegalArgumentException e) {
+        view.print(e.getMessage());
+        return;
+      }
+      if (!portfolio.isValidDateForPortfolio(validDate2)) {
+        view.print("Invalid date. Please enter a valid market date.");
+      }
+    } while (!portfolio.isValidDateForPortfolio(validDate2));
+
+    String interval;
+    do {
+      view.print("Enter interval (DAYS, WEEKS, MONTHS): ");
+      scanner.nextLine();
+      interval = scanner.nextLine().toUpperCase();
+      if (!interval.equals("DAYS") && !interval.equals("WEEKS") && !interval.equals("MONTHS")) {
+        view.print("Invalid interval. Please enter a valid interval.");
+      }
+    } while (!validDate.equals("DAYS") && !validDate.equals("WEEKS")
+            && !validDate.equals("MONTHS"));
+
+    PlotInterval plotInterval = PlotInterval.valueOf(interval);
+    ControllerCommand command = new PlotPortfolioCommand(portfolio.getName(), validDate, validDate2,
+            plotInterval);
+    command.execute(controller);
   }
-
 }
-
-
-
