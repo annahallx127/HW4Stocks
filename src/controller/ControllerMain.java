@@ -23,7 +23,7 @@ public class ControllerMain {
     Scanner scanner = new Scanner(System.in);
     View view = new ViewImpl(System.out);
     ModelImpl model = new ModelImpl();
-    Controller controller = new ControllerImpl(model, view, scanner, System.out);
+    Controller controller = new ControllerImpl(model, view);
 
     controller.runController(controller, view, scanner);
   }

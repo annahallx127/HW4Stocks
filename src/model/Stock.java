@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Set;
+
 /**
  * An interface for a stock.
  * Each stock has a name, a ticker symbol, opening price, closing price, low price, and high price.
@@ -119,4 +121,12 @@ public interface Stock {
    * @return a hash code value for this stock.
    */
   int hashCode();
+
+  /**
+   * Parses the valid symbols from the given file.
+   *
+   * @param filePath the path to the file containing the valid symbols.
+   * @return a set of valid symbols.
+   */
+  Set<String> parseValidSymbols(String filePath);
 }

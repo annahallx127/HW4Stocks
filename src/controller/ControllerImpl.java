@@ -38,16 +38,18 @@ import model.PlotInterval;
 
 public class ControllerImpl implements Controller {
 
-  private final Scanner scanner;
-  private final Appendable out;
   private final Model model;
   private static View view;
 
-  public ControllerImpl(Model model, View view, Scanner scanner, Appendable out) {
+  /**
+   * Constructs a new ControllerImpl object with the specified model and view.
+   *
+   * @param model the model to be used by the controller.
+   * @param view the view to be used by the controller.
+   */
+  public ControllerImpl(Model model, View view) {
     this.model = model;
     this.view = view;
-    this.scanner = scanner;
-    this.out = out;
   }
 
   @Override
@@ -129,7 +131,8 @@ public class ControllerImpl implements Controller {
   }
 
   //controls the user choice and the main menu loop
-  private static void handleUserChoice(Controller controller, Scanner scanner, View view, int choice) {
+  private static void handleUserChoice(Controller controller, Scanner scanner,
+                                       View view, int choice) {
     switch (choice) {
       case 1:
         handleCalculateGainOrLoss(controller, scanner, view);
@@ -246,7 +249,8 @@ public class ControllerImpl implements Controller {
   }
 
 
-  private static void handleCalculateXDayMovingAverage(Controller controller, Scanner scanner, View view) {
+  private static void handleCalculateXDayMovingAverage(Controller controller,
+                                                       Scanner scanner, View view) {
     view.print("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
@@ -298,7 +302,8 @@ public class ControllerImpl implements Controller {
     controller.executeCommand(command);
   }
 
-  private static void handleCalculateXDayCrossovers(Controller controller, Scanner scanner, View view) {
+  private static void handleCalculateXDayCrossovers(Controller controller,
+                                                    Scanner scanner, View view) {
     view.print("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
@@ -516,7 +521,8 @@ public class ControllerImpl implements Controller {
     }
   }
 
-  private static void viewPortfolioChooseMenuScreen(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void viewPortfolioChooseMenuScreen(Portfolio portfolio,
+                                                    Controller controller, Scanner scanner) {
     while (true) {
       view.print("You are in the Portfolio: " + portfolio.getName());
       view.print("1. Buy shares of a Stock");
@@ -669,13 +675,15 @@ public class ControllerImpl implements Controller {
       return;
     }
     view.print("You are Selling this Stock at Date: " + validDate);
-    ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, validDate);
+    ControllerCommand command = new SellStockCommand(portfolio.getName(),
+            stockToRemove, numOfShares, validDate);
     controller.executeCommand(command);
     controller.getPortfolios().put(portfolio.getName(), portfolio);
     portfolio.savePortfolio(validDate);
   }
 
-  private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio,
+                                                          Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -718,7 +726,8 @@ public class ControllerImpl implements Controller {
     controller.executeCommand(command);
   }
 
-  private static void reBalanceChosenPortfolio(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void reBalanceChosenPortfolio(Portfolio portfolio,
+                                               Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -777,15 +786,18 @@ public class ControllerImpl implements Controller {
     }
 
     if (totalWeight != 100) {
-      view.print("The total weight must be exactly 100%. You entered a total of " + totalWeight + "%.");
+      view.print("The total weight must be exactly 100%. You entered a total of "
+              + totalWeight + "%.");
       return;
     }
 
-    ControllerCommand command = new ReBalancePortfolioCommand(validDate, portfolio.getName(), targetWeights);
+    ControllerCommand command = new ReBalancePortfolioCommand(validDate,
+            portfolio.getName(), targetWeights);
     controller.executeCommand(command);
   }
 
-  private static void totalValueOfPortfolioAtDate(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void totalValueOfPortfolioAtDate(Portfolio portfolio,
+                                                  Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -830,7 +842,8 @@ public class ControllerImpl implements Controller {
   }
 
 
-  private static void findDistributionValueAtDate(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void findDistributionValueAtDate(Portfolio portfolio,
+                                                  Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;

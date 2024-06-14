@@ -282,7 +282,8 @@ public class ModelStock implements Stock {
     return date.toString();
   }
 
-  public static Set<String> parseValidSymbols(String filePath) {
+  @Override
+  public Set<String> parseValidSymbols(String filePath) {
     Set<String> validSymbols = new HashSet<>();
     String line;
 

@@ -392,6 +392,8 @@ public class ModelPortfolio implements Portfolio {
                 .append(MONTHS.getTargetResolution())
                 .append(System.lineSeparator());
         break;
+      default:
+          throw new IllegalArgumentException("Invalid plot interval.");
     }
 
     return sb.toString();
