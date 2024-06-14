@@ -888,7 +888,6 @@ public class ControllerImpl implements Controller {
     }
   }
 
-
   private static void handlePlotPerformanceBarChart(Portfolio portfolio,
                                                     Controller controller, Scanner scanner) {
 
