@@ -33,19 +33,31 @@ import view.View;
  * to the user. It also creates instances of the model and view to interact with the user and
  * process the data.
  */
-
 public class ControllerImpl implements Controller {
 
-  private final Scanner scanner;
-  private final Appendable out;
   private Model model;
   private View view;
 
+  /**
+   * Constructs a new ControllerImpl object, initializing it with the specified model, view,
+   * and input/output handlers.
+   * This constructor sets up the necessary components for the controller to interact with
+   * the application's model and view layers,
+   * facilitating user interaction and data processing.
+   *
+   * @param model   the model component of the stock investment program that handles business
+   *                logic and data manipulation.
+   * @param view    the view component of the stock investment program that handles data
+   *                presentation and user interface.
+   * @param scanner the Scanner object used to read input from the user. This parameter is
+   *                not used in the constructor but is typically used in methods for input
+   *                handling.
+   * @param out     the Appendable object used to output data to the user. This could be
+   *                System.out or another output stream.
+   */
   public ControllerImpl(Model model, View view, Scanner scanner, Appendable out) {
     this.model = model;
     this.view = view;
-    this.scanner = scanner;
-    this.out = out;
   }
 
   @Override
@@ -127,7 +139,8 @@ public class ControllerImpl implements Controller {
   }
 
   //controls the user choice and the main menu loop
-  private static void handleUserChoice(Controller controller, Scanner scanner, View view, int choice) {
+  private static void handleUserChoice(Controller controller,
+                                       Scanner scanner, View view, int choice) {
     switch (choice) {
       case 1:
         handleCalculateGainOrLoss(controller, scanner, view);
@@ -152,7 +165,8 @@ public class ControllerImpl implements Controller {
     }
   }
 
-  private static void handleCalculateGainOrLoss(Controller controller, Scanner scanner, View view) {
+  private static void handleCalculateGainOrLoss(Controller controller,
+                                                Scanner scanner, View view) {
     System.out.println("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
@@ -171,7 +185,8 @@ public class ControllerImpl implements Controller {
     int month;
     int day;
     do {
-      System.out.println("DISCLAIMER: If you have entered any non market date, the nearest market " +
+      System.out.println("DISCLAIMER: If you have entered any non market date, " +
+              "the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter start date (YYYY-MM-DD): ");
 
@@ -244,7 +259,8 @@ public class ControllerImpl implements Controller {
   }
 
 
-  private static void handleCalculateXDayMovingAverage(Controller controller, Scanner scanner, View view) {
+  private static void handleCalculateXDayMovingAverage(Controller controller,
+                                                       Scanner scanner, View view) {
     System.out.println("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
@@ -296,7 +312,8 @@ public class ControllerImpl implements Controller {
     controller.executeCommand(command);
   }
 
-  private static void handleCalculateXDayCrossovers(Controller controller, Scanner scanner, View view) {
+  private static void handleCalculateXDayCrossovers(Controller controller,
+                                                    Scanner scanner, View view) {
     System.out.println("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
@@ -333,7 +350,8 @@ public class ControllerImpl implements Controller {
     int month;
     int day;
     do {
-      System.out.println("DISCLAIMER: If you have entered any non market date, the nearest market " +
+      System.out.println("DISCLAIMER: If you have entered any non market date," +
+              " the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter start date (YYYY-MM-DD): ");
 
@@ -409,7 +427,8 @@ public class ControllerImpl implements Controller {
     controller.executeCommand(command);
   }
 
-  private static void addAndBuyStock(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void addAndBuyStock(Portfolio portfolio,
+                                     Controller controller, Scanner scanner) {
     while (true) {
       System.out.println("Enter ticker symbol: ");
       String ticker = scanner.nextLine().toUpperCase();
@@ -428,7 +447,8 @@ public class ControllerImpl implements Controller {
       int month;
       int day;
       do {
-        System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+        System.out.println("DISCLAIMER: If you have entered a non market date," +
+                " the nearest market " +
                 "\ndate backwards will be considered");
         System.out.println("Enter date you would like to purchase on (YYYY-MM-DD): ");
         System.out.println("Enter a valid year (YYYY): ");
@@ -470,7 +490,8 @@ public class ControllerImpl implements Controller {
         System.out.println("You have added " + quantity + " shares of " + ticker.toUpperCase()
                 + " to portfolio: " + portfolio.getName() + "!");
       } else {
-        System.out.println("Quantity must be greater than 0 and a whole number, please try again.");
+        System.out.println("Quantity must be greater than 0 and a whole number, " +
+                "please try again.");
         return;
       }
 
@@ -513,7 +534,8 @@ public class ControllerImpl implements Controller {
     }
   }
 
-  private static void viewPortfolioChooseMenuScreen(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void viewPortfolioChooseMenuScreen(Portfolio portfolio,
+                                                    Controller controller, Scanner scanner) {
     while (true) {
       System.out.println("You are in the Portfolio: " + portfolio.getName());
       System.out.println("1. Buy shares of a Stock");
@@ -614,7 +636,8 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      System.out.println("DISCLAIMER: If you have entered a non market date, " +
+              "the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to sell on (YYYY-MM-DD): ");
 
@@ -665,13 +688,15 @@ public class ControllerImpl implements Controller {
       return;
     }
     System.out.println("You are Selling this Stock at Date: " + validDate);
-    ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, validDate);
+    ControllerCommand command = new SellStockCommand(portfolio.getName(),
+            stockToRemove, numOfShares, validDate);
     controller.executeCommand(command);
     controller.getPortfolios().put(portfolio.getName(), portfolio);
     portfolio.savePortfolio(validDate);
   }
 
-  private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio,
+                                                          Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -679,7 +704,8 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      System.out.println("DISCLAIMER: If you have entered a non market date," +
+              " the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to view composition on (YYYY-MM-DD): ");
 
@@ -713,7 +739,8 @@ public class ControllerImpl implements Controller {
     controller.executeCommand(command);
   }
 
-  private static void reBalanceChosenPortfolio(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void reBalanceChosenPortfolio(Portfolio portfolio,
+                                               Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -753,7 +780,8 @@ public class ControllerImpl implements Controller {
 
 
     Map<Stock, Integer> targetWeights = new HashMap<>();
-    System.out.println("Enter the weights for each stock in your portfolio. Weights must total to" +
+    System.out.println("Enter the weights for each stock in your portfolio. " +
+            "Weights must total to" +
             " 100%. ");
     scanner.nextLine();
 
@@ -771,15 +799,18 @@ public class ControllerImpl implements Controller {
     }
 
     if (totalWeight != 100) {
-      System.out.println("The total weight must be exactly 100%. You entered a total of " + totalWeight + "%.");
+      System.out.println("The total weight must be exactly 100%. " +
+              "You entered a total of " + totalWeight + "%.");
       return;
     }
 
-    ControllerCommand command = new ReBalancePortfolioCommand(validDate, portfolio.getName(), targetWeights);
+    ControllerCommand command = new ReBalancePortfolioCommand(validDate,
+            portfolio.getName(), targetWeights);
     controller.executeCommand(command);
   }
 
-  private static void totalValueOfPortfolioAtDate(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void totalValueOfPortfolioAtDate(Portfolio portfolio,
+                                                  Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -787,7 +818,8 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      System.out.println("DISCLAIMER: If you have entered a non market date, " +
+              "the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to get value on (YYYY-MM-DD): ");
 
@@ -823,7 +855,8 @@ public class ControllerImpl implements Controller {
   }
 
 
-  private static void findDistributionValueAtDate(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void findDistributionValueAtDate(Portfolio portfolio,
+                                                  Controller controller, Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;
@@ -831,7 +864,8 @@ public class ControllerImpl implements Controller {
     int day;
 
     do {
-      System.out.println("DISCLAIMER: If you have entered a non market date, the nearest market " +
+      System.out.println("DISCLAIMER: If you have entered a non market date, " +
+              "the nearest market " +
               "\ndate backwards will be considered");
       System.out.println("Enter date you would like to find distribution on (YYYY-MM-DD): ");
 

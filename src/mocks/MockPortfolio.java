@@ -1,17 +1,32 @@
 package mocks;
 
-import model.*;
+import model.PlotInterval;
+import model.Stock;
+import model.Portfolio;
+import model.Transaction;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A mock implementation of the Portfolio interface used primarily for testing the functionality
+ * of portfolio management without interacting with actual stock market data or external systems.
+ * This class provides a simplified environment to simulate the addition and removal of stocks,
+ * portfolio valuation, and other operations like rebalancing and transaction recording.
+ */
 public class MockPortfolio implements Portfolio {
   private String name;
   private Map<Stock, Double> stocks = new HashMap<>();
   private List<Transaction> transactions = new ArrayList<>();
 
+  /**
+   * Constructs a MockPortfolio with a specified name.
+   *
+   * @param name the name of the portfolio
+   */
   public MockPortfolio(String name) {
     this.name = name;
   }
@@ -131,7 +146,8 @@ public class MockPortfolio implements Portfolio {
     }
     StringBuilder sb = new StringBuilder();
     for (Map.Entry<Stock, Double> entry : stocks.entrySet()) {
-      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue()).append(" shares\n");
+      sb.append(entry.getKey().toString()).append(": ").append(entry.getValue())
+              .append(" shares\n");
     }
     return sb.toString();
   }

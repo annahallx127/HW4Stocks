@@ -34,12 +34,12 @@ public class MockModel implements Model {
 
   @Override
   public void savePortfolio(String name, String date) {
-
+    // not implemented for the sake of testing
   }
 
   @Override
   public void loadPortfolio(String name, String path) throws IllegalArgumentException {
-
+    // not implemented for the sake of testing
   }
 
   /**
@@ -58,12 +58,15 @@ public class MockModel implements Model {
   }
 
   @Override
-  public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval) throws IllegalArgumentException {
+  public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval)
+          throws IllegalArgumentException {
     return "";
   }
 
   @Override
-  public String plotPortfolio(String name, String dateStart, String dateEnd, PlotInterval interval) throws IllegalArgumentException {
+  public String plotPortfolio(String name, String dateStart,
+                              String dateEnd, PlotInterval interval)
+          throws IllegalArgumentException {
     return "";
   }
 
