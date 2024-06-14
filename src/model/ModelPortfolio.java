@@ -159,7 +159,7 @@ public class ModelPortfolio implements Portfolio {
     Map<Stock, Double> effectiveShares = new HashMap<>();
 
     for (Transaction transaction : transactions) {
-      if (!transaction.getDate().isAfter(validDate)) {
+      if (transaction.getDate().isAfter(validDate)) {
         Stock stock = transaction.getStock();
         double shares = transaction.getShares();
         if ("sell".equalsIgnoreCase(transaction.getType())) {
@@ -291,37 +291,105 @@ public class ModelPortfolio implements Portfolio {
     LocalDate validStartDate = getValidMarketDateWeekend(dateStart);
     LocalDate validEndDate = getValidMarketDateWeekend(dateEnd);
     StringBuilder sb = new StringBuilder();
-    sb.append("Performance of Portfolio: '").append(name).append("' from ")
-            .append(dateEnd).append(" to ").append(dateStart)
+    sb.append("'").append(name).append("' from ")
+            .append(dateEnd).append(" to ").append(dateStart).append(":")
             .append(System.lineSeparator()).append(System.lineSeparator());
     try {
-      isValidDateForPortfolio(validStartDate.toString());
-      isValidDateForPortfolio(validEndDate.toString());
+      boolean valid = isValidDateForPortfolio(validStartDate.toString()) &&
+              isValidDateForPortfolio(validEndDate.toString());
+      if (!valid) {
+        throw new IllegalArgumentException("Invalid date for portfolio operations: "
+                + validStartDate + " or " + validEndDate);
+      }
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }
 
+    // value of portfolio at start date
+    double startDateValue = valueOfPortfolio(validStartDate.toString());
+    // value of portfolio at end date
+    double endDateValue = valueOfPortfolio(validEndDate.toString());
+    // number of days to look back
+    int daysToLookBack = validStartDate.getDayOfYear() - validEndDate.getDayOfYear();
+
     switch (scale) {
       case DAYS:
-        double startDateScale = valueOfPortfolio(validStartDate
-                .minusDays(1).toString());
-        for (int i = 1; i < 30; i++) {
-          // 30 day view
-          LocalDate currentDate = validStartDate.minusDays(i);
-          if (currentDate.isBefore(validEndDate)) {
-            double totalValue = valueOfPortfolio(currentDate.toString());
-            sb.append(currentDate).append(": ").append("*".repeat(DAYS.scale(totalValue)))
-                    .append(System.lineSeparator());
-          }
+        // set the resolution for the plot
+        DAYS.setResolution(startDateValue, endDateValue);
+        // number of days to look back
+        if (daysToLookBack > 30) {
+          // no more than 30 lines per plot
+          daysToLookBack = 30;
         }
-        sb.append(System.lineSeparator()).append("Scale: * = ~$").append(DAYS.scale(startDateScale))
+        for (int i = daysToLookBack; i > 0; i--) {
+          // from end date to start date
+          LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusDays(i).toString());
+          double totalValue = valueOfPortfolio(currDate.toString());
+          sb.append(currDate).append(": ")
+                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append(System.lineSeparator());
+        }
+        sb.append(System.lineSeparator()).append("Scale: * = $")
+                .append(DAYS.getTargetResolution())
                 .append(System.lineSeparator());
         break;
       case WEEKS:
+        // set the resolution for the plot
+        DAYS.setResolution(startDateValue, endDateValue);
+        if (daysToLookBack > 30) {
+          // no more than 30 lines per plot
+          daysToLookBack = 30;
+        }
+        for (int i = daysToLookBack; i > 0; i--) {
+          // from end date to start date
+          LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusWeeks(i).toString());
+          double totalValue = valueOfPortfolio(currDate.toString());
+          sb.append(currDate).append(": ")
+                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append(System.lineSeparator());
+        }
+        sb.append(System.lineSeparator()).append("Scale: * = $")
+                .append(DAYS.getTargetResolution())
+                .append(System.lineSeparator());
+        break;
       case MONTHS:
+        // set the resolution for the plot
+        DAYS.setResolution(startDateValue, endDateValue);
+        if (daysToLookBack > 30) {
+          // no more than 30 lines per plot
+          daysToLookBack = 30;
+        }
+        for (int i = daysToLookBack; i > 0; i--) {
+          // from end date to start date
+          LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusMonths(i).toString());
+          double totalValue = valueOfPortfolio(currDate.toString());
+          sb.append(currDate).append(": ")
+                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append(System.lineSeparator());
+        }
+        sb.append(System.lineSeparator()).append("Scale: * = $")
+                .append(DAYS.getTargetResolution())
+                .append(System.lineSeparator());
+        break;
       case YEARS:
-      case FIVE_YEARS:
-      case TEN_YEARS:
+        // set the resolution for the plot
+        DAYS.setResolution(startDateValue, endDateValue);
+        if (daysToLookBack > 30) {
+          // no more than 30 lines per plot
+          daysToLookBack = 30;
+        }
+        for (int i = daysToLookBack; i > 0; i--) {
+          // from end date to start date
+          LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusYears(i).toString());
+          double totalValue = valueOfPortfolio(currDate.toString());
+          sb.append(currDate).append(": ")
+                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append(System.lineSeparator());
+        }
+        sb.append(System.lineSeparator()).append("Scale: * = $")
+                .append(DAYS.getTargetResolution())
+                .append(System.lineSeparator());
+        break;
     }
 
     return sb.toString();

@@ -27,7 +27,7 @@ public class PortfolioWriterTest {
    * Rule to create a temporary folder for testing file operations.
    */
   @Rule
-  public TemporaryFolder folder = new TemporaryFolder();
+  public TemporaryFolder folder = new TemporaryFolder(new File("src/data/portfolios"));
 
   /**
    * Sets up the test environment before each test. Initializes the test file and the

@@ -1,15 +1,18 @@
 package model;
 
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,16 +100,29 @@ public class ModelImpl implements Model {
 
   @Override
   public void loadPortfolio(String name, String path) throws IllegalArgumentException {
-    // path is a directory - append the name of the portfolio to the path
-    if (Paths.get(path).toFile().isDirectory()) {
-      path = path + "/" + name + ".xml";
+    // if path is empty, set it to the default path
+    if (path.isEmpty()) {
+      path = "src/data/portfolios/";
+    }
+
+    // add a trailing slash if it doesn't exist
+    if (!path.endsWith("/")) {
+      path += "/";
+    }
+
+    Path namePath = Path.of(path + name + ".xml");
+    boolean nameInPath = namePath.toFile().exists() && !namePath.toFile().isDirectory();
+
+    if (!nameInPath) {
+      throw new IllegalArgumentException("The portfolio could not be loaded: " +
+              "the file does not exist or is not a .XML file.");
     }
 
     try {
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser saxParser = factory.newSAXParser();
       PortfolioReader reader = new PortfolioReader(name);
-      saxParser.parse(path, reader);
+      saxParser.parse(path + name, reader);
       portfolios.put(reader.getPortfolio().getName(), reader.getPortfolio());
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("The portfolio could not be loaded: " + e.getMessage());
@@ -137,9 +153,6 @@ public class ModelImpl implements Model {
     // High volume API key: 09I1ESM2FDLI0Y6D
     URL url;
 
-    // TODO: API calls should only be made after the user requests a date that is not cached,
-    //  or if the user requests a date range that is not cached. Then, the data should be cached
-    //  again if the date is present, or throw an exception if the date is not present.
     try {
       /*
       create the URL. This is the query to the web service. The query string
@@ -196,18 +209,6 @@ public class ModelImpl implements Model {
   @Override
   public Map<String, Portfolio> getPortfolios() {
     return portfolios;
-  }
-
-  @Override
-  public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval)
-          throws IllegalArgumentException {
-    Stock stock = this.get(symbol);
-
-    try {
-      return stock.plot(dateStart, dateEnd, interval);
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException(e.getMessage());
-    }
   }
 
   @Override

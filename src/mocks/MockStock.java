@@ -69,11 +69,6 @@ public class MockStock implements Stock {
   public void isValidSymbol(String symbol) {
   }
 
-  @Override
-  public String plot(String dateStart, String dateEnd, PlotInterval interval) {
-    return "";
-  }
-
   /**
    * Manually set the price of the stock on the specified date.
    * For the purposes of mock testing only.
