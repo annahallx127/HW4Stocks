@@ -51,7 +51,8 @@ public class PortfolioReaderTest {
     portfolio.add(new ModelStock("GOOG"), 2, "2024-06-06");
     writtenTestFile = "src/data/portfolios/portfolioTest.xml";
     File test = folder.newFile();
-    PortfolioWriter writer = new PortfolioWriter("portfolioTest", "2024-06-06", folder.getRoot().getAbsolutePath());
+    PortfolioWriter writer = new PortfolioWriter("portfolioTest", "2024-06-06",
+            folder.getRoot().getAbsolutePath());
     writer.writeStock("AAPL", 1);
     writer.writeStock("GOOG", 2);
     writer.close();

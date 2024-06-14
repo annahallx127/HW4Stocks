@@ -11,10 +11,12 @@ import model.Portfolio;
  * the portfolio relative
  * to the total portfolio value, providing a detailed snapshot of portfolio
  * composition by value at that date.
+ *
  * <p>
  * The command uses the portfolio's name to retrieve it and then fetches the distribution
  * for the specified date.
  * The results include the value and percentage of the total for each stock in the portfolio.
+ * </p>
  */
 public class DistributionValueCommand implements ControllerCommand {
 

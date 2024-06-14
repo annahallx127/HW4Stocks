@@ -3,7 +3,6 @@ package mocks;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.PlotInterval;
 import model.Stock;
 
 /**

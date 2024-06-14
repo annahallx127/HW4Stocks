@@ -554,8 +554,10 @@ public class ModelPortfolioUnitTests {
     portfolio.add(stock1, 10, "2024-06-06");
     portfolio.add(stock3, 10, "2024-06-06");
 
-    String expectedString = "'Test Portfolio' from 2024-06-06 to 2024-05-06" + System.lineSeparator()
-            + "2024-06-06: **************************************************" + System.lineSeparator()
+    String expectedString = "'Test Portfolio' from 2024-06-06 to 2024-05-06"
+            + System.lineSeparator()
+            + "2024-06-06: **************************************************"
+            + System.lineSeparator()
             + "Scale: * = $10" + System.lineSeparator();
 
     assertEquals(expectedString,

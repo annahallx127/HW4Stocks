@@ -10,8 +10,10 @@ import model.Portfolio;
  * of the portfolio's holdings, including the types and quantities of stocks it contains
  * at a specified point in time.
  *
+ * <p>
  * This command includes the date for viewing the composition and the name of the portfolio
  * whose composition is to be displayed.
+ * </p>
  */
 public class ViewCompositionCommand implements ControllerCommand {
   private final String date;

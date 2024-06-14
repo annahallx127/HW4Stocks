@@ -10,10 +10,12 @@ import model.Stock;
  * This command facilitates the execution of a sell order within the context of a stock
  * investment application,
  * adjusting the portfolio's holdings accordingly and updating its state.
+ *
  * <p>
  * The command includes the portfolio name from which the stock is to be sold,
  * the ticker symbol of the stock,
  * the number of shares to be sold, and the date on which the sale should occur.
+ * </p>
  */
 public class SellStockCommand implements ControllerCommand {
   private final String portfolioName;

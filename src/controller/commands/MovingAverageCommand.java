@@ -10,11 +10,13 @@ import model.Stock;
  * for financial analysis, particularly in the context of technical stock analysis where
  * moving averages are
  * commonly used to identify trends and potential buy/sell signals.
+ *
  * <p>
  * The command includes parameters for the stock's ticker symbol, the number of days for
  * averaging, and the target date
  * for the calculation. It uses the controller to access stock data and compute the moving
  * average.
+ * </p>
  */
 public class MovingAverageCommand implements ControllerCommand {
   private final String ticker;

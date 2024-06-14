@@ -454,7 +454,8 @@ public class ControllerImpl implements Controller {
         if (!stock.isValidDate(date)) {
           view.print("Invalid date. Please enter a valid market date.");
         }
-      } while (!stock.isValidDate(date));
+      }
+      while (!stock.isValidDate(date));
 
       view.print("You are Buying this Stock at Date: " + date);
 
@@ -643,7 +644,8 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate));
 
 
     view.print("Enter ticker symbol to remove: ");
@@ -708,7 +710,8 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate));
 
 
     ControllerCommand command = new ViewCompositionCommand(portfolio.getName(), validDate);
@@ -751,7 +754,8 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate));
 
 
     Map<Stock, Integer> targetWeights = new HashMap<>();
@@ -817,7 +821,8 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate));
 
 
     ControllerCommand command = new PortfolioValueCommand(portfolio.getName(), validDate);
@@ -861,7 +866,8 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate));
 
     ControllerCommand command = new DistributionValueCommand(portfolio.getName(), validDate);
     controller.executeCommand(command);
@@ -924,7 +930,8 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate));
 
     LocalDate endDate;
     String validDate2;
@@ -959,18 +966,21 @@ public class ControllerImpl implements Controller {
       if (!portfolio.isValidDateForPortfolio(validDate2)) {
         view.print("Invalid date. Please enter a valid market date.");
       }
-    } while (!portfolio.isValidDateForPortfolio(validDate2));
+    }
+    while (!portfolio.isValidDateForPortfolio(validDate2));
 
     String interval;
     do {
-      view.print("Enter interval (DAYS, WEEKS, MONTHS): ");
+      view.print("Enter interval (DAYS, WEEKS, MONTHS, YEARS): ");
       scanner.nextLine();
       interval = scanner.nextLine().toUpperCase();
-      if (!interval.equals("DAYS") && !interval.equals("WEEKS") && !interval.equals("MONTHS")) {
+      if (!interval.equals("DAYS") && !interval.equals("WEEKS") && !interval.equals("MONTHS")
+              && !interval.equals("YEARS")) {
         view.print("Invalid interval. Please enter a valid interval.");
       }
-    } while (!validDate.equals("DAYS") && !validDate.equals("WEEKS")
-            && !validDate.equals("MONTHS"));
+    }
+    while (!validDate.equals("DAYS") && !validDate.equals("WEEKS")
+            && !validDate.equals("MONTHS") && !validDate.equals("YEARS"));
 
     PlotInterval plotInterval = PlotInterval.valueOf(interval);
     ControllerCommand command = new PlotPortfolioCommand(portfolio.getName(), validDate, validDate2,
