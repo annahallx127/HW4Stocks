@@ -165,7 +165,6 @@ public class ModelPortfolioUnitTests {
     double expectedValue2 = (3 * 194.0300);
     assertEquals(expectedValue2, portfolio.valueOfPortfolio("2024-06-03"), 0.01);
 
-//    double expectedValue3 = (3 * 190.9000);
     double expectedValue3 = 0.0; // should now be 0.0
     assertEquals(expectedValue3, portfolio.valueOfPortfolio("2024-05-22"), 0.01);
   }

@@ -27,9 +27,9 @@ import model.Stock;
  * </portfolio>
  * }
  * </pre>
- * <p>
- * The parsed data is used to create a Portfolio object that can be
- * used for various operations such as adding stocks, calculating values, etc.
+ *
+ * <p>The parsed data is used to create a Portfolio object that can be
+ * used for various operations such as adding stocks, calculating values, etc.</p>
  */
 public class PortfolioReader extends StockReader {
   private Portfolio portfolio;

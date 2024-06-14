@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
  * the writing of stock data, and the correct closing and saving of the file.
  */
 public class PortfolioWriterTest {
-  private PortfolioWriter writer;
   private File test;
   private String writtenTestFile;
 
@@ -49,7 +48,7 @@ public class PortfolioWriterTest {
   @Test
   public void testPortfolioWriter() {
     try {
-      writer = new PortfolioWriter("portfolioTest", "2024-06-06",
+      PortfolioWriter writer = new PortfolioWriter("portfolioTest", "2024-06-06",
               folder.getRoot().getAbsolutePath());
       writer.writeStock("AAPL", 1);
       writer.writeStock("GOOG", 2);

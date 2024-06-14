@@ -52,5 +52,3 @@ You also cannot enter any date that is before the latest transaction!
 
 All dates for stock methods should be supported, if it is not a valid market date, for holidays such as
 Christmas, or New Years, it will find the nearest market date backwards.
-
-

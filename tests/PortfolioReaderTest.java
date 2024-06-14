@@ -29,9 +29,6 @@ import parser.PortfolioWriter;
  */
 public class PortfolioReaderTest {
   private Portfolio portfolio;
-  private PortfolioWriter writer;
-  private PortfolioReader reader;
-  private File test;
   private String writtenTestFile;
 
   /**
@@ -53,8 +50,8 @@ public class PortfolioReaderTest {
     portfolio.add(new ModelStock("AAPL"), 1, "2024-06-06");
     portfolio.add(new ModelStock("GOOG"), 2, "2024-06-06");
     writtenTestFile = "src/data/portfolios/portfolioTest.xml";
-    test = folder.newFile();
-    writer = new PortfolioWriter("portfolioTest", "2024-06-06", folder.getRoot().getAbsolutePath());
+    File test = folder.newFile();
+    PortfolioWriter writer = new PortfolioWriter("portfolioTest", "2024-06-06", folder.getRoot().getAbsolutePath());
     writer.writeStock("AAPL", 1);
     writer.writeStock("GOOG", 2);
     writer.close();
@@ -71,7 +68,7 @@ public class PortfolioReaderTest {
     try {
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser saxParser = factory.newSAXParser();
-      reader = new PortfolioReader("portfolioTest");
+      PortfolioReader reader = new PortfolioReader("portfolioTest");
       saxParser.parse(writtenTestFile, reader);
       Map<Stock, Double> readerStocks = reader.getPortfolio().getStocks();
       Map<Stock, Double> portfolioStocks = portfolio.getStocks();

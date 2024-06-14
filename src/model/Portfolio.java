@@ -111,7 +111,7 @@ public interface Portfolio {
    * @param dateEnd   the date at which to stop examining the portfolio's performance.
    * @param scale     the timescale on which to plot the graph.
    * @return a bar chart representation of the portfolio's performance over the specified
-   * time period.
+   *         time period.
    */
   String plot(String dateStart, String dateEnd, PlotInterval scale);
 

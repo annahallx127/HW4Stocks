@@ -97,4 +97,3 @@ predefined target value (targetFirstValueAsterisks). This design allows for flex
 of data across different time intervals and ensures that the plot scales appropriately based on
 the total portfolio value. The use of enums makes it easy to manage and extend the intervals if
 needed.
-
