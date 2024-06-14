@@ -16,6 +16,8 @@ import java.util.Map;
 import parser.PortfolioWriter;
 
 import static model.PlotInterval.DAYS;
+import static model.PlotInterval.MONTHS;
+import static model.PlotInterval.WEEKS;
 
 /**
  * Represents a portfolio in the stock investment program. Each portfolio has a name and manages a
@@ -335,7 +337,7 @@ public class ModelPortfolio implements Portfolio {
         break;
       case WEEKS:
         // set the resolution for the plot
-        DAYS.setResolution(startDateValue, endDateValue);
+        WEEKS.setResolution(startDateValue, endDateValue);
         if (daysToLookBack > 30) {
           // no more than 30 lines per plot
           daysToLookBack = 30;
@@ -345,7 +347,7 @@ public class ModelPortfolio implements Portfolio {
           LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusWeeks(i).toString());
           double totalValue = valueOfPortfolio(currDate.toString());
           sb.append(currDate).append(": ")
-                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append("*".repeat(WEEKS.scaleFactor(totalValue)))
                   .append(System.lineSeparator());
         }
         sb.append(System.lineSeparator()).append("Scale: * = $")
@@ -354,7 +356,7 @@ public class ModelPortfolio implements Portfolio {
         break;
       case MONTHS:
         // set the resolution for the plot
-        DAYS.setResolution(startDateValue, endDateValue);
+        MONTHS.setResolution(startDateValue, endDateValue);
         if (daysToLookBack > 30) {
           // no more than 30 lines per plot
           daysToLookBack = 30;
@@ -364,7 +366,7 @@ public class ModelPortfolio implements Portfolio {
           LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusMonths(i).toString());
           double totalValue = valueOfPortfolio(currDate.toString());
           sb.append(currDate).append(": ")
-                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append("*".repeat(MONTHS.scaleFactor(totalValue)))
                   .append(System.lineSeparator());
         }
         sb.append(System.lineSeparator()).append("Scale: * = $")
@@ -373,7 +375,7 @@ public class ModelPortfolio implements Portfolio {
         break;
       case YEARS:
         // set the resolution for the plot
-        DAYS.setResolution(startDateValue, endDateValue);
+        MONTHS.setResolution(startDateValue, endDateValue);
         if (daysToLookBack > 30) {
           // no more than 30 lines per plot
           daysToLookBack = 30;
@@ -383,11 +385,11 @@ public class ModelPortfolio implements Portfolio {
           LocalDate currDate = getValidMarketDateWeekend(validStartDate.minusYears(i).toString());
           double totalValue = valueOfPortfolio(currDate.toString());
           sb.append(currDate).append(": ")
-                  .append("*".repeat(DAYS.scaleFactor(totalValue)))
+                  .append("*".repeat(MONTHS.scaleFactor(totalValue)))
                   .append(System.lineSeparator());
         }
         sb.append(System.lineSeparator()).append("Scale: * = $")
-                .append(DAYS.getTargetResolution())
+                .append(MONTHS.getTargetResolution())
                 .append(System.lineSeparator());
         break;
     }

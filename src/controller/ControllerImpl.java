@@ -963,14 +963,15 @@ public class ControllerImpl implements Controller {
 
     String interval;
     do {
-      view.print("Enter interval (DAYS, WEEKS, MONTHS): ");
+      view.print("Enter interval (DAYS, WEEKS, MONTHS, YEARS): ");
       scanner.nextLine();
       interval = scanner.nextLine().toUpperCase();
-      if (!interval.equals("DAYS") && !interval.equals("WEEKS") && !interval.equals("MONTHS")) {
+      if (!interval.equals("DAYS") && !interval.equals("WEEKS") && !interval.equals("MONTHS")
+              && !interval.equals("YEARS")) {
         view.print("Invalid interval. Please enter a valid interval.");
       }
     } while (!validDate.equals("DAYS") && !validDate.equals("WEEKS")
-            && !validDate.equals("MONTHS"));
+            && !validDate.equals("MONTHS") && !validDate.equals("YEARS"));
 
     PlotInterval plotInterval = PlotInterval.valueOf(interval);
     ControllerCommand command = new PlotPortfolioCommand(portfolio.getName(), validDate, validDate2,
