@@ -48,7 +48,9 @@ public class MockPortfolio implements Portfolio {
 
   @Override
   public void add(Stock s, double shares, String date) {
-    if (shares <= 0) throw new IllegalArgumentException("Shares must be positive.");
+    if (shares <= 0) {
+      throw new IllegalArgumentException("Shares must be positive.");
+    }
     stocks.put(s, stocks.getOrDefault(s, 0.0) + shares);
     transactions.add(new MockTransaction(LocalDate.parse(date), s, shares, "buy"));
   }
@@ -73,7 +75,8 @@ public class MockPortfolio implements Portfolio {
   @Override
   public boolean isValidDateForPortfolio(String date) {
     LocalDate parsedDate = LocalDate.parse(date);
-    return !(parsedDate.getDayOfWeek().getValue() == 6 || parsedDate.getDayOfWeek().getValue() == 7);
+    return !(parsedDate.getDayOfWeek().getValue() == 6 || parsedDate.getDayOfWeek()
+            .getValue() == 7);
   }
 
   @Override

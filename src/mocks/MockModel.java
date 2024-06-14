@@ -57,7 +57,6 @@ public class MockModel implements Model {
     return Map.copyOf(portfolios);
   }
 
-  @Override
   public String plotStock(String symbol, String dateStart, String dateEnd, PlotInterval interval)
           throws IllegalArgumentException {
     return "";

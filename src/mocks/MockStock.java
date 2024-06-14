@@ -64,9 +64,9 @@ public class MockStock implements Stock {
     return prices.getOrDefault(date, 0.0);
   }
 
-  // fix this later os that it calls the ones in the api
   @Override
   public void isValidSymbol(String symbol) {
+    // not implemented for the sake of testing
   }
 
   /**
