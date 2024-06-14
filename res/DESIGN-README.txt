@@ -1,5 +1,5 @@
 The design of our program is based on the model view controller (MVC) architecture.
-
+(See line 50 for the changes and additions).
 Stocks are represented by the 'Stock' interface and implemented in the 'modelStock' class of
 the model package. They represent a single stock for a company, and store the stock's symbol, name,
 and the stock data for the stock. The stock data is stored in an ArrayList<String>, where each
@@ -15,7 +15,7 @@ the portfolio. The key for the HashMap is the stock symbol, and the value is the
 of that stock that are in the portfolio. The portfolio can also calculate the total value of the
 portfolio, based on the stock prices on any given day. Numerous methods to manipulate the portfolio
 are present, such as adding stocks, removing stocks, and calculating the total value
-of the portfolio.
+of the portfolio. See below for the new design explanation!
 
 The model is represented by the 'Model' interface, and its implementation is the 'ModelImpl' class.
 It stores any data that the user would work with, including any stocks or portfolios that
@@ -29,9 +29,9 @@ the fact that the data is stored in a file, the data is not updated in real time
 inaccurate if used without being updated (such as without an internet connection.)
 
 The view is represented by the 'View' interface, and its implementation is the 'ViewImpl' class in
-the view package. It is the user interface that the user interacts with, displaying any relevant
-data to the user. The view also handles any exceptions that are thrown by the controller, and will
-display any subsequent error message to the user.
+the view package. The view now controls the appendable and displays messages to the user
+by appending them to a provided Appendable object. (Changes, we thought that would be a better
+design than before)
 
 The controller is represented by the 'Controller' interface, and its implementation is the
 'ControllerImpl' class in the controller package. It is the part of the program that connects the
@@ -47,4 +47,54 @@ the program. It creates a new instance of the controller, and then calls the go(
 the program. It will read and append from Readable and Appendable objects, defaulting to the
 console.
 
-What we Changed/Added:
+WHAT WE CHANGED OR ADDED:
+We fixed our Controller so that the bulk of the implementation would not be in the View. We added
+Commands that our controller would call for specific interactions with the user. We added to the
+Portfolio Interface and ModelPortfolio class to implement the new requirements of the portfolio.
+We acknowledge that this isn't the best way and that we could have made a new interface that
+extended the old interface and done code reuse, however, we interpreted the assignment through
+thinking that the additions would add on to the program, making it a better version. Much like a
+version update of an iPhone. Once you update the program, it is a better program, runs smoother,
+way better than the old program that you will want to stick with the new version. That is how
+we interpreted and implemented the assignment!
+
+We added the new requirements to ModelPortfolio where now the user is able to query the value of
+the portfolio at any date, add and remove stocks at a specific date, re-balance their portfolio
+at a any date, find the value distribution and composition of their portfolio at any date. It
+also supports saving users portfolios to the application and loading user portfolios in the
+specified format. Our program does not support re-balancing on the weekends, the user will have to
+enter a valid market date for them to re-balance their portfolio. Our model also now supports
+fractional shares, however, the user is not allowed to explicitly purchase or sell fractional shares.
+The only way for the user to have fractional shares is through re-balancing!
+
+The model now has ModelTransaction class and Transaction interface which logs the type of transaction
+made by the user. This also helps keep track of the dates of each transaction to ensure
+no transactions are made before the latest transaction (a design decision we made to minimize
+conflicts).
+The class contains useful methods that are called on by the portfolio. It can get the stock, and
+shares of each type of transaction that has been made.
+
+We added a parser so that the program could read portfolios and write portfolios for the user to save
+and load whenever. We created the StockWriter interface, Stock Reader abstract class,
+PortfolioReader and PortfolioWriter that work together to write and read XML files (chosen format).
+
+The design of the parser separates the tasks of reading and writing stock portfolio data into
+XML files, making the code more organized and easier to manage. It uses interfaces to define the
+standard methods for these operations, allowing different implementations if needed. PortfolioWriter
+writes the portfolio data to a temporary XML file and then formats it for readability, while
+PortfolioReader parses an XML file to reconstruct the portfolio data. This separation ensures that
+reading and writing are handled efficiently and independently. Overall, the design focuses on
+modularity, flexibility, and error handling to provide a robust solution for managing stock
+portfolio data in XML format.
+
+To plot the performance bar chart, we created an enum called PlotInterval.
+The PlotInterval enum defines various intervals for plotting data on a chart, such as days,
+weeks, months, and years, along with multi-year intervals like five and
+ten years. Each interval has a baseRows value associated with it, which likely corresponds
+to how the data is grouped for plotting purposes. The scale method calculates the base scale for
+each asterisk on the x-axis of the plot chart, using the total value of the portfolio and a
+predefined target value (targetFirstValueAsterisks). This design allows for flexible plotting
+of data across different time intervals and ensures that the plot scales appropriately based on
+the total portfolio value. The use of enums makes it easy to manage and extend the intervals if
+needed.
+

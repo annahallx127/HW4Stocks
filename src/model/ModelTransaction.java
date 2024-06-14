@@ -2,6 +2,12 @@ package model;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a transaction involving a stock. This class implements the
+ * Transaction interface and provides the details of the transaction,
+ * including the date, stock, number of shares, and type of transaction
+ * (buy/sell/rebalance).
+ */
 public class ModelTransaction implements Transaction {
 
   private final LocalDate date;
@@ -9,6 +15,15 @@ public class ModelTransaction implements Transaction {
   private final double shares;
   private final String type;
 
+  /**
+   * Constructs a new ModelTransaction with the specified date, stock,
+   * number of shares, and type of transaction.
+   *
+   * @param date   the date of the transaction
+   * @param stock  the stock involved in the transaction
+   * @param shares the number of shares involved in the transaction
+   * @param type   the type of transaction (buy/sell/rebalance)
+   */
   public ModelTransaction(LocalDate date, Stock stock, double shares, String type) {
     this.date = date;
     this.stock = stock;

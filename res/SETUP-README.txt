@@ -1,7 +1,12 @@
 Setup using our program!
+
+Run the JAR File: Use this command to execute the program: java -jar HW4Stocks.jar
+
+
+last resort:
 You can run the program by placing the jar file into a new folder, then in the search bar of that
 folder you can delete the file directory and type "cmd" and enter
-this will lead you to the command prompt window and you can type
+this will lead you to the command prompt window, and you can type
 java -jar HW4Stocks.jar
 
 Reminder:
@@ -20,18 +25,19 @@ When you run the program you will see 6 options.
 
 Congrats! Now you have created your own portfolio with 3 different stocks!!
 
-HOW TO CREATE A SECOND PORTFOLIO WITH 2 DIFFERENT STOCKS NAD QUERY THEIR VALUE ON A SPECIFIC DATE.
-- Now that you are back at the menu screen, enter the number 4 to create another portfolio
-- You will see a prompt to name it, you can name it however you would like
-- Now you will be prompted to enter the ticker symbol of the stock you want to purchase
-- Enter the ticker and the amount of shares, do the same for the second stock
-- After you have filled your portfolio with the 2 stocks, enter no to stop adding stocks
-- You will be taken back to the main menu, to view the value:
-- Enter number 5 to view all your portfolios, choose the portfolio you just made
-- Now enter the number 4 to query the value
-- Enter a valid date (if the date happens to fall on the weekend, the friday before will
-be considered)
-- The value of those stocks should now be displayed!
+HOW TO QUERY THE VALUE AND COST BASIS OF THE PORTFOLIO ABOVE ON TWO SPECIFIC DATES
+- Now that you have created a new portfolio, you will have to go to the portfolio screen, enter 5
+- Enter the number of which your portfolio that you just created is next to
+
+Now you will be entered into the Portfolio menu screen with 9 options.
+- To query the value of the portfolio at a specific date, choose option 6 (find portfolio value),
+then enter the date you want. After this cycle, you will be prompted back to the portfolio menu
+- To query the cost basis of that portfolio at a specific date, you can navigate to option 7 to
+find the distribution of value of each stock at that time or go to option 4 to view the
+composition of the portfolio at the given date
+- Now that you are back to the menu screen, you can check the values with a different date by
+going through the cycle again
+- when you are done choose option 9 and then 7, which will quit the program for you!
 
 Congrats!!
 
@@ -39,7 +45,12 @@ Stocks our program supports: All the stocks that are supported by the API (listi
 All dates for portfolios should be supported including holidays that are New Years or
 Christmas. If the holiday is not either of the two, the program will find the nearest market
 date backwards.
-All dates for stock methods should be supported, if it is not a valid market date, or holiday,
-it will find the nearest market date backwards.
+
+However, if you want to re-balance, our program does not support re-balancing on a weekend or non
+market date, this is specified in the program!
+You also cannot enter any date that is before the latest transaction!
+
+All dates for stock methods should be supported, if it is not a valid market date, for holidays such as
+Christmas, or New Years, it will find the nearest market date backwards.
 
 

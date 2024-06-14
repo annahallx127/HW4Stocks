@@ -2,6 +2,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.xml.sax.SAXException;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -20,17 +22,31 @@ import model.Stock;
 import parser.PortfolioReader;
 import parser.PortfolioWriter;
 
-
+/**
+ * Unit tests for the PortfolioReader class, which is responsible for reading
+ * stock portfolio data from an XML file. This class tests the correctness of
+ * reading and parsing the XML file to reconstruct the portfolio data.
+ */
 public class PortfolioReaderTest {
-  Portfolio portfolio;
-  PortfolioWriter writer;
-  PortfolioReader reader;
-  File test;
-  String writtenTestFile;
+  private Portfolio portfolio;
+  private PortfolioWriter writer;
+  private PortfolioReader reader;
+  private File test;
+  private String writtenTestFile;
 
+  /**
+   * Rule to create a temporary folder for testing file operations.
+   */
   @Rule
   public TemporaryFolder folder = new TemporaryFolder();
 
+  /**
+   * Sets up the test environment before each test. Initializes the portfolio,
+   * writes the portfolio data to an XML file using PortfolioWriter, and prepares
+   * the test file for reading.
+   *
+   * @throws IOException if an I/O error occurs during file creation or writing
+   */
   @Before
   public void setUp() throws IOException {
     portfolio = new ModelPortfolio("portfolioTest");
@@ -44,6 +60,12 @@ public class PortfolioReaderTest {
     writer.close();
   }
 
+  /**
+   * Tests the PortfolioReader by reading the previously written XML file and
+   * verifying that the portfolio data is correctly reconstructed. This test
+   * checks the equality of the stock data, portfolio name, and transactions
+   * between the original portfolio and the one read from the XML file.
+   */
   @Test
   public void testPortfolioReader() {
     try {

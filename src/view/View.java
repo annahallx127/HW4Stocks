@@ -1,22 +1,19 @@
 package view;
 
-import model.Portfolio;
-
 /**
- * The View interface defines the methods required for interacting with the user in the stock
- * investment application. It handles user inputs, displays options and results, and manages
- * the main interaction loop. The view is responsible for providing various functionalities of
- * a stock for a user through the text based user interface. The user will be presented
- * with options that utilize the methods in this interface to complete the user interactions.
+ * An interface representing the view in an MVC (Model-View-Controller) architecture.
+ * The view is responsible for displaying information to the user and can be implemented
+ * to output to various mediums, such as console, GUI, etc. In this case, this program runs a
+ * text based user-interface.
  */
 public interface View {
 
-//  /**
-//   * Initiates the view and presents the user with options.
-//   * Loads the next menu based off of user inputs.
-//   * Handles the main interaction loop with the user.
-//   */
-//  void run();
-
+  /**
+   * A helper function that system.out.println prints a message to the output appendable.
+   * Appends the message followed by a new line separator.
+   * If an IOException occurs, it wraps the exception in a RuntimeException and rethrows it.
+   *
+   * @param message message the message to be printed out my the system.
+   */
   void print(String message);
 }

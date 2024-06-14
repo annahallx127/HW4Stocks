@@ -1,10 +1,7 @@
 package model;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
-import static model.PlotInterval.DAYS;
 
 /**
  * Represents a portfolio in the stock investment program. Every portfolio can have multiple stocks

@@ -31,7 +31,6 @@ public class ModelPortfolio implements Portfolio {
   private final Map<Stock, Double> stocks;
   private final List<Transaction> transactions;
 
-
   /**
    * Constructs a new modelPortfolio with the specified name.
    * Initializes an empty collection of stocks within the portfolio that will later be filled.
@@ -59,29 +58,26 @@ public class ModelPortfolio implements Portfolio {
     return name;
   }
 
-  // add can only add a whole number!!!  only when rebalancing can it be fractional
+  //program makes it so that users cannot add fractional shares, but it still supports it
   @Override
   public void add(Stock s, double shares, String date) {
     if (shares <= 0) {
       throw new IllegalArgumentException("Shares must be greater than zero.");
     }
-
     LocalDate intendedDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
 
-
     // Check if the transaction date is legal
-    if (!transactions.isEmpty() && intendedDate.isBefore(transactions.get(transactions.size() - 1).getDate())) {
-      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    if (!transactions.isEmpty() && intendedDate.isBefore(transactions
+            .get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the " +
+              "latest transaction date.");
     }
 
     Transaction transaction = new ModelTransaction(intendedDate, s, shares, "buy");
     addTransaction(transaction);
   }
 
-  // removing can also only be in whole numbers
-  // add a clause to round up if its .5 and above, round down if .4 and down?
-  // how to deal with this when rebalancing, bc it can do fractional shares
-  // piazza says can allow to sell fractional shares
+  //program makes it so that users cannot remove fractional shares, but it still supports it
   @Override
   public void remove(Stock s, double shares, String date) throws IllegalArgumentException {
     if (shares <= 0) {
@@ -91,13 +87,16 @@ public class ModelPortfolio implements Portfolio {
 
 
     // Ensure no transaction is before the latest transaction
-    if (!transactions.isEmpty() && intendedDate.isBefore(transactions.get(transactions.size() - 1).getDate())) {
-      throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+    if (!transactions.isEmpty() && intendedDate.isBefore(transactions
+            .get(transactions.size() - 1).getDate())) {
+      throw new IllegalArgumentException("Transaction date cannot be before the " +
+              "latest transaction date.");
     }
 
     double currentShares = stocks.getOrDefault(s, 0.0);
     if (shares > currentShares) {
-      throw new IllegalArgumentException("Cannot remove more shares than the number of shares present.");
+      throw new IllegalArgumentException("Cannot remove more shares than the " +
+              "number of shares present.");
     }
 
     Transaction transaction = new ModelTransaction(intendedDate, s, shares, "sell");
@@ -150,33 +149,31 @@ public class ModelPortfolio implements Portfolio {
   public double valueOfPortfolio(String date) {
 
     if (!isValidDateForPortfolio(date)) {
-      throw new IllegalArgumentException("Cannot check portfolio value on weekend, please enter a market date");
+      throw new IllegalArgumentException("Cannot check portfolio value on weekend, " +
+              "please enter a market date");
     }
     LocalDate newDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     LocalDate validDate = getValidMarketDateWeekend(date);
 
 
-    // This map will hold the effective shares of each stock up to the valid date.
     Map<Stock, Double> effectiveShares = new HashMap<>();
 
-    // Aggregate shares from all transactions up to and including the valid date.
     for (Transaction transaction : transactions) {
       if (!transaction.getDate().isAfter(validDate)) {
         Stock stock = transaction.getStock();
         double shares = transaction.getShares();
         if ("sell".equalsIgnoreCase(transaction.getType())) {
-          shares = -shares;  // Negate shares if the transaction is a sell.
+          shares = -shares;
         }
         effectiveShares.merge(stock, shares, Double::sum);
       }
     }
 
     double totalValue = 0.0;
-    // Calculate the total value based on the aggregated shares.
     for (Map.Entry<Stock, Double> entry : effectiveShares.entrySet()) {
       Stock stock = entry.getKey();
       double shares = entry.getValue();
-      if (shares > 0) {  // Only calculate value for positive shares.
+      if (shares > 0) {
         double stockPrice = stock.getPriceOnDate(validDate.toString());
         totalValue += stockPrice * shares;
       }
@@ -237,10 +234,12 @@ public class ModelPortfolio implements Portfolio {
     for (Map.Entry<Stock, Double> entry : stockValues.entrySet()) {
       double stockValue = entry.getValue();
       double percentage = stockValue / totalValue * 100;
-      distribution.put(entry.getKey().toString(), String.format("$%.2f (%.2f%%)", stockValue, percentage));
+      distribution.put(entry.getKey().toString(), String.format("$%.2f (%.2f%%)",
+              stockValue, percentage));
     }
 
-    StringBuilder result = new StringBuilder("Total Portfolio Value: ").append(String.format("$%.2f\n", totalValue));
+    StringBuilder result = new StringBuilder("Total Portfolio Value: ")
+            .append(String.format("$%.2f\n", totalValue));
     for (Map.Entry<String, String> entry : distribution.entrySet()) {
       result.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
     }
@@ -262,7 +261,8 @@ public class ModelPortfolio implements Portfolio {
         Stock stock = transaction.getStock();
         double shares = transaction.getShares();
         if (transaction.getType().equalsIgnoreCase("buy")) {
-          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock, 0.0) + shares);
+          portfolioComposition.put(stock, portfolioComposition.getOrDefault(stock,
+                  0.0) + shares);
         } else if (transaction.getType().equalsIgnoreCase("sell")) {
           double currentShares = portfolioComposition.getOrDefault(stock, 0.0);
           portfolioComposition.put(stock, currentShares - shares);
@@ -327,12 +327,12 @@ public class ModelPortfolio implements Portfolio {
     return sb.toString();
   }
 
-
   @Override
   public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> targetWeights) {
     LocalDate intendedDate = LocalDate.parse(reBalanceDate, DateTimeFormatter.ISO_LOCAL_DATE);
 
-    if (intendedDate.getDayOfWeek() == DayOfWeek.SATURDAY || intendedDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+    if (intendedDate.getDayOfWeek() == DayOfWeek.SATURDAY || intendedDate.getDayOfWeek()
+            == DayOfWeek.SUNDAY) {
       throw new IllegalArgumentException("This program does not support re-balancing a" +
               " portfolio on a non market date! Please enter a valid date.");
     }
@@ -385,8 +385,10 @@ public class ModelPortfolio implements Portfolio {
   @Override
   public void addTransaction(Transaction transaction) throws IllegalArgumentException {
     if (!"rebalance".equalsIgnoreCase(transaction.getType())) {
-      if (!transactions.isEmpty() && transaction.getDate().isBefore(transactions.get(transactions.size() - 1).getDate())) {
-        throw new IllegalArgumentException("Transaction date cannot be before the latest transaction date.");
+      if (!transactions.isEmpty() && transaction.getDate().isBefore(transactions
+              .get(transactions.size() - 1).getDate())) {
+        throw new IllegalArgumentException("Transaction date cannot be before the" +
+                " latest transaction date.");
       }
 
       for (Transaction t : transactions) {
@@ -396,7 +398,8 @@ public class ModelPortfolio implements Portfolio {
           if ("sell".equalsIgnoreCase(transaction.getType()) &&
                   "buy".equalsIgnoreCase(t.getType()) &&
                   transaction.getShares() > t.getShares()) {
-            throw new IllegalArgumentException("Cannot sell more shares than were bought in the same month.");
+            throw new IllegalArgumentException("Cannot sell more shares than were " +
+                    "bought in the same month.");
           }
         }
       }
@@ -407,7 +410,8 @@ public class ModelPortfolio implements Portfolio {
 
     Stock stock = transaction.getStock();
     double shares = transaction.getShares();
-    if ("buy".equalsIgnoreCase(transaction.getType()) || "rebalance".equalsIgnoreCase(transaction.getType())) {
+    if ("buy".equalsIgnoreCase(transaction.getType())
+            || "rebalance".equalsIgnoreCase(transaction.getType())) {
       stocks.merge(stock, shares, Double::sum);
     } else if ("sell".equalsIgnoreCase(transaction.getType())) {
       double currentShares = stocks.getOrDefault(stock, 0.0);

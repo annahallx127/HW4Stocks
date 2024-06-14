@@ -1,25 +1,41 @@
-
 import controller.ControllerImpl;
 import mocks.MockModel;
 import mocks.MockStock;
+
 import model.Portfolio;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import view.View;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Scanner;
 
 import mocks.MockView;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests for the ControllerImpl class, which handles the interaction between the user,
+ * the model, and the view. This class tests various functionalities such as creating a portfolio,
+ * adding stocks, calculating gain/loss, viewing portfolios, calculating moving averages,
+ * re-balancing portfolios, and handling invalid inputs. These tests implement MockModel and Mock
+ * View so that it a simulate a real life user interaction without needing a user.
+ */
 public class ControllerTest {
   private MockModel model;
   private View view;
   private StringWriter output;
   private ControllerImpl controller;
 
+  /**
+   * Sets up the test environment before each test. Initializes the mock model, view,
+   * controller, and adds a mock stock to the model.
+   */
   @Before
   public void setUp() {
     model = new MockModel();
@@ -33,51 +49,64 @@ public class ControllerTest {
   }
 
   private void simulateInput(String input) {
-    Scanner scanner = new Scanner(input);
-    controller = new ControllerImpl(model, view, scanner, output);
-    controller.runController(controller, view, scanner);
+    InputStream in = new ByteArrayInputStream(input.getBytes());
+    System.setIn(in);
+    controller = new ControllerImpl(model, view, new Scanner(System.in), output);
+    controller.runController(controller, view, new Scanner(System.in));
   }
 
   @Test
   public void testCreatePortfolioAndAddStock() {
-    simulateInput("4\nMyPortfolio\nAAPL\n10\nno\n6\n");
+    String input = "4\nblah\nAAPL\n2021\n01\n01\n9\nno\n7\n";
+    simulateInput(input);
 
-
-    Portfolio portfolio = model.getPortfolios().get("MyPortfolio");
-    assertTrue("Portfolio should contain AAPL stock", portfolio.getStocks().containsKey(model.get("AAPL")));
-    assertEquals("Should have 10 shares of AAPL", 10.0, portfolio.getStocks().get(model.get("AAPL")), 0.01);
-    assertTrue("Output should confirm stock addition", output.toString().contains("You have added 10 shares of AAPL to your portfolio!"));
+    Portfolio portfolio = model.getPortfolios().get("blah");
+    assertTrue("Portfolio should contain AAPL stock",
+            portfolio.getStocks().containsKey(model.get("AAPL")));
+    assertEquals("Should have 9 shares of AAPL", 9.0,
+            portfolio.getStocks().get(model.get("AAPL")), 0.01);
+    assertTrue("Output should confirm stock addition",
+            output.toString().contains("You have added 9 shares of AAPL to your portfolio!"));
   }
 
   @Test
   public void testCalculateGainOrLoss() {
-    simulateInput("1\nAAPL\n2021-01-01\n2021-01-31\n6\n");
-    assertEquals("Gain should be calculated correctly", 10.0, model.get("AAPL").gainedValue("2021-01-01", "2021-01-31"), 0.01);
+    String input = "1\nAAPL\n2021\n01\n01\n2021\n01\n31\n7\n";
+    simulateInput(input);
+    assertEquals("Gain should be calculated correctly",
+            10.0, model.get("AAPL").gainedValue("2021-01-01", "2021-01-31"), 0.01);
   }
 
   @Test
   public void testViewPortfolio() {
-    simulateInput("5\n1\n6\n");
     model.makePortfolio("MyPortfolio");
-    assertEquals("The portfolio is empty!", model.getPortfolios().get("MyPortfolio").toString());
+    String input = "5\n1\n9\n7";
+    simulateInput(input);
+    assertEquals("The portfolio is empty!",
+            model.getPortfolios().get("MyPortfolio").toString());
   }
 
   @Test
   public void testCalculateXDayMovingAverage() {
-    simulateInput("2\nAAPL\n10\n2021-01-01\n6\n");
-    assertEquals("Moving average should be calculated correctly", 155.0, model.get("AAPL").getMovingAverage(10, "2021-01-01"), 0.01);
+    String input = "2\nAAPL\n9\n2021\n01\n01\n7\n";
+    simulateInput(input);
+    assertEquals("Moving average should be calculated correctly",
+            155.0, model.get("AAPL").getMovingAverage(9, "2021-01-01"),
+            0.01);
   }
 
   @Test
   public void testInvalidTickerSymbolForGainOrLoss() {
-    simulateInput("1\nINVALID\n2021-01-01\n2021-01-31\n6\n");
-    assertTrue("Should handle invalid ticker symbol", output.toString().contains("Invalid ticker symbol"));
+    String input = "1\nINVALID\n2021\n01\n01\n2021\n01\n31\n7\n";
+    simulateInput(input);
+    assertTrue("Should handle invalid ticker symbol",
+            output.toString().contains("Invalid ticker symbol"));
   }
-
 
   @Test
   public void testInvalidTickerSymbolForGainOrLossDisplay() {
-    simulateInput("1\nINVALID\n2021-01-01\n2021-01-31\n7\n");
+    String input = "1\nINVALID\n7\n";
+    simulateInput(input);
     String expectedOutput = "Isaac and Anna's Stock Investment Company\n" +
             "Choose an Option From the Menu:\n" +
             "1. Calculate Gain or Loss of a Stock\n" +
@@ -104,4 +133,55 @@ public class ControllerTest {
     assertEquals(expectedOutput, output.toString());
   }
 
+  @Test
+  public void testReBalancePortfolio() {
+    String input = "4\nergerg\nAAPL\n2021\n01\n01\n5\n1\n5\n2021\n01\n01\nAAPL\n90\n7\n";
+    simulateInput(input);
+    assertTrue("Output should confirm rebalancing",
+            output.toString().contains("Re-balanced portfolio"));
+  }
+
+  @Test
+  public void testGetValueDistribution() {
+    model.makePortfolio("MyPortfolio");
+    String input = "5\n1\n7\n";
+    simulateInput(input);
+    assertTrue("Output should show distribution of value",
+            output.toString().contains("Distribution of value"));
+  }
+
+  @Test
+  public void testGetComposition() {
+    model.makePortfolio("MyPortfolio");
+    String input = "5\n1\n4\n2021\n01\n01\n7\n";
+    simulateInput(input);
+    assertTrue("Output should show composition of portfolio",
+            output.toString().contains("Composition of portfolio"));
+  }
+
+  @Test
+  public void testInvalidInputForReBalance() {
+    String input = "5\n1\n5\n2021\n01\n01\nINVALID\n90\n7\n";
+    simulateInput(input);
+    assertTrue("Should handle invalid ticker symbol for rebalancing",
+            output.toString().contains("Invalid ticker symbol"));
+  }
+
+  @Test
+  public void testInvalidInputForValueDistribution() {
+    model.makePortfolio("MyPortfolio");
+    String input = "5\n1\n7\n2021\n01\n01\n9\n7\n";
+    simulateInput(input);
+    assertTrue("Should handle invalid input for value distribution",
+            output.toString().contains("Invalid date"));
+  }
+
+  @Test
+  public void testInvalidInputForComposition() {
+    model.makePortfolio("MyPortfolio");
+    String input = "4\nblah\nAAPL\n2021\n01\n01\n6\n5\n1\n4\nINVALID\nryh\nrth\n9\n";
+    simulateInput(input);
+    assertTrue("Should handle invalid input for composition",
+            output.toString().contains("Invalid date"));
+  }
 }

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -18,29 +19,68 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
 /**
- * A class that writes a stock portfolio to a file. The portfolio is written in XML format.
+ * A class that writes a stock portfolio to an XML file. This class implements
+ * the StockWriter interface and provides functionality to write stock information
+ * to a temporary XML file and then transform and save it to the specified directory
+ * and file name. The XML file will have a root element named after the portfolio, with each stock
+ * entry as a child element containing the stock symbol and the number of shares.
+ * Example of the generated XML structure:
+ * <pre>
+ * {@code
+ * <portfolio date="YYYY-MM-DD">
+ *     <stock index="0">
+ *         <symbol>STOCK_SYMBOL</symbol>
+ *         <shares>NUMBER_OF_SHARES</shares>
+ *     </stock>
+ *     ...
+ * </portfolio>
+ * }
+ * </pre>
  */
 public class PortfolioWriter implements StockWriter {
-  StreamResult result;
-  XMLOutputFactory factory = XMLOutputFactory.newFactory();
-  XMLStreamWriter tempWriter;
-  int counter = 0;
-  File tmp = File.createTempFile("xml", null);
-  FileWriter stream = new FileWriter(tmp);
+  private StreamResult result;
+  private XMLOutputFactory factory = XMLOutputFactory.newFactory();
+  private XMLStreamWriter tempWriter;
+  private int counter = 0;
+  private File tmp = File.createTempFile("xml", null);
+  private FileWriter stream = new FileWriter(tmp);
 
+  /**
+   * Constructs a PortfolioWriter instance to write portfolio data to an XML file.
+   *
+   * @param name      the name of the portfolio file (without extension)
+   * @param date      the date associated with the portfolio
+   * @param directory the directory where the portfolio file will be saved
+   * @throws IOException if an I/O error occurs during file creation
+   */
   public PortfolioWriter(String name, String date, String directory) throws IOException {
     try {
-      FileWriter streamWriter = new FileWriter(directory + name + ".xml");
+      if (directory.isEmpty()) {
+        directory = "src/data/portfolios/";
+      }
+      if (!directory.endsWith("/")) {
+        directory += "/";
+      }
+      if (!name.endsWith(".xml")) {
+        name += ".xml";
+      }
+      FileWriter streamWriter = new FileWriter(Path.of(directory, name).toString());
       result = new StreamResult(streamWriter);
       tempWriter = factory.createXMLStreamWriter(stream);
       tempWriter.writeStartDocument();
-      tempWriter.writeStartElement(name);
+      tempWriter.writeStartElement("portfolio");
       tempWriter.writeAttribute("date", date);
     } catch (XMLStreamException e) {
       e.printStackTrace(System.err);
     }
   }
 
+  /**
+   * Writes a stock entry to the temporary XML file.
+   *
+   * @param symbol the stock symbol
+   * @param shares the number of shares of the stock
+   */
   @Override
   public void writeStock(String symbol, double shares) {
     try {
@@ -59,6 +99,10 @@ public class PortfolioWriter implements StockWriter {
     }
   }
 
+  /**
+   * Closes the temporary XML writer, finalizes the document, and transforms it into the final XML
+   * format saved to the specified file. Ensures the XML output is indented for readability.
+   */
   @Override
   public void close() {
     try {

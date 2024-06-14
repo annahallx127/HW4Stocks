@@ -455,7 +455,8 @@ public class ModelPortfolioUnitTests {
     try {
       portfolio.add(stock1, 10, "2024-10-13");
     } catch (IllegalArgumentException e) {
-      assertEquals("Transaction date cannot be before the latest transaction date.", e.getMessage());
+      assertEquals("Transaction date cannot be before the latest transaction date.",
+              e.getMessage());
     }
   }
 
@@ -489,7 +490,6 @@ public class ModelPortfolioUnitTests {
 
     String expectedString2 = "AAPL: 17.0 shares" + System.lineSeparator();
     assertEquals(expectedString2, portfolio.getCompositionAtDate("2024-06-04"));
-
   }
 
   @Test

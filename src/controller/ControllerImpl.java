@@ -47,10 +47,6 @@ public class ControllerImpl implements Controller {
     this.scanner = scanner;
     this.out = out;
   }
-//  @Override
-//  public void controllerGo() {
-//    view.run();
-//  }
 
   @Override
   public Stock getStock(String symbol) throws IllegalArgumentException {
@@ -61,11 +57,6 @@ public class ControllerImpl implements Controller {
   public Map<String, Portfolio> getPortfolios() {
     return model.getPortfolios();
   }
-
-  // TODO: find solution for setting portfolio from copy
-//  public void setPortfolio() {
-//    model.setPortfolio();
-//  }
 
   @Override
   public void makePortfolio(String name) {
@@ -83,10 +74,6 @@ public class ControllerImpl implements Controller {
     model.loadPortfolio(name, path);
   }
 
-//  @Override
-//  public Appendable getAppendable() {
-//    return out;
-//  }
   @Override
   public void executeCommand(ControllerCommand command) {
     command.execute(this);
@@ -103,7 +90,6 @@ public class ControllerImpl implements Controller {
     view.print("Error: " + message);
   }
 
-
   @Override
   public void runController(Controller controller, View view, Scanner scanner) {
     while (true) {
@@ -117,6 +103,7 @@ public class ControllerImpl implements Controller {
     }
   }
 
+  // the main menu prompt
   private static void printMainMenu(View view) {
     view.print("Isaac and Anna's Stock Investment Company");
     view.print("Choose an Option From the Menu:");
@@ -139,6 +126,7 @@ public class ControllerImpl implements Controller {
     }
   }
 
+  //controls the user choice and the main menu loop
   private static void handleUserChoice(Controller controller, Scanner scanner, View view, int choice) {
     switch (choice) {
       case 1:
@@ -513,8 +501,16 @@ public class ControllerImpl implements Controller {
     }
     ControllerCommand command = new CreatePortfolioCommand(name);
     controller.executeCommand(command);
+    view.print("Your portfolio has been saved in the directory! "
+            + "(it might take a while to show up) "
+            + "Any changes you have made in this portfolio shall update!");
 
-    addAndBuyStock(portfolio, controller, scanner);
+    try {
+      addAndBuyStock(portfolio, controller, scanner);
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      return;
+    }
   }
 
   private static void viewPortfolioChooseMenuScreen(Portfolio portfolio, Controller controller, Scanner scanner) {
@@ -528,8 +524,7 @@ public class ControllerImpl implements Controller {
       System.out.println("6. Find Portfolio Value");
       System.out.println("7. Find Distribution of Value");
       System.out.println("8. View Performance Over Time");
-      System.out.println("9. Save Portfolio to Device");
-      System.out.println("10. Go Back");
+      System.out.println("9. Go Back");
 
       int option;
       try {
@@ -566,9 +561,6 @@ public class ControllerImpl implements Controller {
           handlePlotPerformanceBarChart(portfolio, controller, scanner);
           break;
         case 9:
-//          savePortfolioToDevice(portfolio);
-          break;
-        case 10:
           return;
         default:
           System.out.println("Invalid choice. Please try again.");
@@ -653,6 +645,7 @@ public class ControllerImpl implements Controller {
 
 
     System.out.println("Enter ticker symbol to remove: ");
+    scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
     Stock stockToRemove;
     try {
@@ -662,16 +655,20 @@ public class ControllerImpl implements Controller {
       System.out.println(e.getMessage());
       return;
     }
-    System.out.println("Enter quantity: ");
-    double numOfShares = scanner.nextInt();
+    System.out.println("Enter quantity (cannot be fractional): ");
 
-
+    double numOfShares;
+    try {
+      numOfShares = scanner.nextInt();
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      return;
+    }
     System.out.println("You are Selling this Stock at Date: " + validDate);
     ControllerCommand command = new SellStockCommand(portfolio.getName(), stockToRemove, numOfShares, validDate);
     controller.executeCommand(command);
     controller.getPortfolios().put(portfolio.getName(), portfolio);
     portfolio.savePortfolio(validDate);
-
   }
 
   private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio, Controller controller, Scanner scanner) {
@@ -849,7 +846,7 @@ public class ControllerImpl implements Controller {
         date = LocalDate.of(year, month, day);
       } catch (DateTimeParseException e) {
         System.out.println("Invalid date. Please enter a valid date.");
-       return;
+        return;
       }
 
       validDate = date.toString();
@@ -869,23 +866,34 @@ public class ControllerImpl implements Controller {
   }
 
   private static void handleLoadPortfolio(Controller controller, Scanner scanner, View view) {
-//    System.out.println("Enter the name of the portfolio to load: ");
-//    String portfolioName = scanner.nextLine();
-//
-//    ControllerCommand command = new LoadPortfolioCommand(portfolioName);
-//    controller.executeCommand(command);
+    System.out.println("Enter the name of the portfolio to load: ");
+    System.out.println("Format should just be the NAMEOFYOURPORTFOLIO (all in one line): ");
 
+    scanner.nextLine();
+    String portfolioName = scanner.nextLine();
+
+    try {
+      controller.loadPortfolio(portfolioName, "src/data/portfolios");
+      Portfolio loadedPortfolio = controller.getPortfolios().get(portfolioName);
+      if (loadedPortfolio != null) {
+        System.out.println("Portfolio '" + portfolioName + "' loaded successfully.");
+        viewPortfolioChooseMenuScreen(loadedPortfolio, controller, scanner);
+      } else {
+        System.out.println("Portfolio '" + portfolioName + "' does not exist.");
+      }
+    } catch (Exception e) {
+      System.out.println("Error loading portfolio: " + e.getMessage());
+    }
   }
+
 
   private static void handlePlotPerformanceBarChart(Portfolio portfolio,
                                                     Controller controller, Scanner scanner) {
 
+
   }
 
 }
-
-
-
 
 
 

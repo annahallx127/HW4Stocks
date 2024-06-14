@@ -1,8 +1,12 @@
 package model;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 
+/**
+ * Represents a transaction involving stocks in a portfolio. This interface
+ * defines the methods required to access the details of a transaction, such as
+ * the date, stock, number of shares, and type of transaction (buy/sell/rebalance).
+ */
 public interface Transaction {
   /**
    * Gets the date of the transaction.
@@ -26,7 +30,7 @@ public interface Transaction {
   double getShares();
 
   /**
-   * Gets the type of transaction (buy/sell).
+   * Gets the type of transaction (buy/sell/rebalance).
    *
    * @return the type of transaction
    */

@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * Represents different intervals for plotting data on a chart. Each interval
+ * is associated with a base number of rows used for plotting. The intervals
+ * include days, weeks, months, years, five years, and ten years.
+ */
 public enum PlotInterval {
   DAYS(7), WEEKS(4), MONTHS(12), YEARS(10),
   FIVE_YEARS(5), TEN_YEARS(5);

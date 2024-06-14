@@ -123,8 +123,8 @@ public interface Stock {
   /**
    * Plots the graph of the stock with the given symbol.
    *
-   * @param date the start date of the graph. Must be a valid date in the format "YYYY-MM-DD".
-   * @param interval the interval of the graph. Must be a valid interval.
+   * @param dateStart the start date of the graph. Must be a valid date in the format "YYYY-MM-DD".
+   * @param interval  the interval of the graph. Must be a valid interval.
    * @return the graph of the stock as a string.
    */
   String plot(String dateStart, String dateEnd, PlotInterval interval);
