@@ -12,6 +12,7 @@ import view.ViewImpl;
  * This class initializes the necessary components and starts the application.
  */
 public class ControllerMain {
+
   /**
    * The main method that serves as the entry point of the application.
    * Initializes the input and output streams, creates a controller, and starts the application.
