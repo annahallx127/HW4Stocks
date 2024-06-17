@@ -49,7 +49,7 @@ public class ControllerImpl implements Controller {
    */
   public ControllerImpl(Model model, View view) {
     this.model = model;
-    this.view = view;
+    ControllerImpl.view = view;
   }
 
   @Override
@@ -224,13 +224,13 @@ public class ControllerImpl implements Controller {
       day2 = scanner.nextInt();
 
       try {
-        validDate = LocalDate.of(year2, month2, day2);
+        validDate2 = LocalDate.of(year2, month2, day2);
       } catch (DateTimeParseException e) {
         view.print("Invalid date. Please enter a valid date.");
         return;
       }
 
-      endDate = validDate.toString();
+      endDate = validDate2.toString();
 
 
       if (!stock.isValidDate(endDate)) {

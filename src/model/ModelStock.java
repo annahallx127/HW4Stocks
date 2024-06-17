@@ -35,7 +35,7 @@ public class ModelStock implements Stock {
   public ModelStock(String symbol) {
     this.symbol = symbol;
     this.apiInfo = new ArrayList<>();
-    String csvFile = "src/data/listing_status.csv";
+    String csvFile = "res/data/listing_status.csv";
     validSymbols = parseValidSymbols(csvFile);
 
     readFile();
@@ -45,13 +45,13 @@ public class ModelStock implements Stock {
   }
 
   private void readFile() {
-    try (FileReader fileReader = new FileReader("src/data/api/" + this.symbol + ".csv");
+    try (FileReader fileReader = new FileReader("res/data/api/" + this.symbol + ".csv");
          BufferedReader br = new BufferedReader(fileReader)) {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }
       if (this.apiInfo.isEmpty()) {
-        File file = new File("src/data/api/" + this.symbol + ".csv");
+        File file = new File("res/data/api/" + this.symbol + ".csv");
         file.delete();
         throw new IllegalArgumentException("No results found for stock " + symbol + ".");
       }

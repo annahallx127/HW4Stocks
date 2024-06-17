@@ -444,7 +444,7 @@ public class ModelPortfolio implements Portfolio {
   @Override
   public void savePortfolio(String date) {
     try {
-      PortfolioWriter writer = new PortfolioWriter(name, date, "src/data/portfolios");
+      PortfolioWriter writer = new PortfolioWriter(name, date, "res/data/portfolios");
       for (Stock s : stocks.keySet()) {
         writer.writeStock(s.toString(), stocks.get(s));
       }
