@@ -2,6 +2,7 @@ package mocks;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import model.Stock;
 
@@ -66,6 +67,11 @@ public class MockStock implements Stock {
   @Override
   public void isValidSymbol(String symbol) {
     // not implemented for the sake of testing
+  }
+
+  @Override
+  public Set<String> parseValidSymbols(String filePath) {
+    return null;
   }
 
   /**

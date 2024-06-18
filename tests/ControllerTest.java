@@ -41,7 +41,7 @@ public class ControllerTest {
     model = new MockModel();
     output = new StringWriter();
     view = new MockView(output);
-    controller = new ControllerImpl(model, view, new Scanner(System.in), System.out);
+    controller = new ControllerImpl(model, view);
     MockStock stock = new MockStock("AAPL");
     stock.setPriceOnDate("2021-01-01", 150.0);
     stock.setPriceOnDate("2021-01-31", 160.0);
@@ -51,7 +51,7 @@ public class ControllerTest {
   private void simulateInput(String input) {
     InputStream in = new ByteArrayInputStream(input.getBytes());
     System.setIn(in);
-    controller = new ControllerImpl(model, view, new Scanner(System.in), output);
+    controller = new ControllerImpl(model, view);
     controller.runController(controller, view, new Scanner(System.in));
   }
 
