@@ -2,6 +2,7 @@ package controller;
 
 import java.util.Scanner;
 
+import model.Model;
 import model.ModelImpl;
 
 import view.View;
@@ -22,7 +23,7 @@ public class ControllerMain {
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
     View view = new ViewImpl(System.out);
-    ModelImpl model = new ModelImpl();
+    Model model = new ModelImpl();
     Controller controller = new ControllerImpl(model, view);
 
     controller.runController(controller, view, scanner);
