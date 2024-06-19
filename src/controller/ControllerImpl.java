@@ -45,7 +45,7 @@ public class ControllerImpl implements Controller {
    * Constructs a new ControllerImpl object with the specified model and view.
    *
    * @param model the model to be used by the controller.
-   * @param view the view to be used by the controller.
+   * @param view  the view to be used by the controller.
    */
   public ControllerImpl(Model model, View view) {
     this.model = model;
@@ -996,8 +996,8 @@ public class ControllerImpl implements Controller {
             && !validDate.equals("MONTHS") && !validDate.equals("YEARS"));
 
     PlotInterval plotInterval = PlotInterval.valueOf(interval);
-    ControllerCommand command = new PlotPortfolioCommand(portfolio.getName(), validDate, validDate2,
-            plotInterval);
+    ControllerCommand command = new PlotPortfolioCommand(portfolio.getName(),
+            validDate, validDate2, plotInterval);
     command.execute(controller);
   }
 }
