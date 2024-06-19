@@ -1,14 +1,14 @@
 package controller;
 
 import model.ModelImpl;
-import view.View;
-import view.ViewImpl;
+import view.JFrameView;
+import model.Model;
 
 public class JFrameMain {
 
     public static void main(String[] args) {
-        View view = new ViewImpl(System.out);
-        ModelImpl model = new ModelImpl();
-
+        Model model = new ModelImpl();
+        JFrameView view = new JFrameView();
+        new JFrameControllerImpl(model, view);
     }
 }

@@ -2,7 +2,6 @@ package view;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -11,194 +10,340 @@ public class JFrameView extends JFrame {
 
     private JButton createNewPortfolioButton;
     private JButton loadNewPortfolio;
-
     private JButton transactionWindow;
     private JButton buyOrSellEnter;
-
-    private JButton fileOpenButton;
     private JButton findValueWindow;
     private JButton findValueEnter;
     private JButton findCompositionWindow;
     private JButton findCompEnter;
     private JButton savePortfolio;
+    private JList<String> portfolioList;
+    private DefaultListModel<String> portfolioListModel;
 
-    private JFrame mainMenu;
+    private JTextField transactionTypeField;
+    private JTextField stockTickerField;
+    private JTextField yearField;
+    private JTextField monthField;
+    private JTextField dayField;
 
+    private JFrame portfolioMenu;
+    private File loadedPortfolioFile;
+    private JTextArea messageArea;
 
     public JFrameView() {
-        this.mainMenu = new JFrame("I&A's Stock Investment Company");
-        mainMenu.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        mainMenu.setSize(600, 500);
-        mainMenu.setLocationRelativeTo(null);
-        mainMenu.setVisible(true);
-
+        super("I&A's Stock Investment Company");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(600, 500);
+        setLocationRelativeTo(null);
+        setVisible(true);
         createMainMenuView();
     }
 
     private void createMainMenuView() {
-        createNewPortfolioButton = new JButton();
-        loadNewPortfolio = new JButton();
+        getContentPane().setLayout(new BorderLayout());
 
-        getContentPane().setLayout(new FlowLayout());
+        portfolioListModel = new DefaultListModel<>();
+        portfolioList = new JList<>(portfolioListModel);
+        portfolioList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        portfolioList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                showPortfolioMenu(portfolioList.getSelectedValue());
+            }
+        });
 
-        JPanel mainPanel = new JPanel();
-        mainPanel.add(new JLabel("Available Portfolios"), BorderLayout.SOUTH);
-        mainPanel.add(new JList<>(), BorderLayout.CENTER);// list of portfolios
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JLabel availablePortfoliosLabel = new JLabel("Available Portfolios");
+        availablePortfoliosLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainPanel.add(availablePortfoliosLabel, BorderLayout.NORTH);
+        mainPanel.add(new JScrollPane(portfolioList), BorderLayout.CENTER);
 
+        JPanel bottomLeftPanel = new JPanel(new GridLayout(2, 1));
+        createNewPortfolioButton = new JButton("Create New Portfolio");
+        createNewPortfolioButton.setActionCommand("createNewPortfolio");
+        loadNewPortfolio = new JButton("Load Portfolio");
+        loadNewPortfolio.setActionCommand("loadPortfolio");
+        bottomLeftPanel.add(createNewPortfolioButton);
+        bottomLeftPanel.add(loadNewPortfolio);
 
-        // bottom of the menu panel w/ 2 button options
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(createNewPortfolioButton, BorderLayout.NORTH);
-        bottomPanel.add(loadNewPortfolio, BorderLayout.NORTH);
-        mainPanel.add(bottomPanel, BorderLayout.NORTH);
+        mainPanel.add(bottomLeftPanel, BorderLayout.SOUTH);
+        mainPanel.setPreferredSize(new Dimension(320, getHeight())); // Set the preferred size to take 2/5 of the screen width
+
+        getContentPane().add(mainPanel, BorderLayout.WEST);
+
+        messageArea = new JTextArea(20, 30);
+        messageArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(messageArea);
+
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JLabel calculationsLabel = new JLabel("Update Feed");
+        calculationsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        rightPanel.add(calculationsLabel, BorderLayout.NORTH);
+
+        getContentPane().add(rightPanel, BorderLayout.CENTER);
     }
 
-
-    // new window popup
-    private void createNewPortfolioWindow() {
-        JWindow createPortfolioWindow = new JWindow();
-        // asks for name of portfolio
-        // asks to buy a stock
-        JFrame portfolioMenu = new JFrame("Create New Portfolio");
-        portfolioMenu.setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-
+    private void showPortfolioMenu(String portfolioName) {
+        if (portfolioMenu != null) {
+            portfolioMenu.dispose();
+        }
+        portfolioMenu = new JFrame("Portfolio Menu - " + portfolioName);
+        portfolioMenu.setSize(400, 300);
+        portfolioMenu.setLocationRelativeTo(this);
+        portfolioMenu.setVisible(true);
     }
 
+    public void createNewPortfolioWindow() {
+        portfolioMenu = new JFrame("Create New Portfolio");
+        portfolioMenu.setSize(400, 300);
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-    // leads to the second frame
-    private void portfolioChooseMenuWindow() {
-        JWindow portfolioWindow = new JWindow();
-        JFrame portfolioMenu = new JFrame("Portfolio Menu Screen");
-        portfolioMenu.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        JLabel nameLabel = new JLabel("Enter Portfolio Name:");
+        JTextField nameField = new JTextField(15);
+        panel.add(nameLabel, gbc);
+        panel.add(nameField, gbc);
 
-        transactionWindow = new JButton("Buy or Sell Stock(s)");
-        findValueWindow = new JButton("Find Value of Portfolio at Date");
-        findCompositionWindow = new JButton("Find Composiiton of Portfolio at Date");
+        JButton createButton = new JButton("Create Portfolio");
+        createButton.setPreferredSize(new Dimension(150, 25));
+        createButton.setActionCommand("createPortfolioConfirm");
+        panel.add(createButton, gbc);
 
-        savePortfolio = new JButton("Save This Portfolio");
+        JButton buyStockButton = new JButton("Buy Stock");
+        buyStockButton.setPreferredSize(new Dimension(150, 25));
+        buyStockButton.setActionCommand("buyStock");
+        panel.add(buyStockButton, gbc);
 
+        portfolioMenu.add(panel);
+        portfolioMenu.pack();
+        portfolioMenu.setLocationRelativeTo(null);
+        portfolioMenu.setVisible(true);
 
+        createButton.addActionListener(e -> {
+            String portfolioName = nameField.getText().trim();
+            if (!portfolioName.isEmpty()) {
+                addPortfolioToList(portfolioName);
+                closePortfolioMenu();
+            }
+        });
 
+        buyStockButton.addActionListener(e -> buyOrSellWindow());
     }
 
-    // leads to the buy/sell window
-    private void buyOrSellWindow() {
-        JWindow buySellWindow = new JWindow();
+    public void buyOrSellWindow() {
         JFrame buySellWindowFrame = new JFrame("Buy or Sell Stock(s)");
-        buySellWindowFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        buySellWindowFrame.setSize(400, 300);
 
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         JLabel transactionType = new JLabel("Transaction Type (buy/sell): ");
-        JTextField transactionField = new JTextField(1);
+        transactionTypeField = new JTextField(10);
+        panel.add(transactionType, gbc);
+        panel.add(transactionTypeField, gbc);
 
         JLabel stockLabel = new JLabel("Stock Ticker: ");
-        JTextField stockTickerField = new JTextField(1);
+        stockTickerField = new JTextField(10);
+        panel.add(stockLabel, gbc);
+        panel.add(stockTickerField, gbc);
 
         JLabel yearLabel = new JLabel("Year of Transaction (YYYY): ");
-        JTextField yearField = new JTextField(1);
+        yearField = new JTextField(10);
+        panel.add(yearLabel, gbc);
+        panel.add(yearField, gbc);
 
         JLabel monthLabel = new JLabel("Month of Transaction (MM): ");
-        JTextField monthField = new JTextField(1);
+        monthField = new JTextField(10);
+        panel.add(monthLabel, gbc);
+        panel.add(monthField, gbc);
 
         JLabel dayLabel = new JLabel("Day of Transaction (DD): ");
-        JTextField dayField = new JTextField(1);
+        dayField = new JTextField(10);
+        panel.add(dayLabel, gbc);
+        panel.add(dayField, gbc);
 
         buyOrSellEnter = new JButton("Enter Transaction");
+        buyOrSellEnter.setActionCommand("enterTransaction");
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(buyOrSellEnter, gbc);
 
-
-
+        buySellWindowFrame.add(panel);
+        buySellWindowFrame.pack();
+        buySellWindowFrame.setLocationRelativeTo(null);
+        buySellWindowFrame.setVisible(true);
     }
 
-    private void findValueWindow() {
-        JWindow valueWindow = new JWindow();
+    public void findValueWindow() {
         JFrame valueFrame = new JFrame("Find Value at Date");
+        valueFrame.setSize(400, 300);
 
-        JLabel year = new JLabel("Enter valid Year: ");
-        JTextField yearText = new JTextField(1);
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        JLabel month = new JLabel("Enter valid Month: ");
-        JTextField monthText = new JTextField(1);
+        JLabel year = new JLabel("Enter valid Year (YYYY): ");
+        yearField = new JTextField(10);
+        panel.add(year, gbc);
+        panel.add(yearField, gbc);
 
-        JLabel day = new JLabel("Enter valid Day: ");
-        JTextField dayText = new JTextField(1);
+        JLabel month = new JLabel("Enter valid Month (MM): ");
+        monthField = new JTextField(10);
+        panel.add(month, gbc);
+        panel.add(monthField, gbc);
+
+        JLabel day = new JLabel("Enter valid Day (DD): ");
+        dayField = new JTextField(10);
+        panel.add(day, gbc);
+        panel.add(dayField, gbc);
 
         findValueEnter = new JButton("Enter");
+        findValueEnter.setActionCommand("findValueEnter");
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(findValueEnter, gbc);
+
+        valueFrame.add(panel);
+        valueFrame.pack();
+        valueFrame.setLocationRelativeTo(null);
+        valueFrame.setVisible(true);
     }
 
-    private void findCompositionWindow() {
-        JWindow compWindow = new JWindow();
+    public void findCompositionWindow() {
         JFrame compFrame = new JFrame("Find Composition at Date");
+        compFrame.setSize(400, 300);
 
-        JLabel year = new JLabel("Enter valid Year: ");
-        JTextField yearText = new JTextField(1);
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        JLabel month = new JLabel("Enter valid Month: ");
-        JTextField monthText = new JTextField(1);
+        JLabel year = new JLabel("Enter valid Year (YYYY): ");
+        yearField = new JTextField(10);
+        panel.add(year, gbc);
+        panel.add(yearField, gbc);
 
-        JLabel day = new JLabel("Enter valid Day: ");
-        JTextField dayText = new JTextField(1);
+        JLabel month = new JLabel("Enter valid Month (MM): ");
+        monthField = new JTextField(10);
+        panel.add(month, gbc);
+        panel.add(monthField, gbc);
+
+        JLabel day = new JLabel("Enter valid Day (DD): ");
+        dayField = new JTextField(10);
+        panel.add(day, gbc);
+        panel.add(dayField, gbc);
 
         findCompEnter = new JButton("Enter");
+        findCompEnter.setActionCommand("findCompositionEnter");
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(findCompEnter, gbc);
 
+        compFrame.add(panel);
+        compFrame.pack();
+        compFrame.setLocationRelativeTo(null);
+        compFrame.setVisible(true);
     }
 
-    private void loadNewPortfolio() {
-        final JFileChooser fileChoser = new JFileChooser("res/data/");
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv Files", ".csv");
-        fileChoser.setFileFilter(filter);
-        int retvalue = fileChoser.showOpenDialog(null);
+    public void loadNewPortfolio() {
+        final JFileChooser fileChooser = new JFileChooser("res/data/");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv Files", "csv");
+        fileChooser.setFileFilter(filter);
+        fileChooser.setApproveButtonText("Open");
+        int retvalue = fileChooser.showOpenDialog(null);
         if (retvalue == JFileChooser.APPROVE_OPTION) {
-            File f = fileChoser.getSelectedFile();
-            // TODO: model loads file into list of portfolios, updates portfolio
+            loadedPortfolioFile = fileChooser.getSelectedFile();
+            // TODO: Load portfolio from file
         }
-        loadNewPortfolio.setActionCommand("loadPortfolio");
     }
 
-    // controller should call the listeners below and then use the method from the model
+    public String getPortfolioName() {
+        return ((JTextField) ((JPanel) portfolioMenu.getContentPane().getComponent(0)).getComponent(1)).getText().trim();
+    }
+
+    public void addPortfolioToList(String portfolioName) {
+        portfolioListModel.addElement(portfolioName);
+    }
+
+    public void closePortfolioMenu() {
+        portfolioMenu.dispose();
+    }
+
+    public void displayMessage(String message) {
+        messageArea.append(message + "\n");
+    }
+
+    public void displayErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public String getTransactionType() {
+        return transactionTypeField.getText();
+    }
+
+    public String getStockTicker() {
+        return stockTickerField.getText();
+    }
+
+    public String getTransactionYear() {
+        return yearField.getText();
+    }
+
+    public String getTransactionMonth() {
+        return monthField.getText();
+    }
+
+    public String getTransactionDay() {
+        return dayField.getText();
+    }
+
+    public File getLoadedPortfolioFile() {
+        return loadedPortfolioFile;
+    }
+
     public void addCreateNewPortfolioListener(ActionListener listenForCreatePButton) {
         createNewPortfolioButton.addActionListener(listenForCreatePButton);
-        // should lead to JTextArea to enter portfolio name, then the main portfolio menu
     }
 
-    public void addLoadPortfolioListener(ActionListener listForLoad) {
-        loadNewPortfolio.addActionListener(listForLoad);
-        // have them load a new portfolio from xml
-    }
-
-    public void triggerTransactionWindow(ActionListener listenForTransaction) {
-        transactionWindow.addActionListener(listenForTransaction);//add button here
-        buyOrSellWindow(); // triggers the buy/sell window
-    }
-
-    public void triggerPortfolioMenuWindow(ActionListener listenForMenu) {
-        portfolioChooseMenuWindow(); // triggers the portfolio window
-    }
-
-    public void buyOrSellEnterButtonListener(ActionListener listenForBuyOrSell) {
+    public void addBuyOrSellEnterListener(ActionListener listenForBuyOrSell) {
         buyOrSellEnter.addActionListener(listenForBuyOrSell);
     }
 
-    //needs its own enter button
-    public void triggerValueButtonListenerWindow(ActionListener listenForValue) {
-        findValueWindow.addActionListener(listenForValue);
-    }
-    public void getValueButtonListener(ActionListener listenForValue) {
-
+    public void addFindValueEnterListener(ActionListener listenForValue) {
+        findValueEnter.addActionListener(listenForValue);
     }
 
-    //needs its own enter button
-    public void triggerCompositionButtonListenerWindow(ActionListener listenForComposition) {
-        findCompositionWindow.addActionListener(listenForComposition);
+    public void addFindCompEnterListener(ActionListener listenForComp) {
+        findCompEnter.addActionListener(listenForComp);
     }
 
-    public void getCompositionButtonListener(ActionListener listenForComp) {
-
-    }
-
-    public void savePortfolioButtonListener(ActionListener listenForSave) {
+    public void addSavePortfolioListener(ActionListener listenForSave) {
         savePortfolio.addActionListener(listenForSave);
     }
 
+    public void addLoadPortfolioListener(ActionListener listenForLoad) {
+        loadNewPortfolio.addActionListener(listenForLoad);
+    }
 
+    //testing
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrameView frameView = new JFrameView();
+            frameView.addPortfolioToList("Sample Portfolio 1");
+            frameView.addPortfolioToList("Sample Portfolio 2");
+
+            frameView.addCreateNewPortfolioListener(e -> frameView.createNewPortfolioWindow());
+            frameView.addBuyOrSellEnterListener(e -> frameView.displayMessage("Transaction entered."));
+            frameView.addFindValueEnterListener(e -> frameView.displayMessage("Value found."));
+            frameView.addFindCompEnterListener(e -> frameView.displayMessage("Composition found."));
+            frameView.addLoadPortfolioListener(e -> frameView.loadNewPortfolio());
+        });
+    }
 }
