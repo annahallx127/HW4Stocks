@@ -1,3 +1,4 @@
+import model.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,10 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import model.ModelPortfolio;
-import model.ModelStock;
-import model.Portfolio;
-import model.Stock;
 import parser.PortfolioReader;
 import parser.PortfolioWriter;
 
@@ -30,6 +27,7 @@ import parser.PortfolioWriter;
 public class PortfolioReaderTest {
   private Portfolio portfolio;
   private String writtenTestFile;
+  private Model model;
 
   /**
    * Rule to create a temporary folder for testing file operations.
@@ -46,6 +44,7 @@ public class PortfolioReaderTest {
    */
   @Before
   public void setUp() throws IOException {
+    model = new ModelImpl();
     portfolio = new ModelPortfolio("portfolioTest");
     portfolio.add(new ModelStock("AAPL"), 1, "2024-06-06");
     portfolio.add(new ModelStock("GOOG"), 2, "2024-06-06");
@@ -69,7 +68,7 @@ public class PortfolioReaderTest {
     try {
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser saxParser = factory.newSAXParser();
-      PortfolioReader reader = new PortfolioReader("portfolioTest");
+      PortfolioReader reader = new PortfolioReader("portfolioTest", model);
       saxParser.parse(writtenTestFile, reader);
       Map<Stock, Double> readerStocks = reader.getPortfolio().getStocks();
       Map<Stock, Double> portfolioStocks = portfolio.getStocks();

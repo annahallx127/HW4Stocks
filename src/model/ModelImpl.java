@@ -59,7 +59,7 @@ public class ModelImpl implements Model {
   @Override
   public Stock get(String symbol) throws IllegalArgumentException {
     // if present in data package, get the stock
-    if (Files.exists(Paths.get("src/data/api" + symbol + ".csv"))) {
+    if (Files.exists(Paths.get(System.getProperty("java.io.tmpdir") + symbol + ".csv").toAbsolutePath())) {
       Stock newStock = new ModelStock(symbol);
       stocks.put(symbol, newStock);
       return newStock;
@@ -104,22 +104,22 @@ public class ModelImpl implements Model {
     }
 
     // add a trailing slash if it doesn't exist
-    if (!path.endsWith("/")) {
-      path += "/";
+    if (!path.endsWith(String.valueOf(File.separatorChar))) {
+      path += File.separatorChar;
     }
 
-    Path namePath = Path.of(path + name + ".xml");
-    boolean nameInPath = namePath.toFile().exists() && !namePath.toFile().isDirectory();
+    //Path namePath = Path.of(path + name + ".xml");
+//    boolean nameInPath = namePath.toFile().exists() && !namePath.toFile().isDirectory();
 
-    if (!nameInPath) {
-      throw new IllegalArgumentException("The portfolio could not be loaded: " +
-              "the file does not exist or is not a .xml file.");
-    }
+//    if (!nameInPath) {
+//      throw new IllegalArgumentException("The portfolio could not be loaded: " +
+//              "the file does not exist or is not a .xml file.");
+//    }
 
     try {
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser saxParser = factory.newSAXParser();
-      PortfolioReader reader = new PortfolioReader(name);
+      PortfolioReader reader = new PortfolioReader(name, this);
       saxParser.parse(path + name, reader);
       portfolios.put(reader.getPortfolio().getName(), reader.getPortfolio());
     } catch (IllegalArgumentException e) {

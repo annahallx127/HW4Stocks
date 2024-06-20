@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +45,7 @@ public class JFrameView extends JFrame {
   }
 
   private void initializeComponents() {
+
     createNewPortfolioButton = new JButton("Create New Portfolio");
     createNewPortfolioButton.setActionCommand("createNewPortfolio");
 
@@ -359,16 +361,17 @@ public class JFrameView extends JFrame {
     compFrame.setVisible(true);
   }
 
-  public void loadNewPortfolio() {
-    final JFileChooser fileChooser = new JFileChooser("res/data/");
-    FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv Files", "csv");
+  public boolean loadNewPortfolio() {
+    final JFileChooser fileChooser = new JFileChooser(Path.of("res/data/portfolios").toAbsolutePath().toString());
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(".xml Files", "xml");
     fileChooser.setFileFilter(filter);
     fileChooser.setApproveButtonText("Open");
     int retvalue = fileChooser.showOpenDialog(null);
     if (retvalue == JFileChooser.APPROVE_OPTION) {
       loadedPortfolioFile = fileChooser.getSelectedFile();
-      // TODO: Load portfolio from file
+      return true;
     }
+    return false;
   }
 
   public String getPortfolioName() {
@@ -378,6 +381,7 @@ public class JFrameView extends JFrame {
   public void addPortfolioToList(String portfolioName) {
     portfolioListModel.addElement(portfolioName);
   }
+
 
   public void addSavePortfolioEnterListener(ActionListener listenForSave) {
     saveEnter.addActionListener(listenForSave);
@@ -421,6 +425,10 @@ public class JFrameView extends JFrame {
 
   public File getLoadedPortfolioFile() {
     return loadedPortfolioFile;
+  }
+
+  public String getLoadedPortfolioName() {
+    return loadedPortfolioFile.getName();
   }
 
   public void addCreateNewPortfolioListener(ActionListener listenForCreatePButton) {

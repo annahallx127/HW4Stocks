@@ -40,6 +40,7 @@ public interface Portfolio {
    *
    * @param s      the stock to add to the portfolio.
    * @param shares the number of shares bought.
+   * @param date the date on which the shares were bought.
    */
   void add(Stock s, double shares, String date);
 

@@ -1,15 +1,11 @@
 package parser;
 
+import model.*;
 import org.xml.sax.Attributes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
-import model.ModelPortfolio;
-import model.ModelStock;
-import model.Portfolio;
-import model.Stock;
 
 /**
  * A class that reads a stock portfolio from an XML file. This class extends StockReader
@@ -35,6 +31,7 @@ public class PortfolioReader extends StockReader {
   private Portfolio portfolio;
   private final String name;
   private StringBuilder data;
+  private final Model model;
 
   private String date;
   private String symbol;
@@ -48,9 +45,10 @@ public class PortfolioReader extends StockReader {
    *
    * @param name the name of the portfolio
    */
-  public PortfolioReader(String name) {
+  public PortfolioReader(String name, Model model) {
     this.name = name;
     this.shares = 0.0;
+    this.model = model;
   }
 
   /**
@@ -83,9 +81,13 @@ public class PortfolioReader extends StockReader {
    */
   @Override
   public void startElement(String uri, String localName, String qName, Attributes attributes) {
+    if(attributes.getValue(0) != null && !attributes.getQName(0).equals("index")) {
+      date = attributes.getValue(0);
+    }
+    System.out.println(date);
     if (qName.equalsIgnoreCase(name)) {
       startDocument();
-      date = attributes.getValue("date");
+//      date = attributes.getValue(0);
     } else if (qName.equalsIgnoreCase("stock")) {
       bStock = true;
     } else if (qName.equalsIgnoreCase("symbol")) {
@@ -114,13 +116,14 @@ public class PortfolioReader extends StockReader {
     } else if (bStock) {
       try {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        System.out.println(date);
         LocalDate validDate = LocalDate.parse(date, formatter);
-        Stock stock = new ModelStock(symbol);
+        Stock stock = model.get(symbol);
         portfolio.add(stock, shares, validDate.toString());
         this.reset();
         bStock = false;
       } catch (DateTimeParseException | IllegalArgumentException e) {
-        e.printStackTrace(System.err);
+        System.err.println("Error: " + e.getMessage());
       }
     }
   }
