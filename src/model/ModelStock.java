@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -45,13 +47,14 @@ public class ModelStock implements Stock {
   }
 
   private void readFile() {
-    try (FileReader fileReader = new FileReader("res/data/api/" + this.symbol + ".csv");
+    Path path = Path.of(System.getProperty("java.io.tmpdir") + symbol + ".csv");
+    try (FileReader fileReader = new FileReader(path.toFile());
          BufferedReader br = new BufferedReader(fileReader)) {
       while (br.ready()) {
         apiInfo.add(br.readLine());
       }
       if (this.apiInfo.isEmpty()) {
-        File file = new File("res/data/api/" + this.symbol + ".csv");
+        File file = new File(System.getProperty("java.io.tmpdir") + symbol + ".csv");
         file.delete();
         throw new IllegalArgumentException("No results found for stock " + symbol + ".");
       }
