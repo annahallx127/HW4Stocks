@@ -1,8 +1,30 @@
 package view;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JList;
+import javax.swing.DefaultListModel;
+import javax.swing.SwingConstants;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+
+
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,11 +37,11 @@ public class JFrameView extends JFrame {
 
   private JButton createNewPortfolioButton;
   private JButton loadNewPortfolio;
-  private JButton transactionWindow;
+
   private JButton buyOrSellEnter;
-  private JButton findValueWindow;
+
   private JButton findValueEnter;
-  private JButton findCompositionWindow;
+
   private JButton findCompEnter;
   private JButton savePortfolio;
   private JList<String> portfolioList;
@@ -157,6 +179,7 @@ public class JFrameView extends JFrame {
       String portfolioName = nameField.getText().trim();
       if (!portfolioName.isEmpty()) {
         addPortfolioToList(portfolioName);
+        displayMessage("Portfolio created: " + portfolioName);
         closePortfolioMenu();
       }
     });
@@ -212,7 +235,6 @@ public class JFrameView extends JFrame {
     gbc.fill = GridBagConstraints.NONE;
     panel.add(buyOrSellEnter, gbc);
 
-    // Add list of available stocks
     availableStocksListModel = new DefaultListModel<>();
     availableStocksList = new JList<>(availableStocksListModel);
     availableStocksList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -393,7 +415,7 @@ public class JFrameView extends JFrame {
     loadNewPortfolio.addActionListener(listenForLoad);
   }
 
-  // Method to parse valid stock symbols from a CSV file
+  // display the available stock symbols for the sake of a better looking/more user-friendly ui
   public Set<String> parseValidSymbols(String filePath) {
     Set<String> validSymbols = new HashSet<>();
     String line;
@@ -415,7 +437,6 @@ public class JFrameView extends JFrame {
     return validSymbols;
   }
 
-  // Method to load and display the available stock symbols
   private void loadAvailableStockSymbols(String filePath) {
     Set<String> validSymbols = parseValidSymbols(filePath);
     availableStocksListModel.clear();

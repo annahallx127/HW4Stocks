@@ -3,12 +3,15 @@ package controller;
 
 import model.Model;
 import model.Portfolio;
+import model.Stock;
 import view.JFrameView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import java.util.InputMismatchException;
 import java.util.Objects;
 
 public class JFrameControllerImpl implements ActionListener {
@@ -75,21 +78,81 @@ public class JFrameControllerImpl implements ActionListener {
     }
   }
 
-  // buy / sell
   private void handleTransaction() {
-    // implement transaction logic here
     String transactionType = view.getTransactionType().trim();
-    String stockTicker = view.getStockTicker().trim();
-    int sharesNum = Integer.parseInt(view.getNumOfShares().trim());
+    String stockTicker = view.getStockTicker().trim().toUpperCase();
+
+
+    int sharesNum;
+    try {
+      sharesNum = Integer.parseInt(view.getNumOfShares().trim());
+    } catch (NumberFormatException e) {
+      view.displayMessage(e.getMessage());
+      return;
+    }
+
+
     String year = view.getTransactionYear().trim();
     String month = view.getTransactionMonth().trim();
     String day = view.getTransactionDay().trim();
     Portfolio portfolio = model.getPortfolios().get(view.getPortfolioName());
 
+    Stock stock;
+
+    try {
+      stock = model.get(stockTicker);
+    } catch (IllegalArgumentException e) {
+      view.displayMessage("Invalid stock ticker. Try again.");
+      return;
+    }
+
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//    String ret = String.valueOf(portfolio.add(format.format(year + "-" + month + "-" + day)));
 
+    String date = year + "-" + month + "-" + day;
+    try {
+      date = format.format(format.parse(date));
+    } catch (ParseException e) {
+      view.displayErrorMessage("Invalid date format.");
+      return;
+    }
 
+    if (transactionType.equalsIgnoreCase("buy")) {
+      try {
+        portfolio.add(stock, sharesNum, date);
+      } catch (IllegalArgumentException e) {
+        if (e.getMessage().equals("Shares removed must be greater than zero.")) {
+          view.displayMessage("Shares removed must be greater than zero.");
+        } else if (e.getMessage().equals("Transaction date cannot be before the " +
+                "latest transaction date.")) {
+          view.displayMessage("Transaction date cannot be before the " +
+                  "latest transaction date.");
+        } else if (e.getMessage().equals("Cannot remove more shares than the " +
+                "number of shares present.")) {
+          view.displayMessage("Cannot remove more shares than the " +
+                  "number of shares present.");
+        }
+      }
+      view.displayMessage("Bought " + sharesNum + " share(s) of " + stock + " on " + date);
+    } else if (transactionType.equalsIgnoreCase("sell")) {
+      try {
+        portfolio.remove(stock, sharesNum, date);
+      } catch (IllegalArgumentException e) {
+        if (e.getMessage().equals("Shares removed must be greater than zero.")) {
+          view.displayMessage("Shares removed must be greater than zero.");
+        } else if (e.getMessage().equals("Transaction date cannot be before the " +
+                "latest transaction date.")) {
+          view.displayMessage("Transaction date cannot be before the " +
+                  "latest transaction date.");
+        } else if (e.getMessage().equals("Cannot remove more shares than the " +
+                "number of shares present.")) {
+          view.displayMessage("Cannot remove more shares than the " +
+                  "number of shares present.");
+        }
+      }
+      view.displayMessage(("Sold " + sharesNum + " share(s) of " + stock + " on " + date));
+    } else {
+      view.displayErrorMessage("Invalid transaction type.");
+    }
   }
 
   private void handleFindValue() {
@@ -124,6 +187,7 @@ public class JFrameControllerImpl implements ActionListener {
       view.displayMessage(ret);
     }
   }
+
 
   private void handleSavePortfolio() {
     String year = view.getTransactionYear().trim();
