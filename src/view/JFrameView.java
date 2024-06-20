@@ -169,7 +169,7 @@ public class JFrameView extends JFrame {
 
   public void buyOrSellWindow() {
     JFrame buySellWindowFrame = new JFrame("Buy or Sell Stock(s)");
-    buySellWindowFrame.setSize(500, 350); // Adjusted the size to be a bit smaller
+    buySellWindowFrame.setSize(500, 350);
 
     JPanel panel = new JPanel(new GridBagLayout());
     GridBagConstraints gbc = new GridBagConstraints();
@@ -222,7 +222,7 @@ public class JFrameView extends JFrame {
     panel.add(availableStocksLabel, gbc);
 
     JScrollPane scrollPane = new JScrollPane(availableStocksList);
-    scrollPane.setPreferredSize(new Dimension(480, 100)); // Set preferred size for better fit
+    scrollPane.setPreferredSize(new Dimension(480, 100));
     panel.add(scrollPane, gbc);
 
     buySellWindowFrame.add(panel);
@@ -230,7 +230,6 @@ public class JFrameView extends JFrame {
     buySellWindowFrame.setLocationRelativeTo(null);
     buySellWindowFrame.setVisible(true);
 
-    // Load available stock symbols from the CSV file
     loadAvailableStockSymbols("res/data/listing_status.csv");
   }
 
