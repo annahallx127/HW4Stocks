@@ -125,8 +125,6 @@ public class JFrameControllerImpl implements ActionListener {
     }
   }
 
-
-
   private void handleSavePortfolio() {
     String year = view.getTransactionYear().trim();
     String month = view.getTransactionMonth().trim();

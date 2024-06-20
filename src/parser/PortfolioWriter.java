@@ -56,7 +56,7 @@ public class PortfolioWriter implements StockWriter {
   public PortfolioWriter(String name, String date, String directory) throws IOException {
     try {
       if (directory.isEmpty()) {
-        directory = "res/data/portfolios/";
+        directory = System.getProperty("java.io.tmpdir");
       }
       if (!directory.endsWith("/")) {
         directory += "/";
