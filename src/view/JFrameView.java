@@ -1,30 +1,8 @@
 package view;
 
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JList;
-import javax.swing.DefaultListModel;
-import javax.swing.SwingConstants;
-import javax.swing.JOptionPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-
-
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
@@ -60,16 +38,45 @@ public class JFrameView extends JFrame {
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setSize(600, 500);
     setLocationRelativeTo(null);
+    initializeComponents();
     createMainMenuView();
     setVisible(true);
+  }
+
+  private void initializeComponents() {
+    createNewPortfolioButton = new JButton("Create New Portfolio");
+    createNewPortfolioButton.setActionCommand("createNewPortfolio");
+
+    loadNewPortfolio = new JButton("Load Portfolio");
+    loadNewPortfolio.setActionCommand("loadPortfolio");
+
+    buyOrSellEnter = new JButton("Enter Transaction");
+    buyOrSellEnter.setActionCommand("enterTransaction");
+
+    findValueEnter = new JButton("Enter");
+    findValueEnter.setActionCommand("findValueEnter");
+
+    findCompEnter = new JButton("Enter");
+    findCompEnter.setActionCommand("findCompositionEnter");
+
+    saveEnter = new JButton("Save Portfolio");
+    saveEnter.setActionCommand("savePortfolioEnter");
+
+    portfolioListModel = new DefaultListModel<>();
+    portfolioList = new JList<>(portfolioListModel);
+    portfolioList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    availableStocksListModel = new DefaultListModel<>();
+    availableStocksList = new JList<>(availableStocksListModel);
+    availableStocksList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    messageArea = new JTextArea(20, 30);
+    messageArea.setEditable(false);
   }
 
   private void createMainMenuView() {
     getContentPane().setLayout(new BorderLayout());
 
-    portfolioListModel = new DefaultListModel<>();
-    portfolioList = new JList<>(portfolioListModel);
-    portfolioList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     portfolioList.addListSelectionListener(e -> {
       if (!e.getValueIsAdjusting()) {
         showPortfolioMenu(portfolioList.getSelectedValue());
@@ -83,10 +90,6 @@ public class JFrameView extends JFrame {
     mainPanel.add(new JScrollPane(portfolioList), BorderLayout.CENTER);
 
     JPanel bottomLeftPanel = new JPanel(new GridLayout(2, 1));
-    createNewPortfolioButton = new JButton("Create New Portfolio");
-    createNewPortfolioButton.setActionCommand("createNewPortfolio");
-    loadNewPortfolio = new JButton("Load Portfolio");
-    loadNewPortfolio.setActionCommand("loadPortfolio");
     bottomLeftPanel.add(createNewPortfolioButton);
     bottomLeftPanel.add(loadNewPortfolio);
 
@@ -95,8 +98,6 @@ public class JFrameView extends JFrame {
 
     getContentPane().add(mainPanel, BorderLayout.WEST);
 
-    messageArea = new JTextArea(20, 30);
-    messageArea.setEditable(false);
     JScrollPane scrollPane = new JScrollPane(messageArea);
 
     JPanel rightPanel = new JPanel(new BorderLayout());
@@ -176,8 +177,6 @@ public class JFrameView extends JFrame {
     panel.add(dayLabel, gbc);
     panel.add(dayField, gbc);
 
-    saveEnter = new JButton("Save Portfolio");
-    saveEnter.setActionCommand("savePortfolioEnter");
     gbc.fill = GridBagConstraints.NONE;
     panel.add(saveEnter, gbc);
 
@@ -273,14 +272,8 @@ public class JFrameView extends JFrame {
     panel.add(numShares, gbc);
     panel.add(numField, gbc);
 
-    buyOrSellEnter = new JButton("Enter Transaction");
-    buyOrSellEnter.setActionCommand("enterTransaction");
     gbc.fill = GridBagConstraints.NONE;
     panel.add(buyOrSellEnter, gbc);
-
-    availableStocksListModel = new DefaultListModel<>();
-    availableStocksList = new JList<>(availableStocksListModel);
-    availableStocksList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
     JLabel availableStocksLabel = new JLabel("List of Available Stocks:");
     gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -297,7 +290,6 @@ public class JFrameView extends JFrame {
 
     loadAvailableStockSymbols("res/data/listing_status.csv");
   }
-
 
   public void findValueWindow() {
     JFrame valueFrame = new JFrame("Find Value at Date");
@@ -324,8 +316,6 @@ public class JFrameView extends JFrame {
     panel.add(day, gbc);
     panel.add(dayField, gbc);
 
-    findValueEnter = new JButton("Enter");
-    findValueEnter.setActionCommand("findValueEnter");
     gbc.fill = GridBagConstraints.NONE;
     panel.add(findValueEnter, gbc);
 
@@ -360,8 +350,6 @@ public class JFrameView extends JFrame {
     panel.add(day, gbc);
     panel.add(dayField, gbc);
 
-    findCompEnter = new JButton("Enter");
-    findCompEnter.setActionCommand("findCompositionEnter");
     gbc.fill = GridBagConstraints.NONE;
     panel.add(findCompEnter, gbc);
 
@@ -390,9 +378,11 @@ public class JFrameView extends JFrame {
   public void addPortfolioToList(String portfolioName) {
     portfolioListModel.addElement(portfolioName);
   }
+
   public void addSavePortfolioEnterListener(ActionListener listenForSave) {
     saveEnter.addActionListener(listenForSave);
   }
+
   public void closePortfolioMenu() {
     portfolioMenu.dispose();
   }
@@ -438,9 +428,7 @@ public class JFrameView extends JFrame {
   }
 
   public void addBuyOrSellEnterListener(ActionListener listenForBuyOrSell) {
-    if (buyOrSellEnter != null) {
-      buyOrSellEnter.addActionListener(listenForBuyOrSell);
-    }
+    buyOrSellEnter.addActionListener(listenForBuyOrSell);
   }
 
   public void addFindValueEnterListener(ActionListener listenForValue) {
@@ -450,7 +438,6 @@ public class JFrameView extends JFrame {
   public void addFindCompEnterListener(ActionListener listenForComp) {
     findCompEnter.addActionListener(listenForComp);
   }
-
 
   public void addLoadPortfolioListener(ActionListener listenForLoad) {
     loadNewPortfolio.addActionListener(listenForLoad);

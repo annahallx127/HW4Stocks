@@ -94,13 +94,12 @@ public class JFrameControllerImpl implements ActionListener {
 
     Portfolio portfolio = model.getPortfolios().get(view.getPortfolioName());
 
-
     if (year.isEmpty() || month.isEmpty() || day.isEmpty()) {
-      view.displayMessage("Portfolio saved with date: " + year + "-" + month + "-" + day);
+      view.displayErrorMessage("Please enter a valid date.");
+      return;
     }
 
     Stock stock;
-
     try {
       stock = model.get(stockTicker);
     } catch (IllegalArgumentException e) {
@@ -109,7 +108,6 @@ public class JFrameControllerImpl implements ActionListener {
     }
 
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
     String date = year + "-" + month + "-" + day;
     try {
       date = format.format(format.parse(date));
@@ -122,40 +120,23 @@ public class JFrameControllerImpl implements ActionListener {
       try {
         portfolio.add(stock, sharesNum, date);
       } catch (IllegalArgumentException e) {
-        if (e.getMessage().equals("Shares removed must be greater than zero.")) {
-          view.displayMessage("Shares removed must be greater than zero.");
-        } else if (e.getMessage().equals("Transaction date cannot be before the " +
-                "latest transaction date.")) {
-          view.displayMessage("Transaction date cannot be before the " +
-                  "latest transaction date.");
-        } else if (e.getMessage().equals("Cannot remove more shares than the " +
-                "number of shares present.")) {
-          view.displayMessage("Cannot remove more shares than the " +
-                  "number of shares present.");
-        }
+        view.displayErrorMessage(e.getMessage());
+        return;
       }
       view.displayMessage("Bought " + sharesNum + " share(s) of " + stock + " on " + date);
     } else if (transactionType.equalsIgnoreCase("sell")) {
       try {
         portfolio.remove(stock, sharesNum, date);
       } catch (IllegalArgumentException e) {
-        if (e.getMessage().equals("Shares removed must be greater than zero.")) {
-          view.displayMessage("Shares removed must be greater than zero.");
-        } else if (e.getMessage().equals("Transaction date cannot be before the " +
-                "latest transaction date.")) {
-          view.displayMessage("Transaction date cannot be before the " +
-                  "latest transaction date.");
-        } else if (e.getMessage().equals("Cannot remove more shares than the " +
-                "number of shares present.")) {
-          view.displayMessage("Cannot remove more shares than the " +
-                  "number of shares present.");
-        }
+        view.displayErrorMessage(e.getMessage());
+        return;
       }
       view.displayMessage(("Sold " + sharesNum + " share(s) of " + stock + " on " + date));
     } else {
       view.displayErrorMessage("Invalid transaction type.");
     }
   }
+
 
   private void handleFindValue() {
     String year = view.getTransactionYear().trim();
@@ -174,7 +155,6 @@ public class JFrameControllerImpl implements ActionListener {
     } else {
       view.displayMessage(ret);
     }
-
   }
 
   private void handleFindComposition() {
