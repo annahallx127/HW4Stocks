@@ -125,7 +125,7 @@ public class ModelImpl implements Model {
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("The portfolio could not be loaded: " + e.getMessage());
     } catch (ParserConfigurationException | SAXException | IOException e) {
-      System.err.println("Error when parsing the file: " + e.getMessage());
+      e.printStackTrace();
     }
   }
 

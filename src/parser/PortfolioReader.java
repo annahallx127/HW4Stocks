@@ -39,6 +39,7 @@ public class PortfolioReader extends StockReader {
   private boolean bStock = false;
   private boolean bSymbol = false;
   private boolean bShares = false;
+  private Transaction transaction;
 
   /**
    * Constructs a PortfolioReader instance to read and parse the specified portfolio file.
@@ -84,7 +85,6 @@ public class PortfolioReader extends StockReader {
     if(attributes.getValue(0) != null && !attributes.getQName(0).equals("index")) {
       date = attributes.getValue(0);
     }
-    System.out.println(date);
     if (qName.equalsIgnoreCase(name)) {
       startDocument();
 //      date = attributes.getValue(0);
@@ -116,10 +116,11 @@ public class PortfolioReader extends StockReader {
     } else if (bStock) {
       try {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        System.out.println(date);
         LocalDate validDate = LocalDate.parse(date, formatter);
         Stock stock = model.get(symbol);
+        transaction = new ModelTransaction(validDate, stock, shares, "buy");
         portfolio.add(stock, shares, validDate.toString());
+        portfolio.addTransaction(transaction);
         this.reset();
         bStock = false;
       } catch (DateTimeParseException | IllegalArgumentException e) {
@@ -144,5 +145,6 @@ public class PortfolioReader extends StockReader {
   private void reset() {
     symbol = "";
     shares = 0.0;
+    transaction = null;
   }
 }

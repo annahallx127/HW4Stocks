@@ -7,6 +7,7 @@ import view.JFrameView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class JFrameControllerImpl implements ActionListener {
     this.model = Objects.requireNonNull(model, "Model can not be null.");
 
     view.addCreateNewPortfolioListener(this);
+    view.addCreateNewPortfolioConfirmListener(this);
     view.addBuyOrSellEnterListener(this);
     view.addFindValueEnterListener(this);
     view.addFindCompEnterListener(this);
@@ -103,6 +105,7 @@ public class JFrameControllerImpl implements ActionListener {
       return;
     }
 
+    System.out.println(model.getPortfolios());
     Portfolio portfolio = model.getPortfolios().get(portfolioName);
     if (portfolio == null) {
       view.displayErrorMessage("Portfolio not found.");
@@ -145,7 +148,6 @@ public class JFrameControllerImpl implements ActionListener {
       view.displayErrorMessage(e.getMessage());
     }
   }
-
 
 
   private void handleFindValue() {
@@ -264,8 +266,9 @@ public class JFrameControllerImpl implements ActionListener {
   }
 
   private void handleLoadPortfolio() {
-    view.loadNewPortfolio();
-    model.loadPortfolio(view.getPortfolioName(), view.getLoadedPortfolioFile().getAbsolutePath());
-    view.displayMessage("Portfolio " + view.getPortfolioName() + " loaded.");
+    if (view.loadNewPortfolio()) {
+      model.loadPortfolio(view.getLoadedPortfolioName(), view.getLoadedPortfolioFile().getParent());
+    }
+    view.displayMessage("Portfolio " + view.getLoadedPortfolioName() + " loaded.");
   }
 }

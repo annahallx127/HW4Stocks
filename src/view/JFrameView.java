@@ -1,5 +1,7 @@
 package view;
 
+import controller.JFrameControllerImpl;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -19,6 +21,7 @@ public class JFrameView extends JFrame {
   private JFrame findCompFrame;
   private JFrame saveFrame;
   private JButton createNewPortfolioButton;
+  private JButton createConfirmButton;
   private JButton loadNewPortfolio;
   private JButton buyOrSellEnter;
   private JButton findValueEnter;
@@ -52,6 +55,8 @@ public class JFrameView extends JFrame {
     createNewPortfolioButton = new JButton("Create New Portfolio");
     createNewPortfolioButton.setActionCommand("createNewPortfolio");
 
+    createConfirmButton = new JButton("Create Portfolio");
+    createConfirmButton.setActionCommand("createPortfolioConfirm");
     loadNewPortfolio = new JButton("Load Portfolio");
     loadNewPortfolio.setActionCommand("loadPortfolio");
 
@@ -235,12 +240,10 @@ public class JFrameView extends JFrame {
       panel.add(nameLabel, gbc);
       panel.add(nameField, gbc);
 
-      JButton createButton = new JButton("Create Portfolio");
-      createButton.setPreferredSize(new Dimension(150, 25));
-      createButton.setActionCommand("createPortfolioConfirm");
-      panel.add(createButton, gbc);
+      createConfirmButton.setPreferredSize(new Dimension(150, 25));
+      panel.add(createConfirmButton, gbc);
 
-      createButton.addActionListener(e -> {
+      createConfirmButton.addActionListener(e -> {
         String portfolioName = nameField.getText().trim();
         if (!portfolioName.isEmpty()) {
           addPortfolioToList(portfolioName);
@@ -427,6 +430,7 @@ public class JFrameView extends JFrame {
     int retvalue = fileChooser.showOpenDialog(null);
     if (retvalue == JFileChooser.APPROVE_OPTION) {
       loadedPortfolioFile = fileChooser.getSelectedFile();
+      addPortfolioToList(loadedPortfolioFile.getName());
       return true;
     }
     return false;
@@ -452,7 +456,7 @@ public class JFrameView extends JFrame {
   }
 
   public void displayMessage(String message) {
-    messageArea.append(message + "\n");
+    messageArea.append(message + System.lineSeparator());
   }
 
   public void displayErrorMessage(String message) {
@@ -541,18 +545,22 @@ public class JFrameView extends JFrame {
     }
   }
 
-  // Testing
-  public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-      JFrameView frameView = new JFrameView();
-      frameView.addPortfolioToList("Sample Portfolio 1");
-      frameView.addPortfolioToList("Sample Portfolio 2");
-
-      frameView.addCreateNewPortfolioListener(e -> frameView.createNewPortfolioWindow());
-      frameView.addBuyOrSellEnterListener(e -> frameView.displayMessage("Transaction entered."));
-      frameView.addFindValueEnterListener(e -> frameView.displayMessage("Value found."));
-      frameView.addFindCompEnterListener(e -> frameView.displayMessage("Composition found."));
-      frameView.addLoadPortfolioListener(e -> frameView.loadNewPortfolio());
-    });
+  public void addCreateNewPortfolioConfirmListener(ActionListener listener) {
+    createConfirmButton.addActionListener(listener);
   }
+
+  // Testing
+//  public static void main(String[] args) {
+//    SwingUtilities.invokeLater(() -> {
+//      JFrameView frameView = new JFrameView();
+//      frameView.addPortfolioToList("Sample Portfolio 1");
+//      frameView.addPortfolioToList("Sample Portfolio 2");
+//
+//      frameView.addCreateNewPortfolioListener(e -> frameView.createNewPortfolioWindow());
+//      frameView.addBuyOrSellEnterListener(e -> frameView.displayMessage("Transaction entered."));
+//      frameView.addFindValueEnterListener(e -> frameView.displayMessage("Value found."));
+//      frameView.addFindCompEnterListener(e -> frameView.displayMessage("Composition found."));
+//      frameView.addLoadPortfolioListener(e -> frameView.loadNewPortfolio());
+//    });
+//  }
 }
