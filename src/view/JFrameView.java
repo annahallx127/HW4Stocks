@@ -85,6 +85,8 @@ public class JFrameView extends JFrame {
     getContentPane().add(rightPanel, BorderLayout.CENTER);
   }
 
+
+
   private void showPortfolioMenu(String portfolioName) {
     if (portfolioMenu != null) {
       portfolioMenu.dispose();
