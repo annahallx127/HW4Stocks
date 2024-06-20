@@ -4,7 +4,12 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class JFrameView extends JFrame {
 
@@ -30,6 +35,8 @@ public class JFrameView extends JFrame {
   private JFrame portfolioMenu;
   private File loadedPortfolioFile;
   private JTextArea messageArea;
+  private JList<String> availableStocksList;
+  private DefaultListModel<String> availableStocksListModel;
 
   public JFrameView() {
     super("I&A's Stock Investment Company");
@@ -84,8 +91,6 @@ public class JFrameView extends JFrame {
 
     getContentPane().add(rightPanel, BorderLayout.CENTER);
   }
-
-
 
   private void showPortfolioMenu(String portfolioName) {
     if (portfolioMenu != null) {
@@ -164,7 +169,7 @@ public class JFrameView extends JFrame {
 
   public void buyOrSellWindow() {
     JFrame buySellWindowFrame = new JFrame("Buy or Sell Stock(s)");
-    buySellWindowFrame.setSize(400, 300);
+    buySellWindowFrame.setSize(500, 350); // Adjusted the size to be a bit smaller
 
     JPanel panel = new JPanel(new GridBagLayout());
     GridBagConstraints gbc = new GridBagConstraints();
@@ -207,11 +212,29 @@ public class JFrameView extends JFrame {
     gbc.fill = GridBagConstraints.NONE;
     panel.add(buyOrSellEnter, gbc);
 
+    // Add list of available stocks
+    availableStocksListModel = new DefaultListModel<>();
+    availableStocksList = new JList<>(availableStocksListModel);
+    availableStocksList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    JLabel availableStocksLabel = new JLabel("List of Available Stocks:");
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    panel.add(availableStocksLabel, gbc);
+
+    JScrollPane scrollPane = new JScrollPane(availableStocksList);
+    scrollPane.setPreferredSize(new Dimension(480, 100)); // Set preferred size for better fit
+    panel.add(scrollPane, gbc);
+
     buySellWindowFrame.add(panel);
     buySellWindowFrame.pack();
     buySellWindowFrame.setLocationRelativeTo(null);
     buySellWindowFrame.setVisible(true);
+
+    // Load available stock symbols from the CSV file
+    loadAvailableStockSymbols("res/data/listing_status.csv");
   }
+
+
 
   public void findValueWindow() {
     JFrame valueFrame = new JFrame("Find Value at Date");
@@ -371,7 +394,38 @@ public class JFrameView extends JFrame {
     loadNewPortfolio.addActionListener(listenForLoad);
   }
 
-  //testing
+  // Method to parse valid stock symbols from a CSV file
+  public Set<String> parseValidSymbols(String filePath) {
+    Set<String> validSymbols = new HashSet<>();
+    String line;
+
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+      line = br.readLine();
+
+      while ((line = br.readLine()) != null) {
+        String[] columns = line.split(",");
+        String symbol = columns[0].trim();
+        if (!symbol.isEmpty()) {
+          validSymbols.add(symbol);
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return validSymbols;
+  }
+
+  // Method to load and display the available stock symbols
+  private void loadAvailableStockSymbols(String filePath) {
+    Set<String> validSymbols = parseValidSymbols(filePath);
+    availableStocksListModel.clear();
+    for (String symbol : validSymbols) {
+      availableStocksListModel.addElement(symbol);
+    }
+  }
+
+  // Testing
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
       JFrameView frameView = new JFrameView();

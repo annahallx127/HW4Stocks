@@ -1,7 +1,6 @@
 package controller;
 
-import controller.commands.PlotPortfolioCommand;
-import controller.commands.PortfolioValueCommand;
+
 import model.Model;
 import model.Portfolio;
 import view.JFrameView;
@@ -9,8 +8,7 @@ import view.JFrameView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 import java.util.Objects;
 
 public class JFrameControllerImpl implements ActionListener {
