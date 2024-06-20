@@ -13,7 +13,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class JFrameView extends JFrame {
-
+  private JFrame createNewPortfolioFrame;
+  private JFrame buySellWindowFrame;
+  private JFrame findValueFrame;
+  private JFrame findCompFrame;
+  private JFrame saveFrame;
   private JButton createNewPortfolioButton;
   private JButton loadNewPortfolio;
   private JButton buyOrSellEnter;
@@ -37,7 +41,7 @@ public class JFrameView extends JFrame {
   public JFrameView() {
     super("I&A's Stock Investment Company");
     setDefaultCloseOperation(EXIT_ON_CLOSE);
-    setSize(600, 500);
+    setSize(800, 500);
     setLocationRelativeTo(null);
     initializeComponents();
     createMainMenuView();
@@ -113,252 +117,303 @@ public class JFrameView extends JFrame {
   }
 
   private void showPortfolioMenu(String portfolioName) {
-    if (portfolioMenu != null) {
-      portfolioMenu.dispose();
+    if (portfolioMenu == null || !portfolioMenu.getTitle().equals("Portfolio Menu - " + portfolioName)) {
+      if (portfolioMenu != null) {
+        portfolioMenu.dispose();
+      }
+      portfolioMenu = new JFrame("Portfolio Menu - " + portfolioName);
+      portfolioMenu.setSize(400, 300);
+      portfolioMenu.setLocationRelativeTo(this);
+
+      JPanel panel = new JPanel(new GridBagLayout());
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = new Insets(5, 5, 5, 5);
+
+      JLabel nameLabel = new JLabel("Portfolio: " + portfolioName);
+      panel.add(nameLabel, gbc);
+
+      JButton transactionButton = new JButton("Buy or Sell Stock");
+      transactionButton.setActionCommand("buyOrSell");
+      transactionButton.addActionListener(e -> buyOrSellWindow());
+      panel.add(transactionButton, gbc);
+
+      JButton findValueButton = new JButton("Find Value");
+      findValueButton.setActionCommand("findValue");
+      findValueButton.addActionListener(e -> findValueWindow());
+      panel.add(findValueButton, gbc);
+
+      JButton findCompositionButton = new JButton("Find Composition");
+      findCompositionButton.setActionCommand("findComposition");
+      findCompositionButton.addActionListener(e -> findCompositionWindow());
+      panel.add(findCompositionButton, gbc);
+
+      JButton saveButton = new JButton("Save Portfolio");
+      saveButton.setActionCommand("savePortfolio");
+      saveButton.addActionListener(e -> savePortfolioWindow());
+      panel.add(saveButton, gbc);
+
+      portfolioMenu.add(panel);
+      portfolioMenu.pack();
+      portfolioMenu.setVisible(true);
+    } else {
+      portfolioMenu.setVisible(true);
     }
-    portfolioMenu = new JFrame("Portfolio Menu - " + portfolioName);
-    portfolioMenu.setSize(400, 300);
-    portfolioMenu.setLocationRelativeTo(this);
-
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(5, 5, 5, 5);
-
-    JLabel nameLabel = new JLabel("Portfolio: " + portfolioName);
-    panel.add(nameLabel, gbc);
-
-    JButton transactionButton = new JButton("Buy or Sell Stock");
-    transactionButton.setActionCommand("buyOrSell");
-    transactionButton.addActionListener(e -> buyOrSellWindow());
-    panel.add(transactionButton, gbc);
-
-    JButton findValueButton = new JButton("Find Value");
-    findValueButton.setActionCommand("findValue");
-    findValueButton.addActionListener(e -> findValueWindow());
-    panel.add(findValueButton, gbc);
-
-    JButton findCompositionButton = new JButton("Find Composition");
-    findCompositionButton.setActionCommand("findComposition");
-    findCompositionButton.addActionListener(e -> findCompositionWindow());
-    panel.add(findCompositionButton, gbc);
-
-    JButton saveButton = new JButton("Save Portfolio");
-    saveButton.setActionCommand("savePortfolio");
-    saveButton.addActionListener(e -> savePortfolioWindow());
-    panel.add(saveButton, gbc);
-
-    portfolioMenu.add(panel);
-    portfolioMenu.pack();
-    portfolioMenu.setVisible(true);
   }
 
   public void savePortfolioWindow() {
-    JFrame saveFrame = new JFrame("Save Portfolio");
-    saveFrame.setSize(400, 300);
+    if (saveFrame == null) {
+      saveFrame = new JFrame("Save Portfolio");
+      saveFrame.setSize(400, 300);
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(5, 5, 5, 5);
+      JPanel panel = new JPanel(new GridBagLayout());
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = new Insets(5, 5, 5, 5);
 
-    JLabel yearLabel = new JLabel("Enter Year (YYYY): ");
-    yearField = new JTextField(10);
-    panel.add(yearLabel, gbc);
-    panel.add(yearField, gbc);
+      JLabel yearLabel = new JLabel("Enter Year (YYYY): ");
+      yearField = new JTextField(10);
+      panel.add(yearLabel, gbc);
+      panel.add(yearField, gbc);
 
-    JLabel monthLabel = new JLabel("Enter Month (MM): ");
-    monthField = new JTextField(10);
-    panel.add(monthLabel, gbc);
-    panel.add(monthField, gbc);
+      JLabel monthLabel = new JLabel("Enter Month (MM): ");
+      monthField = new JTextField(10);
+      panel.add(monthLabel, gbc);
+      panel.add(monthField, gbc);
 
-    JLabel dayLabel = new JLabel("Enter Day (DD): ");
-    dayField = new JTextField(10);
-    panel.add(dayLabel, gbc);
-    panel.add(dayField, gbc);
+      JLabel dayLabel = new JLabel("Enter Day (DD): ");
+      dayField = new JTextField(10);
+      panel.add(dayLabel, gbc);
+      panel.add(dayField, gbc);
 
-    gbc.fill = GridBagConstraints.NONE;
-    panel.add(saveEnter, gbc);
+      gbc.fill = GridBagConstraints.NONE;
+      panel.add(saveEnter, gbc);
 
-    saveFrame.add(panel);
-    saveFrame.pack();
-    saveFrame.setLocationRelativeTo(null);
+      saveFrame.add(panel);
+      saveFrame.pack();
+      saveFrame.setLocationRelativeTo(null);
+
+      saveFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+          saveFrame = null;
+        }
+      });
+
+      saveEnter.addActionListener(e -> {
+        String year = yearField.getText().trim();
+        String month = monthField.getText().trim();
+        String day = dayField.getText().trim();
+        if (!year.isEmpty() && !month.isEmpty() && !day.isEmpty()) {
+          displayMessage("Portfolio saved with date: " + year + "-" + month + "-" + day);
+          saveFrame.dispose();
+        } else {
+          displayErrorMessage("Please enter a valid date.");
+        }
+      });
+    }
     saveFrame.setVisible(true);
-
-    saveEnter.addActionListener(e -> {
-      String year = yearField.getText().trim();
-      String month = monthField.getText().trim();
-      String day = dayField.getText().trim();
-      if (!year.isEmpty() && !month.isEmpty() && !day.isEmpty()) {
-        displayMessage("Portfolio saved with date: " + year + "-" + month + "-" + day);
-        saveFrame.dispose();
-      } else {
-        displayErrorMessage("Please enter a valid date.");
-      }
-    });
   }
 
   public void createNewPortfolioWindow() {
-    portfolioMenu = new JFrame("Create New Portfolio");
-    portfolioMenu.setSize(400, 300);
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(5, 5, 5, 5);
+    if (createNewPortfolioFrame == null) {
+      createNewPortfolioFrame = new JFrame("Create New Portfolio");
+      createNewPortfolioFrame.setSize(400, 300);
+      JPanel panel = new JPanel(new GridBagLayout());
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = new Insets(5, 5, 5, 5);
 
-    JLabel nameLabel = new JLabel("Enter Portfolio Name:");
-    JTextField nameField = new JTextField(15);
-    panel.add(nameLabel, gbc);
-    panel.add(nameField, gbc);
+      JLabel nameLabel = new JLabel("Enter Portfolio Name:");
+      JTextField nameField = new JTextField(15);
+      panel.add(nameLabel, gbc);
+      panel.add(nameField, gbc);
 
-    JButton createButton = new JButton("Create Portfolio");
-    createButton.setPreferredSize(new Dimension(150, 25));
-    createButton.setActionCommand("createPortfolioConfirm");
-    panel.add(createButton, gbc);
+      JButton createButton = new JButton("Create Portfolio");
+      createButton.setPreferredSize(new Dimension(150, 25));
+      createButton.setActionCommand("createPortfolioConfirm");
+      panel.add(createButton, gbc);
 
-    createButton.addActionListener(e -> {
-      String portfolioName = nameField.getText().trim();
-      if (!portfolioName.isEmpty()) {
-        addPortfolioToList(portfolioName);
-        displayMessage("Portfolio created: " + portfolioName);
-        closePortfolioMenu();
-      }
-    });
+      createButton.addActionListener(e -> {
+        String portfolioName = nameField.getText().trim();
+        if (!portfolioName.isEmpty()) {
+          addPortfolioToList(portfolioName);
+          displayMessage("Portfolio created: " + portfolioName);
+          closeCreateNewPortfolioWindow();
+        } else {
+          displayErrorMessage("Portfolio name cannot be empty.");
+        }
+      });
 
-    portfolioMenu.add(panel);
-    portfolioMenu.pack();
-    portfolioMenu.setLocationRelativeTo(null);
-    portfolioMenu.setVisible(true);
+      createNewPortfolioFrame.add(panel);
+      createNewPortfolioFrame.pack();
+      createNewPortfolioFrame.setLocationRelativeTo(null);
+
+      createNewPortfolioFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+          createNewPortfolioFrame = null;
+        }
+      });
+    }
+    createNewPortfolioFrame.setVisible(true);
   }
 
   public void buyOrSellWindow() {
-    JFrame buySellWindowFrame = new JFrame("Buy or Sell Stock(s)");
-    buySellWindowFrame.setSize(500, 350);
+    if (buySellWindowFrame == null) {
+      buySellWindowFrame = new JFrame("Buy or Sell Stock(s)");
+      buySellWindowFrame.setSize(500, 350);
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(5, 5, 5, 5);
+      JPanel panel = new JPanel(new GridBagLayout());
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = new Insets(5, 5, 5, 5);
 
-    JLabel transactionType = new JLabel("Transaction Type (buy/sell): ");
-    transactionTypeField = new JTextField(10);
-    panel.add(transactionType, gbc);
-    panel.add(transactionTypeField, gbc);
+      JLabel transactionType = new JLabel("Transaction Type (buy/sell): ");
+      transactionTypeField = new JTextField(10);
+      panel.add(transactionType, gbc);
+      panel.add(transactionTypeField, gbc);
 
-    JLabel stockLabel = new JLabel("Stock Ticker: ");
-    stockTickerField = new JTextField(10);
-    panel.add(stockLabel, gbc);
-    panel.add(stockTickerField, gbc);
+      JLabel stockLabel = new JLabel("Stock Ticker: ");
+      stockTickerField = new JTextField(10);
+      panel.add(stockLabel, gbc);
+      panel.add(stockTickerField, gbc);
 
-    JLabel yearLabel = new JLabel("Year of Transaction (YYYY): ");
-    yearField = new JTextField(10);
-    panel.add(yearLabel, gbc);
-    panel.add(yearField, gbc);
+      JLabel yearLabel = new JLabel("Year of Transaction (YYYY): ");
+      yearField = new JTextField(10);
+      panel.add(yearLabel, gbc);
+      panel.add(yearField, gbc);
 
-    JLabel monthLabel = new JLabel("Month of Transaction (MM): ");
-    monthField = new JTextField(10);
-    panel.add(monthLabel, gbc);
-    panel.add(monthField, gbc);
+      JLabel monthLabel = new JLabel("Month of Transaction (MM): ");
+      monthField = new JTextField(10);
+      panel.add(monthLabel, gbc);
+      panel.add(monthField, gbc);
 
-    JLabel dayLabel = new JLabel("Day of Transaction (DD): ");
-    dayField = new JTextField(10);
-    panel.add(dayLabel, gbc);
-    panel.add(dayField, gbc);
+      JLabel dayLabel = new JLabel("Day of Transaction (DD): ");
+      dayField = new JTextField(10);
+      panel.add(dayLabel, gbc);
+      panel.add(dayField, gbc);
 
-    JLabel numShares = new JLabel("Number of shares to buy/sell: ");
-    numField = new JTextField(10);
-    panel.add(numShares, gbc);
-    panel.add(numField, gbc);
+      JLabel numShares = new JLabel("Number of shares to buy/sell: ");
+      numField = new JTextField(10);
+      panel.add(numShares, gbc);
+      panel.add(numField, gbc);
 
-    gbc.fill = GridBagConstraints.NONE;
-    panel.add(buyOrSellEnter, gbc);
+      gbc.fill = GridBagConstraints.NONE;
+      panel.add(buyOrSellEnter, gbc);
 
-    JLabel availableStocksLabel = new JLabel("List of Available Stocks:");
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    panel.add(availableStocksLabel, gbc);
+      JLabel availableStocksLabel = new JLabel("List of Available Stocks:");
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      panel.add(availableStocksLabel, gbc);
 
-    JScrollPane scrollPane = new JScrollPane(availableStocksList);
-    scrollPane.setPreferredSize(new Dimension(480, 100));
-    panel.add(scrollPane, gbc);
+      JScrollPane scrollPane = new JScrollPane(availableStocksList);
+      scrollPane.setPreferredSize(new Dimension(480, 100));
+      panel.add(scrollPane, gbc);
 
-    buySellWindowFrame.add(panel);
-    buySellWindowFrame.pack();
-    buySellWindowFrame.setLocationRelativeTo(null);
+      buySellWindowFrame.add(panel);
+      buySellWindowFrame.pack();
+      buySellWindowFrame.setLocationRelativeTo(null);
+
+      buySellWindowFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+          buySellWindowFrame = null;
+        }
+      });
+
+      loadAvailableStockSymbols("res/data/listing_status.csv");
+    }
     buySellWindowFrame.setVisible(true);
-
-    loadAvailableStockSymbols("res/data/listing_status.csv");
   }
 
   public void findValueWindow() {
-    JFrame valueFrame = new JFrame("Find Value at Date");
-    valueFrame.setSize(400, 300);
+    if (findValueFrame == null) {
+      findValueFrame = new JFrame("Find Value at Date");
+      findValueFrame.setSize(400, 300);
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(5, 5, 5, 5);
+      JPanel panel = new JPanel(new GridBagLayout());
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = new Insets(5, 5, 5, 5);
 
-    JLabel year = new JLabel("Enter valid Year (YYYY): ");
-    yearField = new JTextField(10);
-    panel.add(year, gbc);
-    panel.add(yearField, gbc);
+      JLabel year = new JLabel("Enter valid Year (YYYY): ");
+      yearField = new JTextField(10);
+      panel.add(year, gbc);
+      panel.add(yearField, gbc);
 
-    JLabel month = new JLabel("Enter valid Month (MM): ");
-    monthField = new JTextField(10);
-    panel.add(month, gbc);
-    panel.add(monthField, gbc);
+      JLabel month = new JLabel("Enter valid Month (MM): ");
+      monthField = new JTextField(10);
+      panel.add(month, gbc);
+      panel.add(monthField, gbc);
 
-    JLabel day = new JLabel("Enter valid Day (DD): ");
-    dayField = new JTextField(10);
-    panel.add(day, gbc);
-    panel.add(dayField, gbc);
+      JLabel day = new JLabel("Enter valid Day (DD): ");
+      dayField = new JTextField(10);
+      panel.add(day, gbc);
+      panel.add(dayField, gbc);
 
-    gbc.fill = GridBagConstraints.NONE;
-    panel.add(findValueEnter, gbc);
+      gbc.fill = GridBagConstraints.NONE;
+      panel.add(findValueEnter, gbc);
 
-    valueFrame.add(panel);
-    valueFrame.pack();
-    valueFrame.setLocationRelativeTo(null);
-    valueFrame.setVisible(true);
+      findValueFrame.add(panel);
+      findValueFrame.pack();
+      findValueFrame.setLocationRelativeTo(null);
+
+      findValueFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+          findValueFrame = null;
+        }
+      });
+    }
+    findValueFrame.setVisible(true);
   }
 
   public void findCompositionWindow() {
-    JFrame compFrame = new JFrame("Find Composition at Date");
-    compFrame.setSize(400, 300);
+    if (findCompFrame == null) {
+      findCompFrame = new JFrame("Find Composition at Date");
+      findCompFrame.setSize(400, 300);
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridwidth = GridBagConstraints.REMAINDER;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.insets = new Insets(5, 5, 5, 5);
+      JPanel panel = new JPanel(new GridBagLayout());
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = new Insets(5, 5, 5, 5);
 
-    JLabel year = new JLabel("Enter valid Year (YYYY): ");
-    yearField = new JTextField(10);
-    panel.add(year, gbc);
-    panel.add(yearField, gbc);
+      JLabel year = new JLabel("Enter valid Year (YYYY): ");
+      yearField = new JTextField(10);
+      panel.add(year, gbc);
+      panel.add(yearField, gbc);
 
-    JLabel month = new JLabel("Enter valid Month (MM): ");
-    monthField = new JTextField(10);
-    panel.add(month, gbc);
-    panel.add(monthField, gbc);
+      JLabel month = new JLabel("Enter valid Month (MM): ");
+      monthField = new JTextField(10);
+      panel.add(month, gbc);
+      panel.add(monthField, gbc);
 
-    JLabel day = new JLabel("Enter valid Day (DD): ");
-    dayField = new JTextField(10);
-    panel.add(day, gbc);
-    panel.add(dayField, gbc);
+      JLabel day = new JLabel("Enter valid Day (DD): ");
+      dayField = new JTextField(10);
+      panel.add(day, gbc);
+      panel.add(dayField, gbc);
 
-    gbc.fill = GridBagConstraints.NONE;
-    panel.add(findCompEnter, gbc);
+      gbc.fill = GridBagConstraints.NONE;
+      panel.add(findCompEnter, gbc);
 
-    compFrame.add(panel);
-    compFrame.pack();
-    compFrame.setLocationRelativeTo(null);
-    compFrame.setVisible(true);
+      findCompFrame.add(panel);
+      findCompFrame.pack();
+      findCompFrame.setLocationRelativeTo(null);
+
+      findCompFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+          findCompFrame = null;
+        }
+      });
+    }
+    findCompFrame.setVisible(true);
   }
 
   public boolean loadNewPortfolio() {
@@ -375,11 +430,11 @@ public class JFrameView extends JFrame {
   }
 
   public String getPortfolioName() {
-    return ((JTextField) ((JPanel) portfolioMenu.getContentPane().getComponent(0)).getComponent(1)).getText().trim();
+    String selected = portfolioList.getSelectedValue();
+    return selected == null ? null : selected.trim();
   }
-
   public void addPortfolioToList(String portfolioName) {
-    portfolioListModel.addElement(portfolioName);
+    portfolioListModel.addElement(portfolioName.trim());
   }
 
 
@@ -387,8 +442,11 @@ public class JFrameView extends JFrame {
     saveEnter.addActionListener(listenForSave);
   }
 
-  public void closePortfolioMenu() {
-    portfolioMenu.dispose();
+  public void closeCreateNewPortfolioWindow() {
+    if (createNewPortfolioFrame != null) {
+      createNewPortfolioFrame.dispose();
+      createNewPortfolioFrame = null;
+    }
   }
 
   public void displayMessage(String message) {

@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
+import java.util.Date;
 import java.util.Objects;
 
 public class JFrameControllerImpl implements ActionListener {
@@ -66,14 +66,19 @@ public class JFrameControllerImpl implements ActionListener {
 
   private void handleCreateNewPortfolio() {
     String portfolioName = view.getPortfolioName();
-    if (!portfolioName.isEmpty() && !model.getPortfolios().containsKey(portfolioName)) {
+    if (portfolioName == null || portfolioName.isEmpty()) {
+      view.displayErrorMessage("Invalid portfolio name.");
+      return;
+    }
+
+    try {
       model.makePortfolio(portfolioName);
       view.addPortfolioToList(portfolioName);
       view.displayMessage("Portfolio created successfully.");
-      view.closePortfolioMenu();
-    } else {
-      view.displayErrorMessage("Invalid or existing portfolio name.");
+    } catch (IllegalArgumentException e) {
+      view.displayErrorMessage(e.getMessage());
     }
+    view.closeCreateNewPortfolioWindow();
   }
 
   private void handleTransaction() {
@@ -84,7 +89,7 @@ public class JFrameControllerImpl implements ActionListener {
     try {
       sharesNum = Integer.parseInt(view.getNumOfShares().trim());
     } catch (NumberFormatException e) {
-      view.displayErrorMessage(e.getMessage());
+      view.displayErrorMessage("Invalid number of shares.");
       return;
     }
 
@@ -92,7 +97,17 @@ public class JFrameControllerImpl implements ActionListener {
     String month = view.getTransactionMonth().trim();
     String day = view.getTransactionDay().trim();
 
-    Portfolio portfolio = model.getPortfolios().get(view.getPortfolioName());
+    String portfolioName = view.getPortfolioName();
+    if (portfolioName == null || portfolioName.isEmpty()) {
+      view.displayErrorMessage("Please select a valid portfolio.");
+      return;
+    }
+
+    Portfolio portfolio = model.getPortfolios().get(portfolioName);
+    if (portfolio == null) {
+      view.displayErrorMessage("Portfolio not found.");
+      return;
+    }
 
     if (year.isEmpty() || month.isEmpty() || day.isEmpty()) {
       view.displayErrorMessage("Please enter a valid date.");
@@ -116,59 +131,101 @@ public class JFrameControllerImpl implements ActionListener {
       return;
     }
 
-    if (transactionType.equalsIgnoreCase("buy")) {
-      try {
+    try {
+      if (transactionType.equalsIgnoreCase("buy")) {
         portfolio.add(stock, sharesNum, date);
-      } catch (IllegalArgumentException e) {
-        view.displayErrorMessage(e.getMessage());
-        return;
-      }
-      view.displayMessage("Bought " + sharesNum + " share(s) of " + stock + " on " + date);
-    } else if (transactionType.equalsIgnoreCase("sell")) {
-      try {
+        view.displayMessage("Bought " + sharesNum + " share(s) of " + stock + " on " + date);
+      } else if (transactionType.equalsIgnoreCase("sell")) {
         portfolio.remove(stock, sharesNum, date);
-      } catch (IllegalArgumentException e) {
-        view.displayErrorMessage(e.getMessage());
-        return;
+        view.displayMessage("Sold " + sharesNum + " share(s) of " + stock + " on " + date);
+      } else {
+        view.displayErrorMessage("Invalid transaction type.");
       }
-      view.displayMessage(("Sold " + sharesNum + " share(s) of " + stock + " on " + date));
-    } else {
-      view.displayErrorMessage("Invalid transaction type.");
+    } catch (IllegalArgumentException e) {
+      view.displayErrorMessage(e.getMessage());
     }
   }
+
 
 
   private void handleFindValue() {
     String year = view.getTransactionYear().trim();
     String month = view.getTransactionMonth().trim();
     String day = view.getTransactionDay().trim();
-    Portfolio portfolio = model.getPortfolios().get(view.getPortfolioName());
+    String portfolioName = view.getPortfolioName();
+
+    // Ensure portfolio exists
+    if (portfolioName == null || portfolioName.isEmpty()) {
+      view.displayErrorMessage("Please select a valid portfolio.");
+      return;
+    }
+
+    Portfolio portfolio = model.getPortfolios().get(portfolioName);
+    if (portfolio == null) {
+      view.displayErrorMessage("Portfolio not found.");
+      return;
+    }
+
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-    String ret = String.valueOf(portfolio.valueOfPortfolio(format.format(year
-            + "-" + month + "-" + day)));
+    String date = year + "-" + month + "-" + day;
+    try {
+      Date parsedDate = format.parse(date);
+      String formattedDate = format.format(parsedDate);
 
-    if (ret.equals("Cannot check portfolio value on weekend, please enter a market date.")) {
-      view.displayErrorMessage("Please Enter a Valid Market Date!");
-    } else if (ret.equals(("Date cannot be in the future."))) {
-      view.displayErrorMessage(("Date cannot be in the future."));
-    } else {
-      view.displayMessage(ret);
+      String ret = String.valueOf(portfolio.valueOfPortfolio(formattedDate));
+
+      if (ret.equals("Cannot check portfolio value on weekend, please enter a market date.")) {
+        view.displayErrorMessage("Please Enter a Valid Market Date!");
+      } else if (ret.equals("Date cannot be in the future.")) {
+        view.displayErrorMessage("Date cannot be in the future.");
+      } else {
+        view.displayMessage(ret);
+      }
+    } catch (ParseException e) {
+      view.displayErrorMessage("Invalid date format.");
+    } catch (IllegalArgumentException e) {
+      view.displayErrorMessage(e.getMessage());
     }
   }
+
 
   private void handleFindComposition() {
     String year = view.getTransactionYear().trim();
     String month = view.getTransactionMonth().trim();
     String day = view.getTransactionDay().trim();
+    String portfolioName = view.getPortfolioName();
+
+    // Ensure portfolio exists
+    if (portfolioName == null || portfolioName.isEmpty()) {
+      view.displayErrorMessage("Please select a valid portfolio.");
+      return;
+    }
+
+    Portfolio portfolio = model.getPortfolios().get(portfolioName);
+    if (portfolio == null) {
+      view.displayErrorMessage("Portfolio not found.");
+      return;
+    }
+
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-    Portfolio portfolio = model.getPortfolios().get(view.getPortfolioName());
-    String ret = portfolio.getCompositionAtDate(format.format(year + "-" + month + "-" + day));
-    if (ret.equals("No transactions have been made in this portfolio yet.")) {
-      view.displayErrorMessage("No transactions have been made in this portfolio yet.");
-    } else {
-      view.displayMessage(ret);
+    String date = year + "-" + month + "-" + day;
+    try {
+      Date parsedDate = format.parse(date);
+      String formattedDate = format.format(parsedDate);
+
+      String ret = portfolio.getCompositionAtDate(formattedDate);
+
+      if (ret.equals("No transactions have been made in this portfolio yet.")) {
+        view.displayErrorMessage("No transactions have been made in this portfolio yet.");
+      } else {
+        view.displayMessage(ret);
+      }
+    } catch (ParseException e) {
+      view.displayErrorMessage("Invalid date format.");
+    } catch (IllegalArgumentException e) {
+      view.displayErrorMessage(e.getMessage());
     }
   }
 
@@ -177,11 +234,31 @@ public class JFrameControllerImpl implements ActionListener {
     String year = view.getTransactionYear().trim();
     String month = view.getTransactionMonth().trim();
     String day = view.getTransactionDay().trim();
+    String portfolioName = view.getPortfolioName();
+
+    // Ensure portfolio exists
+    if (portfolioName == null || portfolioName.isEmpty()) {
+      view.displayErrorMessage("Please select a valid portfolio.");
+      return;
+    }
+
+    Portfolio portfolio = model.getPortfolios().get(portfolioName);
+    if (portfolio == null) {
+      view.displayErrorMessage("Portfolio not found.");
+      return;
+    }
+
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
+    String date = year + "-" + month + "-" + day;
     try {
-      model.savePortfolio(view.getPortfolioName(), format.format(year + "-" + month + "-" + day));
-      view.displayMessage("Portfolio " + view.getPortfolioName() + " saved.");
+      Date parsedDate = format.parse(date);
+      String formattedDate = format.format(parsedDate);
+
+      model.savePortfolio(portfolioName, formattedDate);
+      view.displayMessage("Portfolio " + portfolioName + " saved.");
+    } catch (ParseException e) {
+      view.displayErrorMessage("Invalid date format.");
     } catch (IllegalArgumentException e) {
       view.displayErrorMessage(e.getMessage());
     }
@@ -190,5 +267,6 @@ public class JFrameControllerImpl implements ActionListener {
   private void handleLoadPortfolio() {
     view.loadNewPortfolio();
     model.loadPortfolio(view.getPortfolioName(), view.getLoadedPortfolioFile().getAbsolutePath());
+    view.displayMessage("Portfolio " + view.getPortfolioName() + " loaded.");
   }
 }
