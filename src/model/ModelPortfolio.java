@@ -152,7 +152,7 @@ public class ModelPortfolio implements Portfolio {
 
     if (!isValidDateForPortfolio(date)) {
       throw new IllegalArgumentException("Cannot check portfolio value on weekend, " +
-              "please enter a market date");
+              "please enter a market date.");
     }
     LocalDate newDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
     LocalDate validDate = getValidMarketDateWeekend(date);

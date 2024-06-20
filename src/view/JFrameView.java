@@ -37,23 +37,18 @@ public class JFrameView extends JFrame {
 
   private JButton createNewPortfolioButton;
   private JButton loadNewPortfolio;
-
   private JButton buyOrSellEnter;
-
   private JButton findValueEnter;
-
   private JButton findCompEnter;
-  private JButton savePortfolio;
   private JList<String> portfolioList;
   private DefaultListModel<String> portfolioListModel;
-
   private JTextField transactionTypeField;
   private JTextField stockTickerField;
   private JTextField yearField;
+  private JButton saveEnter;
   private JTextField monthField;
   private JTextField dayField;
   private JTextField numField;
-
   private JFrame portfolioMenu;
   private File loadedPortfolioFile;
   private JTextArea messageArea;
@@ -148,12 +143,60 @@ public class JFrameView extends JFrame {
 
     JButton saveButton = new JButton("Save Portfolio");
     saveButton.setActionCommand("savePortfolio");
-    saveButton.addActionListener(e -> displayMessage("Portfolio saved."));
+    saveButton.addActionListener(e -> savePortfolioWindow());
     panel.add(saveButton, gbc);
 
     portfolioMenu.add(panel);
     portfolioMenu.pack();
     portfolioMenu.setVisible(true);
+  }
+
+  public void savePortfolioWindow() {
+    JFrame saveFrame = new JFrame("Save Portfolio");
+    saveFrame.setSize(400, 300);
+
+    JPanel panel = new JPanel(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridwidth = GridBagConstraints.REMAINDER;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.insets = new Insets(5, 5, 5, 5);
+
+    JLabel yearLabel = new JLabel("Enter Year (YYYY): ");
+    yearField = new JTextField(10);
+    panel.add(yearLabel, gbc);
+    panel.add(yearField, gbc);
+
+    JLabel monthLabel = new JLabel("Enter Month (MM): ");
+    monthField = new JTextField(10);
+    panel.add(monthLabel, gbc);
+    panel.add(monthField, gbc);
+
+    JLabel dayLabel = new JLabel("Enter Day (DD): ");
+    dayField = new JTextField(10);
+    panel.add(dayLabel, gbc);
+    panel.add(dayField, gbc);
+
+    saveEnter = new JButton("Save Portfolio");
+    saveEnter.setActionCommand("savePortfolioEnter");
+    gbc.fill = GridBagConstraints.NONE;
+    panel.add(saveEnter, gbc);
+
+    saveFrame.add(panel);
+    saveFrame.pack();
+    saveFrame.setLocationRelativeTo(null);
+    saveFrame.setVisible(true);
+
+    saveEnter.addActionListener(e -> {
+      String year = yearField.getText().trim();
+      String month = monthField.getText().trim();
+      String day = dayField.getText().trim();
+      if (!year.isEmpty() && !month.isEmpty() && !day.isEmpty()) {
+        displayMessage("Portfolio saved with date: " + year + "-" + month + "-" + day);
+        saveFrame.dispose();
+      } else {
+        displayErrorMessage("Please enter a valid date.");
+      }
+    });
   }
 
   public void createNewPortfolioWindow() {
@@ -256,7 +299,6 @@ public class JFrameView extends JFrame {
   }
 
 
-
   public void findValueWindow() {
     JFrame valueFrame = new JFrame("Find Value at Date");
     valueFrame.setSize(400, 300);
@@ -348,7 +390,9 @@ public class JFrameView extends JFrame {
   public void addPortfolioToList(String portfolioName) {
     portfolioListModel.addElement(portfolioName);
   }
-
+  public void addSavePortfolioEnterListener(ActionListener listenForSave) {
+    saveEnter.addActionListener(listenForSave);
+  }
   public void closePortfolioMenu() {
     portfolioMenu.dispose();
   }
@@ -407,9 +451,6 @@ public class JFrameView extends JFrame {
     findCompEnter.addActionListener(listenForComp);
   }
 
-  public void addSavePortfolioListener(ActionListener listenForSave) {
-    savePortfolio.addActionListener(listenForSave);
-  }
 
   public void addLoadPortfolioListener(ActionListener listenForLoad) {
     loadNewPortfolio.addActionListener(listenForLoad);

@@ -1,6 +1,5 @@
 package controller;
 
-
 import model.Model;
 import model.Portfolio;
 import model.Stock;
@@ -11,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.InputMismatchException;
 import java.util.Objects;
 
 public class JFrameControllerImpl implements ActionListener {
@@ -26,8 +24,8 @@ public class JFrameControllerImpl implements ActionListener {
     view.addBuyOrSellEnterListener(this);
     view.addFindValueEnterListener(this);
     view.addFindCompEnterListener(this);
-    view.addSavePortfolioListener(this);
     view.addLoadPortfolioListener(this);
+    view.addSavePortfolioEnterListener(this);
   }
 
   @Override
@@ -57,7 +55,7 @@ public class JFrameControllerImpl implements ActionListener {
       case "findCompositionEnter":
         handleFindComposition();
         break;
-      case "savePortfolio":
+      case "savePortfolioEnter":
         handleSavePortfolio();
         break;
       case "loadPortfolio":
@@ -82,27 +80,31 @@ public class JFrameControllerImpl implements ActionListener {
     String transactionType = view.getTransactionType().trim();
     String stockTicker = view.getStockTicker().trim().toUpperCase();
 
-
     int sharesNum;
     try {
       sharesNum = Integer.parseInt(view.getNumOfShares().trim());
     } catch (NumberFormatException e) {
-      view.displayMessage(e.getMessage());
+      view.displayErrorMessage(e.getMessage());
       return;
     }
-
 
     String year = view.getTransactionYear().trim();
     String month = view.getTransactionMonth().trim();
     String day = view.getTransactionDay().trim();
+
     Portfolio portfolio = model.getPortfolios().get(view.getPortfolioName());
+
+
+    if (year.isEmpty() || month.isEmpty() || day.isEmpty()) {
+      view.displayMessage("Portfolio saved with date: " + year + "-" + month + "-" + day);
+    }
 
     Stock stock;
 
     try {
       stock = model.get(stockTicker);
     } catch (IllegalArgumentException e) {
-      view.displayMessage("Invalid stock ticker. Try again.");
+      view.displayErrorMessage("Invalid stock ticker. Try again.");
       return;
     }
 
@@ -165,8 +167,10 @@ public class JFrameControllerImpl implements ActionListener {
     String ret = String.valueOf(portfolio.valueOfPortfolio(format.format(year
             + "-" + month + "-" + day)));
 
-    if (ret.equals("Cannot check portfolio value on weekend, please enter a market date")) {
+    if (ret.equals("Cannot check portfolio value on weekend, please enter a market date.")) {
       view.displayErrorMessage("Please Enter a Valid Market Date!");
+    } else if (ret.equals(("Date cannot be in the future."))) {
+      view.displayErrorMessage(("Date cannot be in the future."));
     } else {
       view.displayMessage(ret);
     }
