@@ -236,7 +236,6 @@ public class JFrameControllerImpl implements ActionListener {
     String day = view.getTransactionDay().trim();
     String portfolioName = view.getPortfolioName();
 
-    // Ensure portfolio exists
     if (portfolioName == null || portfolioName.isEmpty()) {
       view.displayErrorMessage("Please select a valid portfolio.");
       return;

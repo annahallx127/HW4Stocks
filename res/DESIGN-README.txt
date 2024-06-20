@@ -97,3 +97,22 @@ predefined target value (targetFirstValueAsterisks). This design allows for flex
 of data across different time intervals and ensures that the plot scales appropriately based on
 the total portfolio value. The use of enums makes it easy to manage and extend the intervals if
 needed.
+
+(Part 3)
+ADDITIONS
+We created a GUI called JFrameView that extends JFrame. The GUI allows users to create their
+own portfolio and buy/sell stocks, find value of the portfolio at a given date, and find the
+composition of the file at a given date. It also allows the user to save and load their portfolios.
+They can load portfolios through their computer as long as the specified format is followed.
+The UI is user-friendly and easy to follow, on the left there are a list of available portfolios.
+If it is empty, the user can select the options below of either creating a new portfolio or
+loading in their own. Once the portfolio is created, they can then query values and make
+transactions in that portfolio when they click on the name. To the right, there is a live update
+feed that repeats the actions of the user and reports the calculations the user has made. The
+program is closed upon exiting the main menu window. We thought was the best design because the
+user is able to evaluate what kind of actions they can take during the early steps of running the
+program. The user will not have to go looking for anything as most of the stuff is displayed at
+the get go. To go with the new view/gui, we created a new controller, implemented in
+JFrameControllerImpl. The model stayed the same because we would be using the same methods to
+query the values. The controller implementation is what will speak to the model on what to
+calculate/how to calculate and then the final result will then be displayed.

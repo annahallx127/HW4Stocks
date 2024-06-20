@@ -49,7 +49,6 @@ public class JFrameView extends JFrame {
   }
 
   private void initializeComponents() {
-
     createNewPortfolioButton = new JButton("Create New Portfolio");
     createNewPortfolioButton.setActionCommand("createNewPortfolio");
 
@@ -85,7 +84,11 @@ public class JFrameView extends JFrame {
 
     portfolioList.addListSelectionListener(e -> {
       if (!e.getValueIsAdjusting()) {
-        showPortfolioMenu(portfolioList.getSelectedValue());
+        String selectedValue = portfolioList.getSelectedValue();
+        if (selectedValue != null) {
+          showPortfolioMenu(selectedValue);
+          portfolioList.clearSelection();
+        }
       }
     });
 
@@ -436,7 +439,6 @@ public class JFrameView extends JFrame {
   public void addPortfolioToList(String portfolioName) {
     portfolioListModel.addElement(portfolioName.trim());
   }
-
 
   public void addSavePortfolioEnterListener(ActionListener listenForSave) {
     saveEnter.addActionListener(listenForSave);
