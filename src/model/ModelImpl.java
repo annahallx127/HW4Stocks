@@ -100,7 +100,7 @@ public class ModelImpl implements Model {
   public void loadPortfolio(String name, String path) throws IllegalArgumentException {
     // if path is empty, set it to the default path
     if (path.isEmpty()) {
-      path = "src/data/portfolios/";
+      path = System.getProperty("java.io.tmpdir");
     }
 
     // add a trailing slash if it doesn't exist
@@ -113,7 +113,7 @@ public class ModelImpl implements Model {
 
     if (!nameInPath) {
       throw new IllegalArgumentException("The portfolio could not be loaded: " +
-              "the file does not exist or is not a .XML file.");
+              "the file does not exist or is not a .xml file.");
     }
 
     try {
