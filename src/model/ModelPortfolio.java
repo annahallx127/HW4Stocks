@@ -401,6 +401,16 @@ public class ModelPortfolio implements Portfolio {
 
   @Override
   public void reBalancePortfolio(String reBalanceDate, Map<Stock, Integer> targetWeights) {
+
+    int totalWeight = targetWeights.values().stream().mapToInt(Integer::intValue).sum();
+    if (totalWeight != 100) {
+      throw new IllegalArgumentException("Total target weights must sum to 100%. " +
+              "The provided sum is " + totalWeight + "%.");
+    }
+    if (targetWeights.values().stream().anyMatch(weight -> weight < 0)) {
+      throw new IllegalArgumentException("Target weights cannot be negative.");
+    }
+
     LocalDate intendedDate = LocalDate.parse(reBalanceDate, DateTimeFormatter.ISO_LOCAL_DATE);
 
     if (intendedDate.getDayOfWeek() == DayOfWeek.SATURDAY || intendedDate.getDayOfWeek()

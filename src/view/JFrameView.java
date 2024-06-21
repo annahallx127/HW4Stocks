@@ -1,10 +1,28 @@
 package view;
 
-import controller.JFrameControllerImpl;
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JList;
+import javax.swing.DefaultListModel;
+import javax.swing.SwingConstants;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
-import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +32,16 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The JFrameView class is the graphical user interface for the Stock application,
+ * extending JFrame. It manages all user interactions for creating and managing
+ * investment portfolios, including operations like buying and selling stocks,
+ * and viewing portfolio value and composition on specific dates.
+ * This class utilizes various Swing components to facilitate user input and display,
+ * and integrates action listeners to connect UI events with backend processing.
+ * It is designed to provide an intuitive and efficient user experience for portfolio
+ * management within the application.
+ */
 public class JFrameView extends JFrame {
   private JFrame createNewPortfolioFrame;
   private JFrame buySellWindowFrame;
@@ -40,7 +68,16 @@ public class JFrameView extends JFrame {
   private JTextArea messageArea;
   private JList<String> availableStocksList;
   private DefaultListModel<String> availableStocksListModel;
+  private String currentPortfolioName;
 
+  /**
+   * Constructs an instance of JFrameView, setting basic properties like title, size, and
+   * visibility.
+   * Initializes all the UI components necessary for the main menu view. This constructor serves as
+   * the entry point for setting up the GUI framework of the application.
+   * It is responsible for initializing components, setting up the layout, and making the initial
+   * frame visible to the user.
+   */
   public JFrameView() {
     super("I&A's Stock Investment Company");
     setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -51,6 +88,7 @@ public class JFrameView extends JFrame {
     setVisible(true);
   }
 
+  //Initializes the buttons and sets the action commands for each button at the start
   private void initializeComponents() {
     createNewPortfolioButton = new JButton("Create New Portfolio");
     createNewPortfolioButton.setActionCommand("createNewPortfolio");
@@ -92,6 +130,7 @@ public class JFrameView extends JFrame {
         String selectedValue = portfolioList.getSelectedValue();
         if (selectedValue != null) {
           showPortfolioMenu(selectedValue);
+          currentPortfolioName = portfolioList.getSelectedValue().trim();
           portfolioList.clearSelection();
         }
       }
@@ -169,7 +208,10 @@ public class JFrameView extends JFrame {
       portfolioMenu.setVisible(true);
     }
   }
-
+  /**
+   * Displays the window for saving portfolios, prompting for date input.
+   * Handles saving actions with error checking for date validity.
+   */
   public void savePortfolioWindow() {
     if (saveFrame == null) {
       saveFrame = new JFrame("Save Portfolio");
@@ -225,6 +267,11 @@ public class JFrameView extends JFrame {
     saveFrame.setVisible(true);
   }
 
+
+  /**
+   * Opens a window for creating a new portfolio, allowing user input for the portfolio name.
+   * Ensures the name is valid and updates the main view upon successful creation.
+   */
   public void createNewPortfolioWindow() {
     if (createNewPortfolioFrame == null) {
       createNewPortfolioFrame = new JFrame("Create New Portfolio");
@@ -244,10 +291,10 @@ public class JFrameView extends JFrame {
       panel.add(createConfirmButton, gbc);
 
       createConfirmButton.addActionListener(e -> {
-        String portfolioName = nameField.getText().trim();
-        if (!portfolioName.isEmpty()) {
-          addPortfolioToList(portfolioName);
-          displayMessage("Portfolio created: " + portfolioName);
+        currentPortfolioName = nameField.getText().trim();
+        if (!currentPortfolioName.isEmpty()) {
+          displayMessage("Portfolio " + currentPortfolioName + " created successfully.");
+          addPortfolioToList(currentPortfolioName);
           closeCreateNewPortfolioWindow();
         } else {
           displayErrorMessage("Portfolio name cannot be empty.");
@@ -268,6 +315,11 @@ public class JFrameView extends JFrame {
     createNewPortfolioFrame.setVisible(true);
   }
 
+  /**
+   * Presents the user with a transaction window for executing buy or sell stock
+   * transactions, including transaction details.
+   * Validates user inputs and initiates the transaction process.
+   */
   public void buyOrSellWindow() {
     if (buySellWindowFrame == null) {
       buySellWindowFrame = new JFrame("Buy or Sell Stock(s)");
@@ -336,6 +388,10 @@ public class JFrameView extends JFrame {
     buySellWindowFrame.setVisible(true);
   }
 
+  /**
+   * Provides a window for users to find the total value of a portfolio on a specified date.
+   * Ensures date validity and displays the calculated value.
+   */
   public void findValueWindow() {
     if (findValueFrame == null) {
       findValueFrame = new JFrame("Find Value at Date");
@@ -379,6 +435,10 @@ public class JFrameView extends JFrame {
     findValueFrame.setVisible(true);
   }
 
+  /**
+   * Allows the user to view the composition of their portfolio at a chosen date.
+   * Useful for assessing asset allocation and diversity at specific times.
+   */
   public void findCompositionWindow() {
     if (findCompFrame == null) {
       findCompFrame = new JFrame("Find Composition at Date");
@@ -422,9 +482,16 @@ public class JFrameView extends JFrame {
     findCompFrame.setVisible(true);
   }
 
+  /**
+   * Facilitates the loading of a portfolio from file storage using a file chooser dialogue.
+   *
+   * @return boolean true if a portfolio is successfully loaded.
+   */
   public boolean loadNewPortfolio() {
-    final JFileChooser fileChooser = new JFileChooser(Path.of("res/data/portfolios").toAbsolutePath().toString());
-    FileNameExtensionFilter filter = new FileNameExtensionFilter(".xml Files", "xml");
+    final JFileChooser fileChooser = new JFileChooser(Path.of("res/data/portfolios")
+            .toAbsolutePath().toString());
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            ".xml Files", "xml");
     fileChooser.setFileFilter(filter);
     fileChooser.setApproveButtonText("Open");
     int retvalue = fileChooser.showOpenDialog(null);
@@ -436,18 +503,41 @@ public class JFrameView extends JFrame {
     return false;
   }
 
-  public String getPortfolioName() {
-    String selected = portfolioList.getSelectedValue();
-    return selected == null ? null : selected.trim();
+//  public String getPortfolioName() {
+//    int index = portfolioList.getFirstVisibleIndex();
+//    portfolioList.setSelectedIndex(index);
+//    String selected = portfolioList.getSelectedValue();
+//
+//    return selected == null ? null : selected.trim();
+//  }
+  /**
+   * Retrieves the name of the currently selected portfolio from the list.
+   * Useful for operations that require knowledge of the selected portfolio.
+   */
+  public String getCurrentPortfolioName() {
+    return currentPortfolioName;
   }
+
+  /**
+   * Adds a new portfolio name to the list in the GUI.
+   * Updates the display to reflect the addition of a new portfolio.
+   */
   public void addPortfolioToList(String portfolioName) {
     portfolioListModel.addElement(portfolioName.trim());
   }
 
+  /**
+   * Registers an ActionListener to handle the save operation when the save button is clicked.
+   * Facilitates external control over the save action in the application.
+   */
   public void addSavePortfolioEnterListener(ActionListener listenForSave) {
     saveEnter.addActionListener(listenForSave);
   }
 
+  /**
+   * Closes the window used for creating a new portfolio.
+   * Helps manage the GUI state by disposing of unnecessary windows.
+   */
   public void closeCreateNewPortfolioWindow() {
     if (createNewPortfolioFrame != null) {
       createNewPortfolioFrame.dispose();
@@ -455,68 +545,156 @@ public class JFrameView extends JFrame {
     }
   }
 
+  /**
+   * Appends a message to the main application's message area for user notifications.
+   * Used for both informational messages and operation confirmations.
+   */
   public void displayMessage(String message) {
     messageArea.append(message + System.lineSeparator());
   }
 
+  /**
+   * Shows an error message dialog box when user inputs are invalid or actions fail.
+   * Essential for guiding users to correct errors and improve data entry.
+   */
   public void displayErrorMessage(String message) {
-    JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    JOptionPane.showMessageDialog(
+            this, message, "Error", JOptionPane.ERROR_MESSAGE);
   }
 
+  /**
+   * Extracts and returns the transaction type specified by the user
+   * (buy/sell are the only valid options).
+   * Critical for determining the nature of stock transactions in the application.
+   */
   public String getTransactionType() {
     return transactionTypeField.getText();
   }
 
+  /**
+   * Retrieves the stock ticker symbol from the user input for transaction processing.
+   * Enables accurate identification and processing of stock transactions.
+   */
   public String getStockTicker() {
     return stockTickerField.getText();
   }
 
+  /**
+   * Obtains the year part of the transaction date entered by the user.
+   * Essential for chronological organization and validation of stock transactions.
+   */
   public String getTransactionYear() {
     return yearField.getText();
   }
 
+  /**
+   * Obtains the month part of the transaction date from user input.
+   * Plays a crucial role in date validation and temporal accuracy of transactions.
+   */
   public String getTransactionMonth() {
     return monthField.getText();
   }
 
+  /**
+   * Obtains the day component of the transaction date from user input.
+   * Helps ensure the precise timing of transactions for accurate record-keeping.
+   */
   public String getTransactionDay() {
     return dayField.getText();
   }
 
+  /**
+   * Obtains the number of shares involved in a transaction from user input.
+   */
   public String getNumOfShares() {
     return numField.getText();
   }
 
+  /**
+   * Gets the loaded portfolio the user has chosen from their computer.
+   *
+   * @return the loaded portfolio as a File
+   */
   public File getLoadedPortfolioFile() {
     return loadedPortfolioFile;
   }
 
+  /**
+   * Gets the name of the loaded portfolio file, aiding in identification within the application.
+   *
+   * @return the name of the loaded portfolio as a String.
+   */
   public String getLoadedPortfolioName() {
     return loadedPortfolioFile.getName();
   }
-
+  /**
+   * Adds an ActionListener to handle user interaction with the 'Create New Portfolio' button.
+   * Enables the creation of new portfolios through UI events.
+   *
+   * @param listenForCreatePButton the ActionListener that responds to the
+   *                               'Create New Portfolio' button click
+   */
   public void addCreateNewPortfolioListener(ActionListener listenForCreatePButton) {
     createNewPortfolioButton.addActionListener(listenForCreatePButton);
   }
 
+  /**
+   * Adds an ActionListener to manage the 'Buy or Sell' operation when triggered by the user.
+   * Central to facilitating stock trading actions directly from the interface.
+   *
+   * @param listenForBuyOrSell the ActionListener that responds to the
+   *                           'Buy or Sell' button click
+   */
   public void addBuyOrSellEnterListener(ActionListener listenForBuyOrSell) {
     buyOrSellEnter.addActionListener(listenForBuyOrSell);
   }
 
+  /**
+   * Registers an ActionListener to the 'Find Value' button to compute and
+   * display portfolio values.
+   * Enhances user capability to assess portfolio performance on specified dates.
+   *
+   * @param listenForValue the ActionListener that responds to the 'Find Value' button click
+   */
   public void addFindValueEnterListener(ActionListener listenForValue) {
     findValueEnter.addActionListener(listenForValue);
   }
 
+  /**
+   * Connects an ActionListener to the 'Find Composition' button to detail portfolio composition.
+   * Assists users in understanding their investment distribution on specific dates.
+   *
+   * @param listenForComp the ActionListener that responds to the 'Find Composition' button click
+   */
   public void addFindCompEnterListener(ActionListener listenForComp) {
     findCompEnter.addActionListener(listenForComp);
   }
 
+  /**
+   * Adds an ActionListener to the 'Load Portfolio' button, facilitating the loading of
+   * portfolio files.
+   * Essential for switching between different portfolio contexts in the application.
+   *
+   * @param listenForLoad the ActionListener that responds to the 'Load Portfolio' button click
+   */
   public void addLoadPortfolioListener(ActionListener listenForLoad) {
     loadNewPortfolio.addActionListener(listenForLoad);
   }
 
+  /**
+   * Adds an ActionListener to the 'Create Portfolio' confirmation button, which
+   * triggers the actual creation of a new portfolio.
+   * This method allows for the integration of business logic upon confirming
+   * the creation of a portfolio.
+   *
+   * @param listener the ActionListener that responds to the
+   *                 'Create Portfolio' confirmation button click
+   */
+  public void addCreateNewPortfolioConfirmListener(ActionListener listener) {
+    createConfirmButton.addActionListener(listener);
+  }
   // display the available stock symbols for the sake of a better looking/more user-friendly ui
-  public Set<String> parseValidSymbols(String filePath) {
+  private Set<String> parseValidSymbols(String filePath) {
     Set<String> validSymbols = new HashSet<>();
     String line;
 
@@ -545,22 +723,4 @@ public class JFrameView extends JFrame {
     }
   }
 
-  public void addCreateNewPortfolioConfirmListener(ActionListener listener) {
-    createConfirmButton.addActionListener(listener);
-  }
-
-  // Testing
-//  public static void main(String[] args) {
-//    SwingUtilities.invokeLater(() -> {
-//      JFrameView frameView = new JFrameView();
-//      frameView.addPortfolioToList("Sample Portfolio 1");
-//      frameView.addPortfolioToList("Sample Portfolio 2");
-//
-//      frameView.addCreateNewPortfolioListener(e -> frameView.createNewPortfolioWindow());
-//      frameView.addBuyOrSellEnterListener(e -> frameView.displayMessage("Transaction entered."));
-//      frameView.addFindValueEnterListener(e -> frameView.displayMessage("Value found."));
-//      frameView.addFindCompEnterListener(e -> frameView.displayMessage("Composition found."));
-//      frameView.addLoadPortfolioListener(e -> frameView.loadNewPortfolio());
-//    });
-//  }
 }

@@ -1,5 +1,8 @@
-The design of our program is based on the model view controller (MVC) architecture.
 (See line 50 for the changes and additions).
+
+(See line 102 for Part 3).
+
+The design of our program is based on the model view controller (MVC) architecture.
 Stocks are represented by the 'Stock' interface and implemented in the 'modelStock' class of
 the model package. They represent a single stock for a company, and store the stock's symbol, name,
 and the stock data for the stock. The stock data is stored in an ArrayList<String>, where each
@@ -65,7 +68,8 @@ also supports saving users portfolios to the application and loading user portfo
 specified format. Our program does not support re-balancing on the weekends, the user will have to
 enter a valid market date for them to re-balance their portfolio. Our model also now supports
 fractional shares, however, the user is not allowed to explicitly purchase or sell fractional shares.
-The only way for the user to have fractional shares is through re-balancing!
+The only way for the user to have fractional shares is through re-balancing! The re-balance method
+should now check that the target weights are valid or that they add up to 100.
 
 The model now has ModelTransaction class and Transaction interface which logs the type of transaction
 made by the user. This also helps keep track of the dates of each transaction to ensure
