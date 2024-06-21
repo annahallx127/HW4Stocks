@@ -1,6 +1,11 @@
 package parser;
 
-import model.*;
+import model.Portfolio;
+import model.Transaction;
+import model.Model;
+import model.Stock;
+import model.ModelPortfolio;
+import model.ModelTransaction;
 import org.xml.sax.Attributes;
 
 import java.time.LocalDate;
@@ -87,7 +92,6 @@ public class PortfolioReader extends StockReader {
     }
     if (qName.equalsIgnoreCase(name)) {
       startDocument();
-//      date = attributes.getValue(0);
     } else if (qName.equalsIgnoreCase("stock")) {
       bStock = true;
     } else if (qName.equalsIgnoreCase("symbol")) {

@@ -1,4 +1,10 @@
-import model.*;
+import model.Stock;
+import model.Portfolio;
+import model.Model;
+import model.ModelImpl;
+import model.ModelStock;
+import model.ModelPortfolio;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +58,8 @@ public class ModelImpl implements Model {
   @Override
   public Stock get(String symbol) throws IllegalArgumentException {
     // if present in data package, get the stock
-    if (Files.exists(Paths.get(System.getProperty("java.io.tmpdir") + symbol + ".csv").toAbsolutePath())) {
+    if (Files.exists(Paths.get(System.getProperty("java.io.tmpdir")
+            + symbol + ".csv").toAbsolutePath())) {
       Stock newStock = new ModelStock(symbol);
       stocks.put(symbol, newStock);
       return newStock;
@@ -107,14 +107,6 @@ public class ModelImpl implements Model {
     if (!path.endsWith(String.valueOf(File.separatorChar))) {
       path += File.separatorChar;
     }
-
-    //Path namePath = Path.of(path + name + ".xml");
-//    boolean nameInPath = namePath.toFile().exists() && !namePath.toFile().isDirectory();
-
-//    if (!nameInPath) {
-//      throw new IllegalArgumentException("The portfolio could not be loaded: " +
-//              "the file does not exist or is not a .xml file.");
-//    }
 
     try {
       SAXParserFactory factory = SAXParserFactory.newInstance();

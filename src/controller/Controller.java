@@ -51,7 +51,8 @@ public interface Controller {
    * Retrieves a map of all portfolios managed within the application. This can be used
    * for displaying portfolio summaries or for operations on multiple portfolios.
    *
-   * @return a map where each key is a portfolio name and each value is the corresponding Portfolio object.
+   * @return a map where each key is a portfolio name and each value is the corresponding
+   * Portfolio object.
    */
   Map<String, Portfolio> getPortfolios();
 
@@ -65,7 +66,8 @@ public interface Controller {
 
   /**
    * Saves the current state of a portfolio to persistent storage, typically a file, based on
-   * the given name and date. This method ensures that portfolio data can be retrieved at a later time.
+   * the given name and date. This method ensures that portfolio data can be retrieved at a
+   * later time.
    *
    * @param name the name of the portfolio to save.
    * @param date the date on which the portfolio is saved.
@@ -73,7 +75,8 @@ public interface Controller {
   void savePortfolio(String name, String date);
 
   /**
-   * Loads a portfolio from persistent storage based on its name. This method is useful for retrieving
+   * Loads a portfolio from persistent storage based on its name. This method is useful
+   * for retrieving
    * previously saved portfolio states.
    *
    * @param name the name of the portfolio to load.
@@ -83,8 +86,8 @@ public interface Controller {
 
   /**
    * Starts the main loop of the controller, processing user inputs and commands through the given
-   * scanner and executing operations as directed. This loop continues until it is explicitly terminated
-   * by the user or an exit command is executed.
+   * scanner and executing operations as directed. This loop continues until it is
+   * explicitly terminated by the user or an exit command is executed.
    *
    * @param controller the controller instance to run this method on.
    * @param view       the view interface for user interactions and displaying results.

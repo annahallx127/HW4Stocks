@@ -157,7 +157,8 @@ public class ControllerImpl implements Controller {
     }
   }
 
-  private static void handleCalculateGainOrLoss(Controller controller, Scanner scanner, View view) {
+  private static void handleCalculateGainOrLoss(
+          Controller controller, Scanner scanner, View view) {
     view.print("Enter ticker symbol: ");
     scanner.nextLine();
     String ticker = scanner.nextLine().toUpperCase();
@@ -416,7 +417,8 @@ public class ControllerImpl implements Controller {
     controller.executeCommand(command);
   }
 
-  private static void addAndBuyStock(Portfolio portfolio, Controller controller, Scanner scanner) {
+  private static void addAndBuyStock(
+          Portfolio portfolio, Controller controller, Scanner scanner) {
     while (true) {
       view.print("Enter ticker symbol: ");
       String ticker = scanner.nextLine().toUpperCase();
@@ -683,7 +685,8 @@ public class ControllerImpl implements Controller {
   }
 
   private static void viewCompositionOfPortfolioAtAnyDate(Portfolio portfolio,
-                                                          Controller controller, Scanner scanner) {
+                                                          Controller controller,
+                                                          Scanner scanner) {
     LocalDate date;
     String validDate;
     int year;

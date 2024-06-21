@@ -1,7 +1,9 @@
 package model;
 
-import java.io.*;
-import java.nio.file.Files;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -145,7 +147,7 @@ public class ModelStock implements Stock {
         }
       }
     }
-    if (ret.length() == 0) {
+    if (ret.isEmpty()) {
       return ret.append("None!").append(System.lineSeparator()).toString();
     }
     return ret.toString();
