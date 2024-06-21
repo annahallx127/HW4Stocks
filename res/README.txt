@@ -20,3 +20,7 @@ Note: The program will not be able to update the database if the user is not con
 internet. As such, data may become outdated if the user does not update the database regularly.
 The program comes with a preloaded database (AAPL and GOOG) for demonstration purposes, but
 any other stocks must be queried by the user.
+
+In the GUI:
+The user is able to buy and sell stocks, create, load, and save portfolios. As well as query
+the value and composition of the chosen portfolio.

@@ -51,8 +51,7 @@ public interface Controller {
    * Retrieves a map of all portfolios managed within the application. This can be used
    * for displaying portfolio summaries or for operations on multiple portfolios.
    *
-   * @return a map where each key is a portfolio name and each value is the corresponding
-   * Portfolio object.
+   * @return a map where each key is a portfolio name and each value is the corresponding object.
    */
   Map<String, Portfolio> getPortfolios();
 

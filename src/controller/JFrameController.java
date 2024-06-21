@@ -90,6 +90,8 @@ public class JFrameController implements ActionListener {
       case "loadPortfolio":
         handleLoadPortfolio();
         break;
+      default:
+        e.toString();
     }
   }
 

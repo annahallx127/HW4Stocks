@@ -5,6 +5,8 @@ import java.util.Scanner;
 import model.Model;
 import model.ModelImpl;
 
+import view.JFrameView;
+import view.JFrameViewImpl;
 import view.View;
 import view.ViewImpl;
 
@@ -21,11 +23,20 @@ public class ControllerMain {
    * @param args command-line arguments (not used)
    */
   public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    View view = new ViewImpl(System.out);
     Model model = new ModelImpl();
-    Controller controller = new ControllerImpl(model, view);
+    if (args.length > 0 && args[0].equals("-text")) {
+      Scanner scanner = new Scanner(System.in);
+      View view = new ViewImpl(System.out);
+      Controller controller = new ControllerImpl(model, view);
 
-    controller.runController(controller, view, scanner);
+      controller.runController(controller, view, scanner);
+    } else if (args.length == 0) {
+      model = new ModelImpl();
+      JFrameView view = new JFrameViewImpl();
+      new JFrameController(model, view);
+    } else {
+      System.err.println("Error with command line arguments");
+      System.exit(-1);
+    }
   }
 }

@@ -1,11 +1,12 @@
 package view;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
- * An abstract JFrame representation of the stock management program. This GUI allows the user to be able to add
+ * An abstract JFrame representation of the stock management program.
+ * This GUI allows the user to be able to add
  * portfolios, save and load portfolios, calculate the value, composition, and
  */
 public abstract class JFrameView extends JFrame {

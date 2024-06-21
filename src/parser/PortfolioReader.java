@@ -6,6 +6,7 @@ import model.Model;
 import model.Stock;
 import model.ModelPortfolio;
 import model.ModelTransaction;
+
 import org.xml.sax.Attributes;
 
 import java.time.LocalDate;
@@ -87,7 +88,7 @@ public class PortfolioReader extends StockReader {
    */
   @Override
   public void startElement(String uri, String localName, String qName, Attributes attributes) {
-    if(attributes.getValue(0) != null && !attributes.getQName(0).equals("index")) {
+    if (attributes.getValue(0) != null && !attributes.getQName(0).equals("index")) {
       date = attributes.getValue(0);
     }
     if (qName.equalsIgnoreCase(name)) {

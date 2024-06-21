@@ -1,13 +1,26 @@
 Setup using our program!
 
-Run the JAR File: Use this command to execute the program: java -jar HW4Stocks.jar
+For the text interface:
+java -jar HW4Stocks.jar -text
+
+For the GUI:
+java -jar HW4Stocks.jar
+
+Any other command line arguments will result in an error.
+Double-clicking on the jar file should work.
 
 
-last resort:
+
+
+
+very very last resort:
 You can run the program by placing the jar file into a new folder, then in the search bar of that
 folder you can delete the file directory and type "cmd" and enter
 this will lead you to the command prompt window, and you can type
+you might need the res folder.
 java -jar HW4Stocks.jar
+
+
 
 Reminder:
 *After every input you enter press enter/return!*
